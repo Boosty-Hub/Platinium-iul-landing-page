@@ -1115,7 +1115,6 @@ export default function IULLanding() {
             <p className={`text-sm ${t.textMuted} mb-8 max-w-md mx-auto`}>
               Cada mes que pasa sin un plan es dinero que pierdes para siempre. El interés compuesto no espera.
             </p>
-            </p>
             <a
               href="#consulta"
               className="inline-block bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-10 py-4 rounded-xl font-bold text-base no-underline hover:shadow-xl hover:shadow-[#1d9fa9]/25 transition-all animate-[pulse_3s_infinite]"
