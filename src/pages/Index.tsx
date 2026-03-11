@@ -9,6 +9,12 @@
 import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
+import heroFamilyImg from "@/assets/hero-family.jpg";
+import testimonial1Img from "@/assets/testimonial-1.jpg";
+import testimonial2Img from "@/assets/testimonial-2.jpg";
+import testimonial3Img from "@/assets/testimonial-3.jpg";
+import consultationImg from "@/assets/consultation.jpg";
+import familyHomeImg from "@/assets/family-home.jpg";
 
 // ─── BRAND TOKENS ────────────────────────────────────────────
 const BRAND = {
