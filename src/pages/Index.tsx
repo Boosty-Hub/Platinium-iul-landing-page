@@ -803,7 +803,7 @@ export default function IULLanding() {
 
       {/* ─── HOW IT WORKS ──────────────────────────────────── */}
       <section id="como-funciona" className="py-24 px-6" aria-labelledby="steps-heading">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <Anim>
             <div className="text-center mb-14">
               <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Proceso simple</p>
@@ -814,22 +814,38 @@ export default function IULLanding() {
             </div>
           </Anim>
 
-          {STEPS.map((s, i) => (
-            <Anim key={i} delay={i * 0.12}>
-              <div className="flex gap-7 mb-10 items-start">
-                <div className="shrink-0 w-20 h-20 flex items-center justify-center border-2 border-[#1d9fa9] rounded-2xl relative">
-                  <span className="text-3xl font-light text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>{s.n}</span>
-                  {i < STEPS.length - 1 && (
-                    <div className="absolute -bottom-11 left-1/2 w-[2px] h-10 bg-gradient-to-b from-[#1d9fa9]/40 to-transparent rounded" />
-                  )}
-                </div>
-                <div className="pt-1.5">
-                  <h3 className={`text-2xl font-semibold ${t.text} mb-2`} style={{ fontFamily: "'Playfair Display', serif" }}>{s.t}</h3>
-                  <p className={`text-[15px] ${t.textMid} leading-relaxed max-w-lg`}>{s.d}</p>
-                </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              {STEPS.map((s, i) => (
+                <Anim key={i} delay={i * 0.12}>
+                  <div className="flex gap-7 mb-10 items-start">
+                    <div className="shrink-0 w-20 h-20 flex items-center justify-center border-2 border-[#1d9fa9] rounded-2xl relative">
+                      <span className="text-3xl font-light text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>{s.n}</span>
+                      {i < STEPS.length - 1 && (
+                        <div className="absolute -bottom-11 left-1/2 w-[2px] h-10 bg-gradient-to-b from-[#1d9fa9]/40 to-transparent rounded" />
+                      )}
+                    </div>
+                    <div className="pt-1.5">
+                      <h3 className={`text-2xl font-semibold ${t.text} mb-2`} style={{ fontFamily: "'Playfair Display', serif" }}>{s.t}</h3>
+                      <p className={`text-[15px] ${t.textMid} leading-relaxed max-w-lg`}>{s.d}</p>
+                    </div>
+                  </div>
+                </Anim>
+              ))}
+            </div>
+            <Anim delay={0.3}>
+              <div className="hidden lg:block rounded-3xl overflow-hidden shadow-xl shadow-[#1d9fa9]/10 border border-[#1d9fa9]/10">
+                <img
+                  src={consultationImg}
+                  alt="Asesor financiero en consulta con una familia latina"
+                  className="w-full h-auto object-cover"
+                  width={512}
+                  height={320}
+                  loading="lazy"
+                />
               </div>
             </Anim>
-          ))}
+          </div>
         </div>
       </section>
 
