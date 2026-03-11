@@ -1,14 +1,1304 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+// ============================================================
+// FILE: src/pages/Index.tsx
+// Platinium Insurance Group — IUL Landing Page
+// Stack: React + Tailwind CSS + Supabase (Lovable)
+// DB: Supabase (leads table) + Edge Function → Kommo CRM
+// Domain: platiniuminsuranceusa.com
+// ============================================================
 
-const Index = () => {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
+import { useState, useEffect, useRef, useCallback, memo } from "react";
+import { Helmet } from "react-helmet-async";
+import { supabase } from "@/integrations/supabase/client";
+
+// ─── BRAND TOKENS ────────────────────────────────────────────
+const BRAND = {
+  primary: "#1d9fa9",
+  primaryDark: "#177D85",
+  primaryLight: "#28C4CF",
+  primaryGhost: "rgba(29,159,169,0.06)",
+  primaryBorder: "rgba(29,159,169,0.15)",
+} as const;
+
+// ─── SEO HEAD (react-helmet-async) ──────────────────────────
+const DOMAIN = "https://platiniuminsuranceusa.com";
+const SEO = {
+  title: "Seguro de Vida IUL para Latinos en Miami | Platinium Insurance Group",
+  description:
+    "Protege a tu familia y construye tu retiro con un Seguro de Vida Universal Indexado (IUL). Consulta gratuita en español. Aceptamos ITIN. Platinium Insurance Group, Miami FL.",
+  keywords:
+    "seguro de vida universal indexado, IUL, IUL para latinos, seguro de vida IUL Miami, IUL para hispanos, seguro de vida con ITIN, plan de retiro latinos USA, IUL vs 401k, seguro indexado en español, agente de seguros IUL Miami, cotización IUL gratis, seguro de vida permanente hispanos, IUL para retiro, IUL para pagar hipoteca, seguro de vida Doral, seguro de vida Hialeah, Platinium Insurance Group",
+  og_image: `${DOMAIN}/og-image.jpg`,
+  locale: "es_US",
 };
 
-export default Index;
+function SEOHead() {
+  return (
+    <Helmet>
+      <html lang="es" />
+      <title>{SEO.title}</title>
+      <meta name="description" content={SEO.description} />
+      <meta name="keywords" content={SEO.keywords} />
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+      <link rel="canonical" href={DOMAIN} />
+
+      {/* Open Graph */}
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content={DOMAIN} />
+      <meta property="og:title" content={SEO.title} />
+      <meta property="og:description" content={SEO.description} />
+      <meta property="og:image" content={SEO.og_image} />
+      <meta property="og:locale" content={SEO.locale} />
+      <meta property="og:site_name" content="Platinium Insurance Group" />
+
+      {/* Twitter */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={SEO.title} />
+      <meta name="twitter:description" content={SEO.description} />
+      <meta name="twitter:image" content={SEO.og_image} />
+
+      {/* Geo */}
+      <meta name="geo.region" content="US-FL" />
+      <meta name="geo.placename" content="Miami" />
+
+      {/* Preconnect fonts */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap"
+        rel="stylesheet"
+      />
+
+      {/* JSON-LD: LocalBusiness */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "InsuranceAgency",
+          name: "Platinium Insurance Group",
+          url: DOMAIN,
+          logo: `${DOMAIN}/logo.png`,
+          image: SEO.og_image,
+          description: SEO.description,
+          telephone: "+1-786-XXX-XXXX",
+          email: "info@platiniuminsuranceusa.com",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "DIRECCIÓN_AQUÍ",
+            addressLocality: "Miami",
+            addressRegion: "FL",
+            postalCode: "33XXX",
+            addressCountry: "US",
+          },
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: 25.7617,
+            longitude: -80.1918,
+          },
+          areaServed: [
+            { "@type": "City", name: "Miami" },
+            { "@type": "City", name: "Doral" },
+            { "@type": "City", name: "Hialeah" },
+            { "@type": "City", name: "Homestead" },
+            { "@type": "State", name: "Florida" },
+          ],
+          priceRange: "$$",
+          openingHoursSpecification: {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            opens: "09:00",
+            closes: "18:00",
+          },
+          sameAs: [
+            "https://www.instagram.com/platiniuminsurance",
+            "https://www.facebook.com/platiniuminsurance",
+          ],
+        })}
+      </script>
+
+      {/* JSON-LD: FAQPage */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: FAQS.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        })}
+      </script>
+
+      {/* JSON-LD: Service */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Service",
+          name: "Seguro de Vida Universal Indexado (IUL)",
+          provider: {
+            "@type": "InsuranceAgency",
+            name: "Platinium Insurance Group",
+          },
+          description:
+            "Seguro de vida permanente con acumulación de valor indexado al mercado, protección familiar y plan de retiro para la comunidad hispana en Miami.",
+          areaServed: { "@type": "State", name: "Florida" },
+          audience: {
+            "@type": "Audience",
+            audienceType: "Hispanos y latinos en Estados Unidos",
+          },
+        })}
+      </script>
+    </Helmet>
+  );
+}
+
+// ─── DATA ────────────────────────────────────────────────────
+
+const FAQS = [
+  {
+    q: "¿Qué es exactamente un Seguro de Vida Universal Indexado (IUL)?",
+    a: "Es un seguro de vida permanente que combina protección financiera para tu familia con un componente de acumulación de valor en efectivo. Tu dinero crece vinculado a índices del mercado como el S&P 500, pero con una protección: si el mercado baja, tu dinero no pierde valor gracias a un piso garantizado. Es protección + crecimiento en un solo instrumento.",
+  },
+  {
+    q: "¿El IUL es una inversión o un seguro?",
+    a: "Técnicamente es un seguro de vida, no un producto de inversión regulado por la SEC. Tu dinero no se invierte directamente en la bolsa de valores. En su lugar, gana intereses basados en el rendimiento de índices bursátiles, con límites de ganancia (cap) y un piso que protege contra pérdidas.",
+  },
+  {
+    q: "¿Puedo aplicar si tengo ITIN y no tengo número de Seguro Social?",
+    a: "Sí. Puedes aplicar con ITIN, pasaporte o matrícula consular, siempre que hayas declarado impuestos en los últimos años. Esto lo convierte en una herramienta accesible para inmigrantes que buscan protección y ahorro formal en Estados Unidos.",
+  },
+  {
+    q: "¿Cuánto necesito para comenzar?",
+    a: "Las primas son flexibles y se adaptan a tu presupuesto. Muchas familias comienzan con aportes desde $200 a $500 mensuales. Durante tu consulta gratuita, diseñamos un plan personalizado basado en tus ingresos, objetivos y situación familiar.",
+  },
+  {
+    q: "¿El IUL es mejor que un 401(k)?",
+    a: "Son herramientas diferentes que pueden complementarse. El 401(k) es excelente si tu empleador hace matching, pero tiene límites de contribución y penalidades por retiro anticipado. El IUL ofrece acceso a tu dinero sin penalidades mediante préstamos de la póliza, protección por fallecimiento y beneficios en vida.",
+  },
+  {
+    q: "He escuchado que el IUL es una estafa, ¿es verdad?",
+    a: "No es una estafa cuando se diseña y se explica correctamente. Las malas experiencias suelen venir de agentes que prometen rendimientos irreales o que no explican los costos. Por eso es crucial trabajar con un asesor licenciado que te muestre escenarios realistas y diseñe la póliza según tus necesidades reales.",
+  },
+  {
+    q: "¿Qué pasa si necesito dinero por una emergencia médica?",
+    a: "El IUL incluye riders para enfermedades crónicas, críticas y terminales. Si sufres un evento de salud grave, puedes acceder a un adelanto del beneficio por fallecimiento para cubrir gastos médicos o de manutención, sin esperar a que alguien fallezca.",
+  },
+  {
+    q: "¿Cuánto tiempo tarda en acumularse el valor en efectivo?",
+    a: "Los primeros años se enfocan en establecer la póliza. El crecimiento real se acelera a partir del año 5-7 gracias al interés compuesto. Por eso el IUL es una estrategia de mediano a largo plazo, ideal para personas que planifican su retiro con 15-30 años de anticipación.",
+  },
+];
+
+const NAV_LINKS = [
+  { label: "Beneficios", href: "#beneficios" },
+  { label: "Cómo Funciona", href: "#como-funciona" },
+  { label: "Comparativa", href: "#comparativa" },
+  { label: "Testimonios", href: "#testimonios" },
+  { label: "FAQ", href: "#faq" },
+];
+
+const BENEFITS = [
+  { icon: "🏠", title: "Protección Familiar", desc: "Asegura el futuro de tu familia con un beneficio por fallecimiento que cubre hipoteca, deudas y nivel de vida. Tu legado, garantizado." },
+  { icon: "📈", title: "Plan de Retiro", desc: "Construye tu jubilación con crecimiento indexado al mercado y acceso a tu dinero libre de impuestos mediante préstamos de la póliza." },
+  { icon: "🏡", title: "Paga tu Hipoteca", desc: "Usa el valor acumulado para liquidar tu hipoteca en 15-20 años en vez de 30. Tu casa libre de deudas, más rápido." },
+  { icon: "❤️", title: "Beneficios en Vida", desc: "Riders para enfermedades crónicas, críticas y terminales. Accede a tu beneficio cuando más lo necesitas, sin esperar." },
+  { icon: "💼", title: "Negocio Familiar", desc: "Protege tu negocio y planifica la sucesión patrimonial. Ideal para dueños de restaurantes, construcción y comercio." },
+  { icon: "🌎", title: "Acceso con ITIN", desc: "Aplica con ITIN, pasaporte o matrícula consular. Tu estatus migratorio no te impide proteger a tu familia." },
+];
+
+const STEPS = [
+  { n: "01", t: "Consulta Gratuita", d: "Hablamos sobre tu situación, tus metas y tu familia. Sin presión, sin compromiso. Solo información clara y honesta." },
+  { n: "02", t: "Diseño Personalizado", d: "Creamos un plan a tu medida: prima flexible, riders opcionales, estrategia de indexación ajustada a tu perfil y horizonte temporal." },
+  { n: "03", t: "Activación y Protección", d: "Desde el día uno tu familia está protegida. Tu póliza comienza a acumular valor en efectivo con el poder del interés compuesto." },
+  { n: "04", t: "Acompañamiento Continuo", d: "Revisamos tu póliza periódicamente, ajustamos contribuciones y te educamos para que aproveches cada beneficio de tu IUL." },
+];
+
+const BANK_VS_IUL = [
+  { f: "Rendimiento anual", b: "0.05% – 0.30%", i: "0% – 12% (con protección)" },
+  { f: "Protección ante caídas", b: "FDIC hasta $250K", i: "Piso garantizado 0%" },
+  { f: "Beneficio por fallecimiento", b: "Ninguno", i: "Desde $250,000+" },
+  { f: "Beneficios en vida", b: "Ninguno", i: "Enfermedades graves, crónicas, terminales" },
+  { f: "Ventaja fiscal", b: "Intereses gravables", i: "Crecimiento diferido, retiros libres*" },
+  { f: "Después de 20 años ($250/mes)", b: "≈ $61,500", i: "≈ $150,000 – $200,000+" },
+];
+
+const FULL_COMPARISON = [
+  { f: "Protección por fallecimiento", iul: true, bank: false, k: false, term: true },
+  { f: "Crecimiento vinculado al mercado", iul: true, bank: false, k: true, term: false },
+  { f: "Protección contra pérdidas (piso 0%)", iul: true, bank: true, k: false, term: false },
+  { f: "Acceso al dinero sin penalidades", iul: true, bank: true, k: false, term: false },
+  { f: "Beneficios fiscales en retiros", iul: true, bank: false, k: false, term: false },
+  { f: "Riders de enfermedades graves", iul: true, bank: false, k: false, term: false },
+  { f: "Cobertura de por vida", iul: true, bank: false, k: false, term: false },
+  { f: "Aplicable con ITIN", iul: true, bank: true, k: false, term: true },
+];
+
+const TABS = [
+  { t: "Latinos con ITIN", c: "Si declaras impuestos con ITIN, ya tienes lo que necesitas para comenzar. El IUL es una de las pocas herramientas financieras formales accesibles sin SSN. Transforma tu disciplina tributaria en un plan de retiro y protección real para tu familia." },
+  { t: "Dueños de Negocio", c: "Tu restaurante, tu negocio de limpieza, tu empresa de construcción: son el sustento de tu familia. El IUL protege ese legado con un beneficio por fallecimiento, riders para enfermedades graves y un plan de retiro que crece mientras tú trabajas." },
+  { t: "Transportistas 1099", c: "Sin 401(k), sin beneficios de empleador, sin red de seguridad. Como conductor independiente, el IUL te da lo que nadie más te ofrece: protección permanente, ahorro para retiro y acceso a tu dinero cuando lo necesites." },
+  { t: "Familias Jóvenes", c: "Entre más joven comiences, más poderoso es el interés compuesto. Protege a tus hijos desde hoy, asegura la casa familiar y construye un colchón financiero que crece con el tiempo." },
+];
+
+const TESTIMONIALS = [
+  { name: "María González", role: "Emprendedora, Miami", text: "Cuando llegué a este país solo tenía mi ITIN y muchos sueños. Nunca pensé que podría tener un plan de retiro formal. Hoy, después de 4 años con mi IUL, tengo protección para mi familia y un fondo que crece cada año.", stars: 5 },
+  { name: "Carlos Mendoza", role: "Transportista, Doral", text: "Como camionero independiente no tenía 401(k) ni beneficios. Mi agente me explicó todo con números reales, sin promesas falsas. Ahora tengo un plan que protege a mis hijos y me está ayudando a pagar mi casa más rápido.", stars: 5 },
+  { name: "Ana Patricia Ruiz", role: "Dueña de restaurante, Hialeah", text: "Al principio pensé que era demasiado bueno para ser verdad. Pero me mostraron los costos, los límites y los escenarios reales. Entendí que no es mágico, es una herramienta.", stars: 5 },
+];
+
+// ─── HOOKS ───────────────────────────────────────────────────
+
+function useInView(threshold = 0.12): [React.RefObject<HTMLDivElement>, boolean] {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setVisible(true);
+          obs.unobserve(el);
+        }
+      },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return [ref, visible];
+}
+
+function useScrollY() {
+  const [y, setY] = useState(0);
+  useEffect(() => {
+    const h = () => setY(window.scrollY);
+    window.addEventListener("scroll", h, { passive: true });
+    return () => window.removeEventListener("scroll", h);
+  }, []);
+  return y;
+}
+
+// ─── REUSABLE COMPONENTS ─────────────────────────────────────
+
+const Anim = memo(function Anim({
+  children,
+  delay = 0,
+  className = "",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const [ref, v] = useInView();
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: v ? 1 : 0,
+        transform: v ? "translateY(0)" : "translateY(32px)",
+        transition: `all 0.7s cubic-bezier(0.22,1,0.36,1) ${delay}s`,
+      }}
+    >
+      {children}
+    </div>
+  );
+});
+
+function CountUp({ end, suffix = "", prefix = "" }: { end: number; suffix?: string; prefix?: string }) {
+  const [c, setC] = useState(0);
+  const [ref, v] = useInView();
+  useEffect(() => {
+    if (!v) return;
+    let s = 0;
+    const step = end / 125;
+    const t = setInterval(() => {
+      s += step;
+      if (s >= end) {
+        setC(end);
+        clearInterval(t);
+      } else setC(Math.floor(s));
+    }, 16);
+    return () => clearInterval(t);
+  }, [v, end]);
+  return (
+    <span ref={ref}>
+      {prefix}
+      {c.toLocaleString()}
+      {suffix}
+    </span>
+  );
+}
+
+const CheckIcon = ({ className = "" }: { className?: string }) => (
+  <svg className={`w-5 h-5 flex-shrink-0 ${className}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
+const StarIcon = () => (
+  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+
+// ─── FORM HANDLER (Supabase + Kommo via Edge Function) ───────
+
+interface LeadFormData {
+  nombre: string;
+  telefono: string;
+  email: string;
+  interes: string;
+}
+
+function getUTMParams(): Record<string, string> {
+  const params = new URLSearchParams(window.location.search);
+  const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+  const result: Record<string, string> = {};
+  utmKeys.forEach((key) => {
+    const val = params.get(key);
+    if (val) result[key] = val.slice(0, 100);
+  });
+  return result;
+}
+
+async function submitLead(data: LeadFormData): Promise<{ ok: boolean; leadId?: string }> {
+  try {
+    const utms = getUTMParams();
+
+    // 1. Insertar en Supabase
+    const { data: lead, error } = await supabase
+      .from("leads")
+      .insert({
+        nombre: data.nombre,
+        telefono: data.telefono,
+        email: data.email,
+        interes: data.interes || "",
+        fuente: "landing-iul",
+        referrer: document.referrer || "direct",
+        user_agent: navigator.userAgent.slice(0, 500),
+        utm_source: utms.utm_source || null,
+        utm_medium: utms.utm_medium || null,
+        utm_campaign: utms.utm_campaign || null,
+        utm_content: utms.utm_content || null,
+        utm_term: utms.utm_term || null,
+      })
+      .select("id")
+      .single();
+
+    if (error) {
+      console.error("Error insertando lead en Supabase:", error);
+      return { ok: false };
+    }
+
+    // 2. Sincronizar con Kommo via Edge Function (fire-and-forget)
+    // No bloqueamos la UI — el lead ya está seguro en Supabase
+    if (lead?.id) {
+      supabase.functions
+        .invoke("sync-lead-to-kommo", {
+          body: { lead_id: lead.id },
+        })
+        .then((res) => {
+          if (res.error) console.warn("Kommo sync error (no-blocking):", res.error);
+        })
+        .catch((err) => console.warn("Kommo sync failed (no-blocking):", err));
+    }
+
+    return { ok: true, leadId: lead?.id };
+  } catch (err) {
+    console.error("Error en submitLead:", err);
+    return { ok: false };
+  }
+}
+
+// ─── MAIN COMPONENT ─────────────────────────────────────────
+
+export default function IULLanding() {
+  const [dark, setDark] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const scrollY = useScrollY();
+  const [form, setForm] = useState<LeadFormData>({ nombre: "", telefono: "", email: "", interes: "" });
+  const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [faqOpen, setFaqOpen] = useState<number | null>(null);
+  const [tab, setTab] = useState(0);
+
+  // Close mobile menu on resize
+  useEffect(() => {
+    const h = () => { if (window.innerWidth > 768) setMenuOpen(false); };
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, []);
+
+  // Prevent scroll when mobile menu open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formState === "loading") return;
+
+    // Basic validation
+    const phone = form.telefono.replace(/\D/g, "");
+    if (phone.length < 10) {
+      alert("Por favor ingresa un número de teléfono válido.");
+      return;
+    }
+    if (!form.email.includes("@") || !form.email.includes(".")) {
+      alert("Por favor ingresa un email válido.");
+      return;
+    }
+    // Sanitize inputs
+    const sanitized: LeadFormData = {
+      nombre: form.nombre.trim().slice(0, 100),
+      telefono: form.telefono.trim().slice(0, 20),
+      email: form.email.trim().toLowerCase().slice(0, 100),
+      interes: form.interes.slice(0, 50),
+    };
+
+    setFormState("loading");
+    const result = await submitLead(sanitized);
+    setFormState(result.ok ? "success" : "error");
+  }, [form, formState]);
+
+  const updateField = useCallback((field: keyof LeadFormData, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  // Theme classes
+  const t = dark
+    ? {
+        bg: "bg-[#0B1A1E]",
+        bg2: "bg-[#0F2229]",
+        card: "bg-[#0F2229]/80 border-[#1d9fa9]/15",
+        text: "text-[#E4EEF0]",
+        textMid: "text-[#94B3BB]",
+        textMuted: "text-[#6A8E98]",
+        nav: "bg-[#0B1A1E]/92",
+        divider: "border-[#1d9fa9]/10",
+        input: "bg-white/[0.04] border-white/10 text-[#E4EEF0]",
+        brandBg: "bg-[#1d9fa9]/[0.08]",
+        dangerBg: "bg-red-500/[0.05]",
+        successBg: "bg-[#1d9fa9]/[0.05]",
+      }
+    : {
+        bg: "bg-[#FAFCFC]",
+        bg2: "bg-[#F0F6F7]",
+        card: "bg-white/90 border-[#1d9fa9]/10",
+        text: "text-[#1A2E33]",
+        textMid: "text-[#4A6B73]",
+        textMuted: "text-[#7A9BA3]",
+        nav: "bg-[#FAFCFC]/92",
+        divider: "border-[#1d9fa9]/10",
+        input: "bg-black/[0.02] border-[#1d9fa9]/20 text-[#1A2E33]",
+        brandBg: "bg-[#1d9fa9]/[0.05]",
+        dangerBg: "bg-red-500/[0.03]",
+        successBg: "bg-[#1d9fa9]/[0.04]",
+      };
+
+  return (
+    <div className={`${t.bg} ${t.text} min-h-screen transition-colors duration-300`} style={{ fontFamily: "'DM Sans', sans-serif" }}>
+      <SEOHead />
+
+      {/* ─── NAVBAR ─────────────────────────────────────────── */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-xl transition-all duration-300 ${
+          scrollY > 50 ? `${t.nav} ${t.divider} border-b shadow-sm` : ""
+        }`}
+        role="navigation"
+        aria-label="Navegación principal"
+      >
+        <div className="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between">
+          {/* Logo */}
+          <a href="#" className="flex items-center gap-2.5 no-underline" aria-label="Platinium Insurance Group - Inicio">
+            <img
+              src="/logo.png"
+              alt="Platinium Insurance Group"
+              className="h-10 w-auto object-contain"
+              width={40}
+              height={40}
+              loading="eager"
+            />
+            <div className="hidden sm:block">
+              <div className="text-[15px] font-bold text-[#1d9fa9] leading-none tracking-wide">PLATINIUM INSURANCE</div>
+              <div className={`text-[9px] tracking-[3px] ${t.textMuted} uppercase`}>GROUP</div>
+            </div>
+          </a>
+
+          {/* Desktop nav */}
+          <div className="hidden lg:flex items-center gap-7">
+            {NAV_LINKS.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                className={`${t.textMid} hover:text-[#1d9fa9] text-sm font-medium transition-colors no-underline`}
+              >
+                {l.label}
+              </a>
+            ))}
+            <button
+              onClick={() => setDark(!dark)}
+              className={`${t.brandBg} ${t.divider} border rounded-full px-3 py-1.5 cursor-pointer flex items-center gap-1.5 transition-all hover:scale-105`}
+              aria-label={dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+            >
+              <span className="text-sm">{dark ? "☀️" : "🌙"}</span>
+              <span className={`text-[11px] ${t.textMid} font-semibold`}>{dark ? "Light" : "Dark"}</span>
+            </button>
+            <a
+              href="#consulta"
+              className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide no-underline hover:shadow-lg hover:shadow-[#1d9fa9]/20 transition-all hover:-translate-y-0.5"
+            >
+              Consulta Gratis
+            </a>
+          </div>
+
+          {/* Mobile buttons */}
+          <div className="flex lg:hidden items-center gap-3">
+            <button
+              onClick={() => setDark(!dark)}
+              className={`${t.divider} border rounded-lg p-2 cursor-pointer`}
+              aria-label={dark ? "Modo claro" : "Modo oscuro"}
+            >
+              <span className="text-base">{dark ? "☀️" : "🌙"}</span>
+            </button>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex flex-col gap-[5px] p-2 bg-transparent border-none cursor-pointer"
+              aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+              aria-expanded={menuOpen}
+            >
+              <span className={`w-[22px] h-[2px] bg-[#1d9fa9] transition-all ${menuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
+              <span className={`w-[22px] h-[2px] bg-[#1d9fa9] transition-all ${menuOpen ? "opacity-0" : ""}`} />
+              <span className={`w-[22px] h-[2px] bg-[#1d9fa9] transition-all ${menuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        {menuOpen && (
+          <div className={`lg:hidden ${t.nav} ${t.divider} border-t px-6 py-4`}>
+            {NAV_LINKS.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                onClick={() => setMenuOpen(false)}
+                className={`block py-3.5 ${t.textMid} no-underline text-base ${t.divider} border-b`}
+              >
+                {l.label}
+              </a>
+            ))}
+            <a
+              href="#consulta"
+              onClick={() => setMenuOpen(false)}
+              className="block text-center mt-4 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-lg font-bold no-underline"
+            >
+              Consulta Gratis
+            </a>
+          </div>
+        )}
+      </nav>
+
+      {/* ─── HERO ──────────────────────────────────────────── */}
+      <section className="min-h-screen flex items-center relative overflow-hidden" aria-label="Inicio">
+        {/* Decorative */}
+        <div className="absolute top-[8%] right-[3%] w-80 h-80 rounded-full border border-[#1d9fa9]/[0.06] animate-[spin_80s_linear_infinite] pointer-events-none" />
+        <div className="absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-6 pt-36 pb-20 relative z-10">
+          <div className="max-w-3xl">
+            {/* Badge */}
+            <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-5 py-2 mb-7 animate-[fadeUp_0.8s_ease]`}>
+              <span className="w-2 h-2 rounded-full bg-[#1d9fa9] shadow-[0_0_8px_rgba(29,159,169,0.5)]" />
+              <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">
+                Asesoría Financiera para Latinos en Miami
+              </span>
+            </div>
+
+            {/* H1 */}
+            <h1
+              className={`text-4xl sm:text-5xl lg:text-6xl font-normal leading-[1.1] mb-6 ${t.text}`}
+              style={{ fontFamily: "'Playfair Display', Georgia, serif", animationDelay: "0.1s", animationFillMode: "both" }}
+            >
+              Protege a tu familia.{" "}
+              <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
+                Construye tu retiro.
+              </span>
+              <br />
+              <span className={`${t.textMuted} text-[0.6em] font-normal`}>Todo en un solo plan.</span>
+            </h1>
+
+            <p className={`text-lg leading-relaxed ${t.textMid} max-w-xl mb-9`}>
+              El Seguro de Vida Universal Indexado (IUL) te permite crecer tu dinero vinculado al mercado{" "}
+              <strong className={t.text}>sin riesgo de pérdida</strong>, con protección permanente para tu familia y acceso a tu dinero cuando lo necesites.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3.5 mb-10">
+              <a
+                href="#consulta"
+                className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-9 py-4 rounded-lg font-bold text-base tracking-wide no-underline hover:shadow-xl hover:shadow-[#1d9fa9]/25 transition-all hover:-translate-y-0.5 text-center"
+              >
+                Agenda tu Consulta Gratis →
+              </a>
+              <a
+                href="#como-funciona"
+                className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold text-[15px] no-underline hover:bg-[#1d9fa9]/10 transition-all text-center"
+              >
+                ¿Cómo funciona?
+              </a>
+            </div>
+
+            {/* Trust badges */}
+            <div className="flex flex-wrap gap-6" aria-label="Garantías">
+              {[["Aplicable con ", "ITIN"], ["Piso garantizado ", "0%"], ["Consulta ", "100% gratis"]].map(([pre, bold], i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <CheckIcon className="text-[#1d9fa9]" />
+                  <span className={`text-sm ${t.textMid}`}>
+                    {pre}
+                    <strong className={t.text}>{bold}</strong>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-9 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+          <span className={`text-[10px] tracking-[2px] ${t.textMuted} uppercase`}>Descubre más</span>
+          <svg className="w-5 h-5 text-[#1d9fa9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <polyline points="19 12 12 19 5 12" />
+          </svg>
+        </div>
+      </section>
+
+      {/* ─── STATS BAR ─────────────────────────────────────── */}
+      <section className={`${t.bg2} ${t.divider} border-y`} aria-label="Estadísticas del mercado">
+        <div className="max-w-7xl mx-auto px-6 py-11 flex flex-col sm:flex-row justify-around items-center gap-5 sm:gap-4 flex-wrap">
+          {[
+            { v: <CountUp end={3710} prefix="$" suffix="B" />, l: "Mercado de seguros EE.UU. para 2033" },
+            { v: <CountUp end={62} suffix="M" />, l: "Hispanos en Estados Unidos" },
+            { v: "0%", l: "Piso garantizado en caídas de mercado" },
+            { v: <CountUp end={12} suffix="%" />, l: "Cap de rendimiento anual potencial" },
+          ].map((s, i) => (
+            <Anim key={i} delay={i * 0.1}>
+              <div className="text-center min-w-[170px]">
+                <div className="text-4xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>{s.v}</div>
+                <div className={`text-[11px] ${t.textMuted} mt-1.5 tracking-wide max-w-[170px]`}>{s.l}</div>
+              </div>
+            </Anim>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── PAIN POINTS ───────────────────────────────────── */}
+      <section className="py-24 px-6" aria-labelledby="pain-heading">
+        <div className="max-w-4xl mx-auto text-center">
+          <Anim>
+            <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">¿Te identificas?</p>
+            <h2
+              id="pain-heading"
+              className={`text-3xl sm:text-4xl font-normal leading-tight ${t.text} mb-4`}
+              style={{ fontFamily: "'Playfair Display', serif" }}
+            >
+              Si trabajas duro pero <em className="text-[#1d9fa9]">no tienes un plan</em>,<br />tu esfuerzo no está protegido
+            </h2>
+            <div className="w-16 h-[3px] bg-gradient-to-r from-transparent via-[#1d9fa9] to-transparent mx-auto mt-5 mb-10 rounded" />
+          </Anim>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+            {[
+              "Trabajas como independiente (1099) y no tienes 401(k) ni beneficios de retiro",
+              "Tu cuenta de ahorro genera menos del 0.3% de interés al año",
+              "No sabes qué pasaría con tu familia si algo te ocurre mañana",
+              "Tienes ITIN pero crees que no puedes acceder a productos financieros formales",
+              "Tu hipoteca te tomará 30 años pagarla al ritmo actual",
+              "Has escuchado del IUL pero no sabes si es real o una estafa",
+            ].map((p, i) => (
+              <Anim key={i} delay={i * 0.06}>
+                <div className={`flex gap-3 p-4 ${t.dangerBg} border border-red-500/10 rounded-xl`}>
+                  <span className="text-red-500 text-lg font-bold shrink-0 leading-relaxed">✕</span>
+                  <p className={`text-sm ${t.textMid} leading-relaxed`}>{p}</p>
+                </div>
+              </Anim>
+            ))}
+          </div>
+
+          <Anim delay={0.4}>
+            <p
+              className={`text-2xl font-normal ${t.text} mt-12 italic leading-relaxed`}
+              style={{ fontFamily: "'Playfair Display', serif" }}
+            >
+              "El mejor momento para empezar fue ayer.<br />
+              El segundo mejor es{" "}
+              <span className="font-bold bg-gradient-to-r from-[#28C4CF] to-[#177D85] bg-clip-text text-transparent">hoy</span>."
+            </p>
+          </Anim>
+        </div>
+      </section>
+
+      {/* ─── BENEFITS ──────────────────────────────────────── */}
+      <section id="beneficios" className={`${t.bg2} py-24 px-6`} aria-labelledby="benefits-heading">
+        <div className="max-w-7xl mx-auto">
+          <Anim>
+            <div className="text-center mb-14">
+              <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Soluciones reales</p>
+              <h2 id="benefits-heading" className={`text-3xl sm:text-4xl font-normal ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                Un solo instrumento,{" "}
+                <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] to-[#177D85] bg-clip-text text-transparent">
+                  múltiples beneficios
+                </span>
+              </h2>
+              <p className={`text-base ${t.textMuted} max-w-xl mx-auto mt-4 leading-relaxed`}>
+                El IUL se adapta a tus necesidades específicas: protección, ahorro, retiro o todo a la vez.
+              </p>
+            </div>
+          </Anim>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {BENEFITS.map((n, i) => (
+              <Anim key={i} delay={i * 0.08}>
+                <article className={`${t.card} border rounded-2xl p-8 h-full flex flex-col backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-lg hover:border-[#1d9fa9]/30`}>
+                  <span className="text-4xl mb-4" role="img" aria-hidden="true">{n.icon}</span>
+                  <h3 className={`text-xl font-semibold ${t.text} mb-3`} style={{ fontFamily: "'Playfair Display', serif" }}>{n.title}</h3>
+                  <p className={`text-sm ${t.textMuted} leading-relaxed flex-1`}>{n.desc}</p>
+                  <div className="mt-4 w-9 h-[3px] bg-gradient-to-r from-[#1d9fa9] to-transparent rounded" />
+                </article>
+              </Anim>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── HOW IT WORKS ──────────────────────────────────── */}
+      <section id="como-funciona" className="py-24 px-6" aria-labelledby="steps-heading">
+        <div className="max-w-4xl mx-auto">
+          <Anim>
+            <div className="text-center mb-14">
+              <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Proceso simple</p>
+              <h2 id="steps-heading" className={`text-3xl sm:text-4xl font-normal ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                Tu camino hacia la{" "}
+                <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] to-[#177D85] bg-clip-text text-transparent">protección financiera</span>
+              </h2>
+            </div>
+          </Anim>
+
+          {STEPS.map((s, i) => (
+            <Anim key={i} delay={i * 0.12}>
+              <div className="flex gap-7 mb-10 items-start">
+                <div className="shrink-0 w-20 h-20 flex items-center justify-center border-2 border-[#1d9fa9] rounded-2xl relative">
+                  <span className="text-3xl font-light text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>{s.n}</span>
+                  {i < STEPS.length - 1 && (
+                    <div className="absolute -bottom-11 left-1/2 w-[2px] h-10 bg-gradient-to-b from-[#1d9fa9]/40 to-transparent rounded" />
+                  )}
+                </div>
+                <div className="pt-1.5">
+                  <h3 className={`text-2xl font-semibold ${t.text} mb-2`} style={{ fontFamily: "'Playfair Display', serif" }}>{s.t}</h3>
+                  <p className={`text-[15px] ${t.textMid} leading-relaxed max-w-lg`}>{s.d}</p>
+                </div>
+              </div>
+            </Anim>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── COMPARISON ────────────────────────────────────── */}
+      <section id="comparativa" className={`${t.bg2} py-24 px-6`} aria-labelledby="comparison-heading">
+        <div className="max-w-4xl mx-auto">
+          <Anim>
+            <div className="text-center mb-12">
+              <p className="text-xs tracking-[3px] text-red-500 uppercase font-bold mb-4">La verdad en números</p>
+              <h2 id="comparison-heading" className={`text-3xl sm:text-4xl font-normal ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                Tu cuenta de banco <em className="text-red-500">no es suficiente</em>
+              </h2>
+              <p className={`text-base ${t.textMuted} max-w-xl mx-auto mt-4`}>
+                Compara el rendimiento real de ahorrar en un banco vs un IUL con protección incluida.
+              </p>
+            </div>
+          </Anim>
+
+          {/* Bank vs IUL table */}
+          <Anim delay={0.15}>
+            <div className="overflow-x-auto mb-4">
+              <table className={`w-full ${t.divider} border rounded-xl overflow-hidden`} role="table" aria-label="Banco vs IUL">
+                <thead>
+                  <tr className={t.brandBg}>
+                    <th className={`text-left p-4 text-[11px] tracking-[2px] ${t.textMuted} uppercase font-bold`}>Característica</th>
+                    <th className={`text-center p-4 text-[11px] tracking-[2px] ${t.textMuted} uppercase font-bold`}>Banco</th>
+                    <th className="text-center p-4 text-[11px] tracking-[2px] text-[#1d9fa9] uppercase font-bold">IUL ✦</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {BANK_VS_IUL.map((r, i) => (
+                    <tr key={i} className={`${t.divider} border-t ${i % 2 !== 0 ? t.brandBg : ""}`}>
+                      <td className={`p-4 text-sm ${t.text} font-medium`}>{r.f}</td>
+                      <td className={`p-4 text-sm ${t.textMuted} text-center`}>{r.b}</td>
+                      <td className="p-4 text-sm text-[#1d9fa9] text-center font-semibold">{r.i}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className={`text-[11px] ${t.textMuted} italic`}>
+              *Retiros mediante préstamos de la póliza pueden ser libres de impuestos cuando se estructuran correctamente. Consulte con su asesor fiscal.
+            </p>
+          </Anim>
+
+          {/* Full comparison */}
+          <Anim delay={0.2}>
+            <h3 className={`text-2xl sm:text-3xl font-normal ${t.text} text-center mt-14 mb-8`} style={{ fontFamily: "'Playfair Display', serif" }}>
+              IUL vs otras opciones:{" "}
+              <span className="italic bg-gradient-to-r from-[#28C4CF] to-[#177D85] bg-clip-text text-transparent">comparación completa</span>
+            </h3>
+            <div className="overflow-x-auto">
+              <table className={`w-full min-w-[560px] ${t.divider} border rounded-xl overflow-hidden`} role="table" aria-label="Comparación completa de productos financieros">
+                <thead>
+                  <tr className={t.brandBg}>
+                    {["Característica", "IUL", "Banco", "401(k)", "Term Life"].map((h, i) => (
+                      <th key={i} className={`p-3 text-[10px] tracking-[1.5px] uppercase font-bold ${i === 1 ? "text-[#1d9fa9]" : t.textMuted} ${i > 0 ? "text-center" : "text-left"}`}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {FULL_COMPARISON.map((r, i) => (
+                    <tr key={i} className={`${t.divider} border-t ${i % 2 !== 0 ? t.brandBg : ""}`}>
+                      <td className={`p-3 text-sm ${t.text}`}>{r.f}</td>
+                      {[r.iul, r.bank, r.k, r.term].map((v, j) => (
+                        <td key={j} className="p-3 text-center">
+                          {v ? <CheckIcon className={j === 0 ? "text-[#1d9fa9] mx-auto" : `${t.textMid} mx-auto`} /> : <span className={`${t.textMuted} opacity-30`}>—</span>}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Anim>
+        </div>
+      </section>
+
+      {/* ─── NICHE TABS ────────────────────────────────────── */}
+      <section className="py-24 px-6" aria-labelledby="niche-heading">
+        <div className="max-w-3xl mx-auto">
+          <Anim>
+            <div className="text-center mb-10">
+              <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Soluciones específicas</p>
+              <h2 id="niche-heading" className={`text-3xl sm:text-4xl font-normal ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                ¿En qué situación{" "}
+                <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] to-[#177D85] bg-clip-text text-transparent">estás tú</span>?
+              </h2>
+            </div>
+          </Anim>
+
+          <Anim delay={0.1}>
+            <div className="flex flex-wrap gap-2 justify-center mb-7" role="tablist" aria-label="Selecciona tu perfil">
+              {TABS.map((item, i) => (
+                <button
+                  key={i}
+                  onClick={() => setTab(i)}
+                  role="tab"
+                  aria-selected={tab === i}
+                  aria-controls={`tabpanel-${i}`}
+                  className={`px-5 py-2.5 text-sm font-semibold rounded-lg cursor-pointer transition-all border ${
+                    tab === i
+                      ? "bg-[#1d9fa9]/10 border-[#1d9fa9] text-[#1d9fa9]"
+                      : `${t.divider} ${t.textMid} hover:border-[#1d9fa9]/30`
+                  }`}
+                >
+                  {item.t}
+                </button>
+              ))}
+            </div>
+
+            <div
+              id={`tabpanel-${tab}`}
+              role="tabpanel"
+              className={`${t.card} border rounded-2xl p-10 text-center backdrop-blur-xl`}
+            >
+              <h3 className="text-2xl font-semibold text-[#1d9fa9] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+                {TABS[tab].t}
+              </h3>
+              <p className={`text-[15px] ${t.textMid} leading-relaxed max-w-xl mx-auto`}>{TABS[tab].c}</p>
+              <a
+                href="#consulta"
+                className="inline-block mt-7 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-8 py-3.5 rounded-lg font-bold no-underline hover:shadow-lg transition-all"
+              >
+                Quiero mi plan personalizado →
+              </a>
+            </div>
+          </Anim>
+        </div>
+      </section>
+
+      {/* ─── TRANSPARENCY ──────────────────────────────────── */}
+      <section className={`${t.bg2} py-24 px-6`} aria-labelledby="transparency-heading">
+        <div className="max-w-5xl mx-auto">
+          <Anim>
+            <div className="text-center mb-12">
+              <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Transparencia total</p>
+              <h2 id="transparency-heading" className={`text-3xl sm:text-4xl font-normal ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                Lo que <em className="text-red-500">otros no te dicen</em>, nosotros sí
+              </h2>
+              <p className={`text-base ${t.textMuted} max-w-xl mx-auto mt-4`}>
+                La confianza se construye con honestidad.
+              </p>
+            </div>
+          </Anim>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Anim delay={0.1}>
+              <div className={`${t.successBg} border border-[#1d9fa9]/15 rounded-2xl p-8 h-full`}>
+                <h3 className="text-xl text-[#1d9fa9] mb-5 flex items-center gap-2.5" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  <CheckIcon className="text-[#1d9fa9]" /> Lo que el IUL SÍ hace
+                </h3>
+                <ul className={`text-sm ${t.textMid} leading-loose space-y-1.5 list-none p-0`}>
+                  {[
+                    "Protege a tu familia de por vida con un beneficio por fallecimiento",
+                    "Crece tu dinero vinculado al mercado con un piso de 0%",
+                    "Te permite acceder a tu dinero sin penalidades",
+                    "Ofrece riders de enfermedades graves que funcionan en vida",
+                    "Acepta aplicantes con ITIN, no necesitas SSN",
+                    "Primas flexibles que se adaptan a tu presupuesto",
+                  ].map((x, i) => (
+                    <li key={i} className="flex gap-2.5 items-start">
+                      <span className="text-[#1d9fa9] font-bold shrink-0">✓</span>
+                      <span>{x}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Anim>
+            <Anim delay={0.2}>
+              <div className={`${t.dangerBg} border border-red-500/10 rounded-2xl p-8 h-full`}>
+                <h3 className="text-xl text-red-500 mb-5 flex items-center gap-2.5" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  ⚠ Lo que debes saber
+                </h3>
+                <ul className={`text-sm ${t.textMid} leading-loose space-y-1.5 list-none p-0`}>
+                  {[
+                    "Tiene costos internos que reducen el valor en los primeros años",
+                    "El rendimiento tiene un techo (cap): típicamente entre 9.5% y 12%",
+                    "No es una inversión directa en bolsa, es un seguro indexado",
+                    "El crecimiento real se acelera después del año 5-7",
+                    "No es ideal para todos: depende de tu horizonte e ingresos",
+                    "Trabaja solo con un agente licenciado que muestre escenarios reales",
+                  ].map((x, i) => (
+                    <li key={i} className="flex gap-2.5 items-start">
+                      <span className="text-red-500 font-bold shrink-0">!</span>
+                      <span>{x}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Anim>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── TESTIMONIALS ──────────────────────────────────── */}
+      <section id="testimonios" className="py-24 px-6" aria-labelledby="testimonials-heading">
+        <div className="max-w-7xl mx-auto">
+          <Anim>
+            <div className="text-center mb-12">
+              <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Historias reales</p>
+              <h2 id="testimonials-heading" className={`text-3xl sm:text-4xl font-normal ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                Familias que ya están{" "}
+                <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] to-[#177D85] bg-clip-text text-transparent">construyendo su futuro</span>
+              </h2>
+            </div>
+          </Anim>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {TESTIMONIALS.map((item, i) => (
+              <Anim key={i} delay={i * 0.12}>
+                <blockquote className={`${t.card} border rounded-2xl p-8 h-full flex flex-col backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-lg`}>
+                  <span className="text-3xl text-[#1d9fa9] opacity-25 leading-none">"</span>
+                  <p className={`text-sm ${t.textMid} leading-relaxed flex-1 italic my-3`}>"{item.text}"</p>
+                  <div className="flex gap-0.5 mb-2.5 text-[#1d9fa9]">
+                    {Array(item.stars).fill(0).map((_, j) => <StarIcon key={j} />)}
+                  </div>
+                  <cite className="not-italic">
+                    <div className={`text-base font-semibold ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>{item.name}</div>
+                    <div className={`text-xs ${t.textMuted} mt-1`}>{item.role}</div>
+                  </cite>
+                </blockquote>
+              </Anim>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── URGENCY ───────────────────────────────────────── */}
+      <section className={`${t.bg2} py-20 px-6`} aria-label="Llamado a la acción">
+        <Anim>
+          <div className={`max-w-3xl mx-auto text-center ${t.brandBg} border-2 border-[#1d9fa9]/15 rounded-3xl p-12 sm:p-14 relative`}>
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <svg className="w-5 h-5 text-[#1d9fa9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold">El tiempo es tu mayor activo</span>
+            </div>
+            <h2
+              className={`text-2xl sm:text-[34px] font-normal ${t.text} leading-snug mb-5`}
+              style={{ fontFamily: "'Playfair Display', serif" }}
+            >
+              Cada año que esperas le cuesta a tu familia{" "}
+              <strong className="bg-gradient-to-r from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-[length:200%_auto] bg-clip-text text-transparent animate-[shimmer_4s_ease-in-out_infinite]">
+                miles de dólares
+              </strong>{" "}
+              en crecimiento compuesto
+            </h2>
+            <p className={`text-[15px] ${t.textMid} leading-relaxed mb-8 max-w-xl mx-auto`}>
+              El interés compuesto necesita tiempo. Una persona que comienza a los 30 acumula significativamente más que alguien que empieza a los 40.
+            </p>
+            <a
+              href="#consulta"
+              className="inline-block bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-10 py-4 rounded-xl font-bold text-base no-underline hover:shadow-xl hover:shadow-[#1d9fa9]/25 transition-all animate-[pulse_3s_infinite]"
+            >
+              Comienza Hoy — Consulta 100% Gratis →
+            </a>
+          </div>
+        </Anim>
+      </section>
+
+      {/* ─── FAQ ───────────────────────────────────────────── */}
+      <section id="faq" className="py-24 px-6" aria-labelledby="faq-heading">
+        <div className="max-w-3xl mx-auto">
+          <Anim>
+            <div className="text-center mb-10">
+              <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Preguntas frecuentes</p>
+              <h2 id="faq-heading" className={`text-3xl sm:text-4xl font-normal ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                Tus dudas,{" "}
+                <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] to-[#177D85] bg-clip-text text-transparent">resueltas</span>
+              </h2>
+            </div>
+          </Anim>
+
+          <div role="region" aria-label="Preguntas frecuentes sobre IUL">
+            {FAQS.map((f, i) => (
+              <Anim key={i} delay={i * 0.04}>
+                <div
+                  className={`mb-2.5 border rounded-xl overflow-hidden transition-all ${
+                    faqOpen === i ? "border-[#1d9fa9]/30 " + t.brandBg : t.divider
+                  }`}
+                >
+                  <button
+                    onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+                    className={`w-full p-5 flex justify-between items-center bg-transparent border-none cursor-pointer text-left hover:${t.brandBg} rounded-xl transition-colors`}
+                    aria-expanded={faqOpen === i}
+                    aria-controls={`faq-answer-${i}`}
+                  >
+                    <span className={`text-[15px] font-semibold pr-4 transition-colors ${faqOpen === i ? "text-[#1d9fa9]" : t.text}`}>
+                      {f.q}
+                    </span>
+                    <span className={`text-xl font-light text-[#1d9fa9] shrink-0 transition-transform ${faqOpen === i ? "rotate-45" : ""}`}>
+                      +
+                    </span>
+                  </button>
+                  <div
+                    id={`faq-answer-${i}`}
+                    role="region"
+                    className="overflow-hidden transition-all duration-400"
+                    style={{ maxHeight: faqOpen === i ? 280 : 0 }}
+                  >
+                    <p className={`px-5 pb-5 text-sm ${t.textMid} leading-relaxed`}>{f.a}</p>
+                  </div>
+                </div>
+              </Anim>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── LEAD FORM ─────────────────────────────────────── */}
+      <section id="consulta" className={`${t.bg2} py-24 px-6`} aria-labelledby="form-heading">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <Anim>
+              <div>
+                <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Da el primer paso</p>
+                <h2
+                  id="form-heading"
+                  className={`text-3xl sm:text-4xl font-normal ${t.text} mb-6`}
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
+                  Tu consulta gratuita te espera
+                </h2>
+                <p className={`text-[15px] ${t.textMid} leading-relaxed mb-8`}>
+                  Sin presión, sin compromiso. Solo una conversación honesta sobre tus metas, tu familia y cómo el IUL puede ayudarte.
+                </p>
+
+                {["Consulta de 20-30 min por Zoom o WhatsApp", "Análisis personalizado de tu situación", "Proyección con números reales"].map((x, i) => (
+                  <div key={i} className="flex items-center gap-3 mb-3.5">
+                    <CheckIcon className="text-[#1d9fa9]" />
+                    <span className={`text-sm ${t.text}`}>{x}</span>
+                  </div>
+                ))}
+
+                <div className={`mt-7 p-5 ${t.brandBg} border border-[#1d9fa9]/15 rounded-xl`}>
+                  <div className="text-xs text-[#1d9fa9] font-bold mb-1.5 tracking-wide">DOCUMENTOS ACEPTADOS</div>
+                  <p className={`text-sm ${t.textMid}`}>Social Security • ITIN • Pasaporte • Matrícula Consular</p>
+                </div>
+              </div>
+            </Anim>
+
+            <Anim delay={0.15}>
+              <div className={`${t.card} border rounded-2xl p-9 backdrop-blur-xl`}>
+                {formState !== "success" ? (
+                  <form onSubmit={handleSubmit} noValidate>
+                    <h3 className={`text-2xl font-semibold ${t.text} mb-1.5 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                      Agenda tu Consulta
+                    </h3>
+                    <p className={`text-sm ${t.textMuted} mb-6 text-center`}>Te contactamos en menos de 24 horas.</p>
+
+                    {[
+                      { n: "nombre" as const, l: "Nombre completo", ty: "text", p: "Tu nombre completo" },
+                      { n: "telefono" as const, l: "Teléfono / WhatsApp", ty: "tel", p: "+1 (___) ___-____" },
+                      { n: "email" as const, l: "Email", ty: "email", p: "tu@email.com" },
+                    ].map((fi) => (
+                      <div key={fi.n} className="mb-4">
+                        <label htmlFor={fi.n} className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
+                          {fi.l} <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                          id={fi.n}
+                          name={fi.n}
+                          type={fi.ty}
+                          placeholder={fi.p}
+                          required
+                          autoComplete={fi.n === "nombre" ? "name" : fi.n === "telefono" ? "tel" : "email"}
+                          value={form[fi.n]}
+                          onChange={(e) => updateField(fi.n, e.target.value)}
+                          className={`w-full p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30`}
+                        />
+                      </div>
+                    ))}
+
+                    <div className="mb-6">
+                      <label htmlFor="interes" className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
+                        ¿Qué te interesa más?
+                      </label>
+                      <select
+                        id="interes"
+                        name="interes"
+                        value={form.interes}
+                        onChange={(e) => updateField("interes", e.target.value)}
+                        className={`w-full p-3.5 ${t.input} border rounded-lg text-sm outline-none appearance-none transition-colors focus:border-[#1d9fa9]`}
+                      >
+                        <option value="">Selecciona una opción</option>
+                        {["Protección familiar", "Plan de retiro", "Pagar hipoteca más rápido", "Proteger mi negocio", "Tengo ITIN y quiero opciones", "Solo quiero información"].map((o) => (
+                          <option key={o} value={o}>{o}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={formState === "loading"}
+                      className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-4 rounded-xl font-bold text-base tracking-wide cursor-pointer hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {formState === "loading" ? "Enviando..." : formState === "error" ? "Reintentar →" : "Quiero Mi Consulta Gratuita →"}
+                    </button>
+                    {formState === "error" && (
+                      <p className="text-xs text-red-500 mt-2 text-center">
+                        Hubo un problema al enviar. Por favor intenta de nuevo o contáctanos directamente por WhatsApp.
+                      </p>
+                    )}
+                    <p className={`text-[11px] ${t.textMuted} mt-3 text-center`}>Tu información es 100% confidencial. Sin spam.</p>
+                  </form>
+                ) : (
+                  <div className="text-center py-10">
+                    <div className={`w-14 h-14 rounded-full ${t.brandBg} mx-auto mb-5 flex items-center justify-center`}>
+                      <CheckIcon className="text-[#1d9fa9]" />
+                    </div>
+                    <h3 className={`text-2xl ${t.text} mb-3`} style={{ fontFamily: "'Playfair Display', serif" }}>¡Recibido!</h3>
+                    <p className={`text-[15px] ${t.textMid} leading-relaxed`}>
+                      Te contactaremos en menos de 24 horas para agendar tu consulta gratuita.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </Anim>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── FINAL CTA ─────────────────────────────────────── */}
+      <section className="py-20 px-6 text-center" aria-label="Llamado final">
+        <Anim>
+          <div className="max-w-2xl mx-auto">
+            <h2
+              className={`text-3xl sm:text-[44px] font-normal ${t.text} leading-tight mb-5`}
+              style={{ fontFamily: "'Playfair Display', serif" }}
+            >
+              Tu familia merece{" "}
+              <strong className="italic bg-gradient-to-r from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-[length:200%_auto] bg-clip-text text-transparent animate-[shimmer_4s_ease-in-out_infinite]">
+                un plan
+              </strong>
+            </h2>
+            <p className={`text-base ${t.textMid} leading-relaxed mb-8`}>
+              No importa si tienes SSN o ITIN. No importa si eres W-2 o 1099. Lo que importa es que hoy puedes dar el primer paso para proteger lo que más quieres.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-3.5">
+              <a href="#consulta" className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-9 py-4 rounded-lg font-bold no-underline hover:shadow-xl transition-all text-center">
+                Agenda tu Consulta Gratis
+              </a>
+              {/* TODO: Reemplazar con número real */}
+              <a href="tel:+1786XXXXXXX" className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold no-underline hover:bg-[#1d9fa9]/10 transition-all inline-flex items-center justify-center gap-2">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+                </svg>
+                Llámanos ahora
+              </a>
+            </div>
+          </div>
+        </Anim>
+      </section>
+
+      {/* ─── FOOTER ────────────────────────────────────────── */}
+      <footer className={`${t.bg2} ${t.divider} border-t py-14 px-6`} role="contentinfo">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+            <div>
+              <div className="flex items-center gap-2.5 mb-4">
+                <img src="/logo.png" alt="Platinium Insurance Group" className="h-9 w-auto" width={36} height={36} loading="lazy" />
+                <div>
+                  <div className="text-[15px] font-bold text-[#1d9fa9]">PLATINIUM INSURANCE</div>
+                  <div className={`text-[9px] tracking-[3px] ${t.textMuted} uppercase`}>GROUP</div>
+                </div>
+              </div>
+              <p className={`text-sm ${t.textMuted} leading-relaxed max-w-xs`}>
+                Asesoría financiera especializada en la comunidad hispana de Miami. Protección, retiro y crecimiento financiero con transparencia.
+              </p>
+            </div>
+            <nav aria-label="Navegación del pie de página">
+              <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">Navegación</h4>
+              {NAV_LINKS.map((l) => (
+                <a key={l.href} href={l.href} className={`block text-sm ${t.textMuted} no-underline mb-2.5 hover:text-[#1d9fa9] transition-colors`}>
+                  {l.label}
+                </a>
+              ))}
+            </nav>
+            <div>
+              <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">Contacto</h4>
+              <address className={`text-sm ${t.textMuted} leading-loose not-italic`}>
+                Miami, Florida<br />
+                {/* TODO: Reemplazar con datos reales */}
+                +1 (786) XXX-XXXX<br />
+                info@platiniuminsuranceusa.com
+              </address>
+            </div>
+          </div>
+          <div className={`${t.divider} border-t pt-5 flex flex-col sm:flex-row justify-between gap-3`}>
+            <p className={`text-[11px] ${t.textMuted} opacity-60`}>© {new Date().getFullYear()} Platinium Insurance Group. Todos los derechos reservados.</p>
+            <p className={`text-[10px] ${t.textMuted} opacity-50 max-w-lg`}>
+              Descargo: Este sitio es informativo y no constituye asesoría financiera, legal o fiscal. El IUL es un producto de seguro, no una inversión regulada por la SEC. Consulte con un asesor licenciado.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
