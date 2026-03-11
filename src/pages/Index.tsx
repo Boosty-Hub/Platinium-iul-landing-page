@@ -732,19 +732,22 @@ export default function IULLanding() {
               className={`text-3xl sm:text-4xl font-normal leading-tight ${t.text} mb-4`}
               style={{ fontFamily: "'Playfair Display', serif" }}
             >
-              Si trabajas duro pero <em className="text-[#1d9fa9]">no tienes un plan</em>,<br />tu esfuerzo no está protegido
+              Si trabajas duro pero <em className="text-[#1d9fa9]">no tienes un plan</em>,<br />tu esfuerzo se pierde cada día
             </h2>
+            <p className={`text-base ${t.textMuted} max-w-xl mx-auto mb-2`}>
+              La inflación se come tus ahorros. El banco te paga 0.05%. Y si mañana no puedes trabajar, ¿quién mantiene a tu familia?
+            </p>
             <div className="w-16 h-[3px] bg-gradient-to-r from-transparent via-[#1d9fa9] to-transparent mx-auto mt-5 mb-10 rounded" />
           </Anim>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
             {[
-              "Trabajas como independiente (1099) y no tienes 401(k) ni beneficios de retiro",
-              "Tu cuenta de ahorro genera menos del 0.3% de interés al año",
-              "No sabes qué pasaría con tu familia si algo te ocurre mañana",
-              "Tienes ITIN pero crees que no puedes acceder a productos financieros formales",
-              "Tu hipoteca te tomará 30 años pagarla al ritmo actual",
-              "Has escuchado del IUL pero no sabes si es real o una estafa",
+              "Trabajas como independiente (1099) y no tienes 401(k), pensión ni beneficios de retiro",
+              "Tu cuenta de ahorro genera menos del 0.3% de interés — la inflación te roba poder adquisitivo cada año",
+              "Si algo te ocurre mañana, tu familia queda sin ingresos, sin plan, sin protección",
+              "Tienes ITIN y piensas que no calificas para productos financieros formales en EE.UU.",
+              "Tu hipoteca te tomará 30 años pagarla — pero con un IUL podrías liquidarla en 15-20",
+              "Has escuchado del IUL pero no sabes si es real — te lo explicamos con números, no con promesas",
             ].map((p, i) => (
               <Anim key={i} delay={i * 0.06}>
                 <div className={`flex gap-3 p-4 ${t.dangerBg} border border-red-500/10 rounded-xl`}>
