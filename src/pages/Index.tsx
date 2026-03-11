@@ -611,7 +611,8 @@ export default function IULLanding() {
         <div className="absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-6 pt-36 pb-20 relative z-10">
-          <div className="max-w-3xl">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div className="max-w-xl">
             {/* Badge */}
             <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-5 py-2 mb-7 animate-[fadeUp_0.8s_ease]`}>
               <span className="w-2 h-2 rounded-full bg-[#1d9fa9] shadow-[0_0_8px_rgba(29,159,169,0.5)]" />
@@ -622,7 +623,7 @@ export default function IULLanding() {
 
             {/* H1 */}
             <h1
-              className={`text-4xl sm:text-5xl lg:text-6xl font-normal leading-[1.1] mb-6 ${t.text}`}
+              className={`text-4xl sm:text-5xl lg:text-[56px] font-normal leading-[1.08] mb-6 ${t.text}`}
               style={{ fontFamily: "'Playfair Display', Georgia, serif", animationDelay: "0.1s", animationFillMode: "both" }}
             >
               Protege a tu familia.{" "}
@@ -630,12 +631,14 @@ export default function IULLanding() {
                 Construye tu retiro.
               </span>
               <br />
-              <span className={`${t.textMuted} text-[0.6em] font-normal`}>Todo en un solo plan.</span>
+              <span className={`${t.textMuted} text-[0.55em] font-normal`}>Con un Indexed Universal Life (IUL).</span>
             </h1>
 
-            <p className={`text-lg leading-relaxed ${t.textMid} max-w-xl mb-9`}>
-              El Seguro de Vida Universal Indexado (IUL) te permite crecer tu dinero vinculado al mercado{" "}
-              <strong className={t.text}>sin riesgo de pérdida</strong>, con protección permanente para tu familia y acceso a tu dinero cuando lo necesites.
+            <p className={`text-lg leading-relaxed ${t.textMid} max-w-xl mb-5`}>
+              Mientras tu dinero duerme en el banco ganando 0.05%, las familias con un <strong className={t.text}>IUL ganan hasta 12% anual</strong> vinculado al S&P 500 — <strong className={t.text}>sin riesgo de pérdida</strong> cuando el mercado cae.
+            </p>
+            <p className={`text-base leading-relaxed ${t.textMid} max-w-xl mb-9`}>
+              Protección permanente + plan de retiro + acceso a tu dinero sin penalidades. <strong className="text-[#1d9fa9]">Todo en un solo instrumento.</strong>
             </p>
 
             {/* CTA Buttons */}
@@ -650,7 +653,7 @@ export default function IULLanding() {
                 href="#como-funciona"
                 className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold text-[15px] no-underline hover:bg-[#1d9fa9]/10 transition-all text-center"
               >
-                ¿Cómo funciona?
+                ¿Cómo funciona el IUL?
               </a>
             </div>
 
@@ -665,6 +668,25 @@ export default function IULLanding() {
                   </span>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Hero Image */}
+          <div className="hidden lg:block relative">
+            <div className="rounded-3xl overflow-hidden shadow-2xl shadow-[#1d9fa9]/10 border border-[#1d9fa9]/10">
+              <img
+                src={heroFamilyImg}
+                alt="Familia latina protegida con un plan IUL"
+                className="w-full h-auto object-cover"
+                width={640}
+                height={384}
+                loading="eager"
+              />
+            </div>
+            {/* Floating stat card */}
+            <div className={`absolute -bottom-5 -left-5 ${t.card} border rounded-2xl p-5 backdrop-blur-xl shadow-xl`}>
+              <div className="text-3xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>$200K+</div>
+              <div className={`text-xs ${t.textMuted} mt-1`}>Valor potencial en 20 años<br />con solo $250/mes</div>
             </div>
           </div>
         </div>
