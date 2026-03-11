@@ -1109,8 +1109,12 @@ export default function IULLanding() {
               </strong>{" "}
               en crecimiento compuesto
             </h2>
-            <p className={`text-[15px] ${t.textMid} leading-relaxed mb-8 max-w-xl mx-auto`}>
-              El interés compuesto necesita tiempo. Una persona que comienza a los 30 acumula significativamente más que alguien que empieza a los 40.
+            <p className={`text-[15px] ${t.textMid} leading-relaxed mb-4 max-w-xl mx-auto`}>
+              Una persona que empieza con $250/mes a los <strong className={t.text}>30 años</strong> puede acumular más de <strong className="text-[#1d9fa9]">$200,000</strong> para su retiro. La misma persona que espera hasta los 40 acumula menos de la mitad.
+            </p>
+            <p className={`text-sm ${t.textMuted} mb-8 max-w-md mx-auto`}>
+              Cada mes que pasa sin un plan es dinero que pierdes para siempre. El interés compuesto no espera.
+            </p>
             </p>
             <a
               href="#consulta"
