@@ -691,6 +691,8 @@ export default function IULLanding() {
           </div>
         </div>
 
+        </div>
+
         {/* Scroll indicator */}
         <div className="absolute bottom-9 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
           <span className={`text-[10px] tracking-[2px] ${t.textMuted} uppercase`}>Descubre más</span>
