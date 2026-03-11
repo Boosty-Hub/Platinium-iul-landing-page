@@ -9,6 +9,12 @@
 import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
+import heroFamilyImg from "@/assets/hero-family.jpg";
+import testimonial1Img from "@/assets/testimonial-1.jpg";
+import testimonial2Img from "@/assets/testimonial-2.jpg";
+import testimonial3Img from "@/assets/testimonial-3.jpg";
+import consultationImg from "@/assets/consultation.jpg";
+import familyHomeImg from "@/assets/family-home.jpg";
 
 // ─── BRAND TOKENS ────────────────────────────────────────────
 const BRAND = {
@@ -239,9 +245,9 @@ const TABS = [
 ];
 
 const TESTIMONIALS = [
-  { name: "María González", role: "Emprendedora, Miami", text: "Cuando llegué a este país solo tenía mi ITIN y muchos sueños. Nunca pensé que podría tener un plan de retiro formal. Hoy, después de 4 años con mi IUL, tengo protección para mi familia y un fondo que crece cada año.", stars: 5 },
-  { name: "Carlos Mendoza", role: "Transportista, Doral", text: "Como camionero independiente no tenía 401(k) ni beneficios. Mi agente me explicó todo con números reales, sin promesas falsas. Ahora tengo un plan que protege a mis hijos y me está ayudando a pagar mi casa más rápido.", stars: 5 },
-  { name: "Ana Patricia Ruiz", role: "Dueña de restaurante, Hialeah", text: "Al principio pensé que era demasiado bueno para ser verdad. Pero me mostraron los costos, los límites y los escenarios reales. Entendí que no es mágico, es una herramienta.", stars: 5 },
+  { name: "María González", role: "Emprendedora, Miami", text: "Cuando llegué a este país solo tenía mi ITIN y muchos sueños. Nunca pensé que podría tener un plan de retiro formal. Hoy, después de 4 años con mi IUL, tengo protección para mi familia y un fondo que crece cada año. Mi asesora me explicó todo en español, sin letra pequeña.", stars: 5, img: testimonial1Img },
+  { name: "Carlos Mendoza", role: "Transportista, Doral", text: "Como camionero independiente no tenía 401(k) ni beneficios. Mi agente me explicó todo con números reales, sin promesas falsas. Ahora tengo un plan que protege a mis hijos y me está ayudando a pagar mi casa más rápido. Mi única queja es no haber empezado antes.", stars: 5, img: testimonial2Img },
+  { name: "Ana Patricia Ruiz", role: "Dueña de restaurante, Hialeah", text: "Al principio pensé que era demasiado bueno para ser verdad. Pero me mostraron los costos, los límites y los escenarios reales. Entendí que no es mágico, es una herramienta poderosa cuando se usa bien. Hoy duermo tranquila sabiendo que mi familia está protegida pase lo que pase.", stars: 5, img: testimonial3Img },
 ];
 
 // ─── HOOKS ───────────────────────────────────────────────────
@@ -605,7 +611,8 @@ export default function IULLanding() {
         <div className="absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-6 pt-36 pb-20 relative z-10">
-          <div className="max-w-3xl">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div className="max-w-xl">
             {/* Badge */}
             <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-5 py-2 mb-7 animate-[fadeUp_0.8s_ease]`}>
               <span className="w-2 h-2 rounded-full bg-[#1d9fa9] shadow-[0_0_8px_rgba(29,159,169,0.5)]" />
@@ -616,7 +623,7 @@ export default function IULLanding() {
 
             {/* H1 */}
             <h1
-              className={`text-4xl sm:text-5xl lg:text-6xl font-normal leading-[1.1] mb-6 ${t.text}`}
+              className={`text-4xl sm:text-5xl lg:text-[56px] font-normal leading-[1.08] mb-6 ${t.text}`}
               style={{ fontFamily: "'Playfair Display', Georgia, serif", animationDelay: "0.1s", animationFillMode: "both" }}
             >
               Protege a tu familia.{" "}
@@ -624,12 +631,14 @@ export default function IULLanding() {
                 Construye tu retiro.
               </span>
               <br />
-              <span className={`${t.textMuted} text-[0.6em] font-normal`}>Todo en un solo plan.</span>
+              <span className={`${t.textMuted} text-[0.55em] font-normal`}>Con un Indexed Universal Life (IUL).</span>
             </h1>
 
-            <p className={`text-lg leading-relaxed ${t.textMid} max-w-xl mb-9`}>
-              El Seguro de Vida Universal Indexado (IUL) te permite crecer tu dinero vinculado al mercado{" "}
-              <strong className={t.text}>sin riesgo de pérdida</strong>, con protección permanente para tu familia y acceso a tu dinero cuando lo necesites.
+            <p className={`text-lg leading-relaxed ${t.textMid} max-w-xl mb-5`}>
+              Mientras tu dinero duerme en el banco ganando 0.05%, las familias con un <strong className={t.text}>IUL ganan hasta 12% anual</strong> vinculado al S&P 500 — <strong className={t.text}>sin riesgo de pérdida</strong> cuando el mercado cae.
+            </p>
+            <p className={`text-base leading-relaxed ${t.textMid} max-w-xl mb-9`}>
+              Protección permanente + plan de retiro + acceso a tu dinero sin penalidades. <strong className="text-[#1d9fa9]">Todo en un solo instrumento.</strong>
             </p>
 
             {/* CTA Buttons */}
@@ -644,7 +653,7 @@ export default function IULLanding() {
                 href="#como-funciona"
                 className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold text-[15px] no-underline hover:bg-[#1d9fa9]/10 transition-all text-center"
               >
-                ¿Cómo funciona?
+                ¿Cómo funciona el IUL?
               </a>
             </div>
 
@@ -661,6 +670,27 @@ export default function IULLanding() {
               ))}
             </div>
           </div>
+
+          {/* Hero Image */}
+          <div className="hidden lg:block relative">
+            <div className="rounded-3xl overflow-hidden shadow-2xl shadow-[#1d9fa9]/10 border border-[#1d9fa9]/10">
+              <img
+                src={heroFamilyImg}
+                alt="Familia latina protegida con un plan IUL"
+                className="w-full h-auto object-cover"
+                width={640}
+                height={384}
+                loading="eager"
+              />
+            </div>
+            {/* Floating stat card */}
+            <div className={`absolute -bottom-5 -left-5 ${t.card} border rounded-2xl p-5 backdrop-blur-xl shadow-xl`}>
+              <div className="text-3xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>$200K+</div>
+              <div className={`text-xs ${t.textMuted} mt-1`}>Valor potencial en 20 años<br />con solo $250/mes</div>
+            </div>
+          </div>
+        </div>
+
         </div>
 
         {/* Scroll indicator */}
@@ -702,19 +732,22 @@ export default function IULLanding() {
               className={`text-3xl sm:text-4xl font-normal leading-tight ${t.text} mb-4`}
               style={{ fontFamily: "'Playfair Display', serif" }}
             >
-              Si trabajas duro pero <em className="text-[#1d9fa9]">no tienes un plan</em>,<br />tu esfuerzo no está protegido
+              Si trabajas duro pero <em className="text-[#1d9fa9]">no tienes un plan</em>,<br />tu esfuerzo se pierde cada día
             </h2>
+            <p className={`text-base ${t.textMuted} max-w-xl mx-auto mb-2`}>
+              La inflación se come tus ahorros. El banco te paga 0.05%. Y si mañana no puedes trabajar, ¿quién mantiene a tu familia?
+            </p>
             <div className="w-16 h-[3px] bg-gradient-to-r from-transparent via-[#1d9fa9] to-transparent mx-auto mt-5 mb-10 rounded" />
           </Anim>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
             {[
-              "Trabajas como independiente (1099) y no tienes 401(k) ni beneficios de retiro",
-              "Tu cuenta de ahorro genera menos del 0.3% de interés al año",
-              "No sabes qué pasaría con tu familia si algo te ocurre mañana",
-              "Tienes ITIN pero crees que no puedes acceder a productos financieros formales",
-              "Tu hipoteca te tomará 30 años pagarla al ritmo actual",
-              "Has escuchado del IUL pero no sabes si es real o una estafa",
+              "Trabajas como independiente (1099) y no tienes 401(k), pensión ni beneficios de retiro",
+              "Tu cuenta de ahorro genera menos del 0.3% de interés — la inflación te roba poder adquisitivo cada año",
+              "Si algo te ocurre mañana, tu familia queda sin ingresos, sin plan, sin protección",
+              "Tienes ITIN y piensas que no calificas para productos financieros formales en EE.UU.",
+              "Tu hipoteca te tomará 30 años pagarla — pero con un IUL podrías liquidarla en 15-20",
+              "Has escuchado del IUL pero no sabes si es real — te lo explicamos con números, no con promesas",
             ].map((p, i) => (
               <Anim key={i} delay={i * 0.06}>
                 <div className={`flex gap-3 p-4 ${t.dangerBg} border border-red-500/10 rounded-xl`}>
@@ -773,7 +806,7 @@ export default function IULLanding() {
 
       {/* ─── HOW IT WORKS ──────────────────────────────────── */}
       <section id="como-funciona" className="py-24 px-6" aria-labelledby="steps-heading">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <Anim>
             <div className="text-center mb-14">
               <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Proceso simple</p>
@@ -784,22 +817,38 @@ export default function IULLanding() {
             </div>
           </Anim>
 
-          {STEPS.map((s, i) => (
-            <Anim key={i} delay={i * 0.12}>
-              <div className="flex gap-7 mb-10 items-start">
-                <div className="shrink-0 w-20 h-20 flex items-center justify-center border-2 border-[#1d9fa9] rounded-2xl relative">
-                  <span className="text-3xl font-light text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>{s.n}</span>
-                  {i < STEPS.length - 1 && (
-                    <div className="absolute -bottom-11 left-1/2 w-[2px] h-10 bg-gradient-to-b from-[#1d9fa9]/40 to-transparent rounded" />
-                  )}
-                </div>
-                <div className="pt-1.5">
-                  <h3 className={`text-2xl font-semibold ${t.text} mb-2`} style={{ fontFamily: "'Playfair Display', serif" }}>{s.t}</h3>
-                  <p className={`text-[15px] ${t.textMid} leading-relaxed max-w-lg`}>{s.d}</p>
-                </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              {STEPS.map((s, i) => (
+                <Anim key={i} delay={i * 0.12}>
+                  <div className="flex gap-7 mb-10 items-start">
+                    <div className="shrink-0 w-20 h-20 flex items-center justify-center border-2 border-[#1d9fa9] rounded-2xl relative">
+                      <span className="text-3xl font-light text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>{s.n}</span>
+                      {i < STEPS.length - 1 && (
+                        <div className="absolute -bottom-11 left-1/2 w-[2px] h-10 bg-gradient-to-b from-[#1d9fa9]/40 to-transparent rounded" />
+                      )}
+                    </div>
+                    <div className="pt-1.5">
+                      <h3 className={`text-2xl font-semibold ${t.text} mb-2`} style={{ fontFamily: "'Playfair Display', serif" }}>{s.t}</h3>
+                      <p className={`text-[15px] ${t.textMid} leading-relaxed max-w-lg`}>{s.d}</p>
+                    </div>
+                  </div>
+                </Anim>
+              ))}
+            </div>
+            <Anim delay={0.3}>
+              <div className="hidden lg:block rounded-3xl overflow-hidden shadow-xl shadow-[#1d9fa9]/10 border border-[#1d9fa9]/10">
+                <img
+                  src={consultationImg}
+                  alt="Asesor financiero en consulta con una familia latina"
+                  className="w-full h-auto object-cover"
+                  width={512}
+                  height={320}
+                  loading="lazy"
+                />
               </div>
             </Anim>
-          ))}
+          </div>
         </div>
       </section>
 
@@ -1016,12 +1065,22 @@ export default function IULLanding() {
                 <blockquote className={`${t.card} border rounded-2xl p-8 h-full flex flex-col backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-lg`}>
                   <span className="text-3xl text-[#1d9fa9] opacity-25 leading-none">"</span>
                   <p className={`text-sm ${t.textMid} leading-relaxed flex-1 italic my-3`}>"{item.text}"</p>
-                  <div className="flex gap-0.5 mb-2.5 text-[#1d9fa9]">
+                  <div className="flex gap-0.5 mb-3 text-[#1d9fa9]">
                     {Array(item.stars).fill(0).map((_, j) => <StarIcon key={j} />)}
                   </div>
-                  <cite className="not-italic">
-                    <div className={`text-base font-semibold ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>{item.name}</div>
-                    <div className={`text-xs ${t.textMuted} mt-1`}>{item.role}</div>
+                  <cite className="not-italic flex items-center gap-3">
+                    <img
+                      src={item.img}
+                      alt={item.name}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-[#1d9fa9]/20"
+                      width={48}
+                      height={48}
+                      loading="lazy"
+                    />
+                    <div>
+                      <div className={`text-base font-semibold ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>{item.name}</div>
+                      <div className={`text-xs ${t.textMuted} mt-0.5`}>{item.role}</div>
+                    </div>
                   </cite>
                 </blockquote>
               </Anim>
@@ -1050,8 +1109,11 @@ export default function IULLanding() {
               </strong>{" "}
               en crecimiento compuesto
             </h2>
-            <p className={`text-[15px] ${t.textMid} leading-relaxed mb-8 max-w-xl mx-auto`}>
-              El interés compuesto necesita tiempo. Una persona que comienza a los 30 acumula significativamente más que alguien que empieza a los 40.
+            <p className={`text-[15px] ${t.textMid} leading-relaxed mb-4 max-w-xl mx-auto`}>
+              Una persona que empieza con $250/mes a los <strong className={t.text}>30 años</strong> puede acumular más de <strong className="text-[#1d9fa9]">$200,000</strong> para su retiro. La misma persona que espera hasta los 40 acumula menos de la mitad.
+            </p>
+            <p className={`text-sm ${t.textMuted} mb-8 max-w-md mx-auto`}>
+              Cada mes que pasa sin un plan es dinero que pierdes para siempre. El interés compuesto no espera.
             </p>
             <a
               href="#consulta"
@@ -1127,10 +1189,10 @@ export default function IULLanding() {
                   Tu consulta gratuita te espera
                 </h2>
                 <p className={`text-[15px] ${t.textMid} leading-relaxed mb-8`}>
-                  Sin presión, sin compromiso. Solo una conversación honesta sobre tus metas, tu familia y cómo el IUL puede ayudarte.
+                  Sin presión, sin compromiso. Solo una conversación honesta sobre tus metas, tu familia y cómo el IUL puede ayudarte. <strong className={t.text}>El 90% de nuestros clientes desearían haber empezado antes.</strong>
                 </p>
 
-                {["Consulta de 20-30 min por Zoom o WhatsApp", "Análisis personalizado de tu situación", "Proyección con números reales"].map((x, i) => (
+                {["Consulta de 20-30 min por Zoom o WhatsApp", "Análisis personalizado de tu situación", "Proyección con números reales, sin promesas falsas", "Te explicamos todo en español, sin jerga financiera"].map((x, i) => (
                   <div key={i} className="flex items-center gap-3 mb-3.5">
                     <CheckIcon className="text-[#1d9fa9]" />
                     <span className={`text-sm ${t.text}`}>{x}</span>
@@ -1140,6 +1202,18 @@ export default function IULLanding() {
                 <div className={`mt-7 p-5 ${t.brandBg} border border-[#1d9fa9]/15 rounded-xl`}>
                   <div className="text-xs text-[#1d9fa9] font-bold mb-1.5 tracking-wide">DOCUMENTOS ACEPTADOS</div>
                   <p className={`text-sm ${t.textMid}`}>Social Security • ITIN • Pasaporte • Matrícula Consular</p>
+                </div>
+
+                {/* Consultation image */}
+                <div className="mt-7 rounded-2xl overflow-hidden shadow-lg hidden md:block">
+                  <img
+                    src={familyHomeImg}
+                    alt="Familia latina en su nuevo hogar"
+                    className="w-full h-48 object-cover"
+                    width={512}
+                    height={192}
+                    loading="lazy"
+                  />
                 </div>
               </div>
             </Anim>
