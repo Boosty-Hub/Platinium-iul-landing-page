@@ -1183,10 +1183,10 @@ export default function IULLanding() {
                   Tu consulta gratuita te espera
                 </h2>
                 <p className={`text-[15px] ${t.textMid} leading-relaxed mb-8`}>
-                  Sin presión, sin compromiso. Solo una conversación honesta sobre tus metas, tu familia y cómo el IUL puede ayudarte.
+                  Sin presión, sin compromiso. Solo una conversación honesta sobre tus metas, tu familia y cómo el IUL puede ayudarte. <strong className={t.text}>El 90% de nuestros clientes desearían haber empezado antes.</strong>
                 </p>
 
-                {["Consulta de 20-30 min por Zoom o WhatsApp", "Análisis personalizado de tu situación", "Proyección con números reales"].map((x, i) => (
+                {["Consulta de 20-30 min por Zoom o WhatsApp", "Análisis personalizado de tu situación", "Proyección con números reales, sin promesas falsas", "Te explicamos todo en español, sin jerga financiera"].map((x, i) => (
                   <div key={i} className="flex items-center gap-3 mb-3.5">
                     <CheckIcon className="text-[#1d9fa9]" />
                     <span className={`text-sm ${t.text}`}>{x}</span>
@@ -1196,6 +1196,18 @@ export default function IULLanding() {
                 <div className={`mt-7 p-5 ${t.brandBg} border border-[#1d9fa9]/15 rounded-xl`}>
                   <div className="text-xs text-[#1d9fa9] font-bold mb-1.5 tracking-wide">DOCUMENTOS ACEPTADOS</div>
                   <p className={`text-sm ${t.textMid}`}>Social Security • ITIN • Pasaporte • Matrícula Consular</p>
+                </div>
+
+                {/* Consultation image */}
+                <div className="mt-7 rounded-2xl overflow-hidden shadow-lg hidden md:block">
+                  <img
+                    src={familyHomeImg}
+                    alt="Familia latina en su nuevo hogar"
+                    className="w-full h-48 object-cover"
+                    width={512}
+                    height={192}
+                    loading="lazy"
+                  />
                 </div>
               </div>
             </Anim>
