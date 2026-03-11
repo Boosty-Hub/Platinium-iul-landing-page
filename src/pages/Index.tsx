@@ -1046,12 +1046,22 @@ export default function IULLanding() {
                 <blockquote className={`${t.card} border rounded-2xl p-8 h-full flex flex-col backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-lg`}>
                   <span className="text-3xl text-[#1d9fa9] opacity-25 leading-none">"</span>
                   <p className={`text-sm ${t.textMid} leading-relaxed flex-1 italic my-3`}>"{item.text}"</p>
-                  <div className="flex gap-0.5 mb-2.5 text-[#1d9fa9]">
+                  <div className="flex gap-0.5 mb-3 text-[#1d9fa9]">
                     {Array(item.stars).fill(0).map((_, j) => <StarIcon key={j} />)}
                   </div>
-                  <cite className="not-italic">
-                    <div className={`text-base font-semibold ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>{item.name}</div>
-                    <div className={`text-xs ${t.textMuted} mt-1`}>{item.role}</div>
+                  <cite className="not-italic flex items-center gap-3">
+                    <img
+                      src={item.img}
+                      alt={item.name}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-[#1d9fa9]/20"
+                      width={48}
+                      height={48}
+                      loading="lazy"
+                    />
+                    <div>
+                      <div className={`text-base font-semibold ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>{item.name}</div>
+                      <div className={`text-xs ${t.textMuted} mt-0.5`}>{item.role}</div>
+                    </div>
                   </cite>
                 </blockquote>
               </Anim>
