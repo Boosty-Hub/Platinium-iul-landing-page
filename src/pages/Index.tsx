@@ -7,6 +7,7 @@
 // ============================================================
 
 import { useState, useEffect, useRef, useCallback, memo } from "react";
+import { Phone, Instagram } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import heroFamilyImg from "@/assets/hero-family.jpg";
