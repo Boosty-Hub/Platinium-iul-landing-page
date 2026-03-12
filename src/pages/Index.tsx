@@ -610,7 +610,7 @@ export default function IULLanding() {
         <div className="absolute top-[8%] right-[3%] w-80 h-80 rounded-full border border-[#1d9fa9]/[0.06] animate-[spin_80s_linear_infinite] pointer-events-none" />
         <div className="absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto px-6 pt-36 pb-20 relative z-10">
+        <div className="max-w-7xl mx-auto px-6 pb-20 relative z-10 pt-[120px]">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div className="max-w-xl">
             {/* Badge */}
@@ -684,7 +684,7 @@ export default function IULLanding() {
                 
             </div>
             {/* Floating stat card */}
-            <div className={`absolute ${t.card} border rounded-2xl p-5 backdrop-blur-xl shadow-xl`} style={{ bottom: '2rem', left: '1rem' }}>
+            <div className={`absolute -bottom-5 -left-5 ${t.card} border rounded-2xl p-5 backdrop-blur-xl shadow-xl`}>
               <div className="text-3xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>$200K+</div>
               <div className={`text-xs ${t.textMuted} mt-1`}>Valor potencial en 20 años<br />con solo $250/mes</div>
             </div>
