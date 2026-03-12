@@ -605,7 +605,7 @@ export default function IULLanding() {
       </nav>
 
       {/* ─── HERO ──────────────────────────────────────────── */}
-      <section className="min-h-screen flex items-center relative overflow-hidden" aria-label="Inicio">
+      <section className="min-h-screen flex flex-col justify-center relative overflow-hidden" aria-label="Inicio">
         {/* Decorative */}
         <div className="absolute top-[8%] right-[3%] w-80 h-80 rounded-full border border-[#1d9fa9]/[0.06] animate-[spin_80s_linear_infinite] pointer-events-none" />
         <div className="absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" />
@@ -837,7 +837,7 @@ export default function IULLanding() {
               )}
             </div>
             <Anim delay={0.3}>
-              <div className="hidden lg:block rounded-3xl overflow-hidden shadow-xl shadow-[#1d9fa9]/10 border border-[#1d9fa9]/10">
+              <div className="rounded-3xl overflow-hidden shadow-xl shadow-[#1d9fa9]/10 border border-[#1d9fa9]/10">
                 <img
                   src={consultationImg}
                   alt="Asesor financiero en consulta con una familia latina"
@@ -1205,7 +1205,7 @@ export default function IULLanding() {
                 </div>
 
                 {/* Consultation image */}
-                <div className="mt-7 rounded-2xl overflow-hidden shadow-lg hidden md:block">
+                <div className="mt-7 rounded-2xl overflow-hidden shadow-lg">
                   <img
                     src={familyHomeImg}
                     alt="Familia latina en su nuevo hogar"
