@@ -354,6 +354,8 @@ interface LeadFormData {
   telefono: string;
   email: string;
   interes: string;
+  anio_nacimiento: string;
+  ahorro_semanal: string;
 }
 
 function getUTMParams(): Record<string, string> {
@@ -382,6 +384,9 @@ async function submitLead(data: LeadFormData): Promise<{ok: boolean;leadId?: str
       fuente: "landing-iul",
       referrer: document.referrer || "direct",
       user_agent: navigator.userAgent.slice(0, 500),
+      anio_nacimiento: data.anio_nacimiento ? parseInt(data.anio_nacimiento) : null,
+      ahorro_semanal: data.ahorro_semanal || null,
+      notas: `Año nacimiento: ${data.anio_nacimiento || 'N/A'} | Ahorro semanal: $${data.ahorro_semanal || 'N/A'}`,
       utm_source: utms.utm_source || null,
       utm_medium: utms.utm_medium || null,
       utm_campaign: utms.utm_campaign || null,
@@ -422,8 +427,9 @@ export default function IULLanding() {
   const [dark, setDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const scrollY = useScrollY();
-  const [form, setForm] = useState<LeadFormData>({ nombre: "", telefono: "", email: "", interes: "" });
+  const [form, setForm] = useState<LeadFormData>({ nombre: "", telefono: "", email: "", interes: "", anio_nacimiento: "", ahorro_semanal: "" });
   const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [step, setStep] = useState(1);
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const [tab, setTab] = useState(0);
 
@@ -459,7 +465,9 @@ export default function IULLanding() {
       nombre: form.nombre.trim().slice(0, 100),
       telefono: form.telefono.trim().slice(0, 20),
       email: form.email.trim().toLowerCase().slice(0, 100),
-      interes: form.interes.slice(0, 50)
+      interes: form.interes.slice(0, 50),
+      anio_nacimiento: form.anio_nacimiento,
+      ahorro_semanal: form.ahorro_semanal
     };
 
     setFormState("loading");
@@ -1175,7 +1183,7 @@ export default function IULLanding() {
         </div>
       </section>
 
-      {/* ─── LEAD FORM ─────────────────────────────────────── */}
+      {/* ─── LEAD FORM (Multi-Step Wizard) ──────────────── */}
       <section id="consulta" className={`${t.bg2} py-24 px-6`} aria-labelledby="form-heading">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
@@ -1186,7 +1194,6 @@ export default function IULLanding() {
                   id="form-heading"
                   className={`text-3xl sm:text-4xl font-normal ${t.text} mb-6`}
                   style={{ fontFamily: "'Playfair Display', serif" }}>
-                  
                   Tu consulta gratuita te espera
                 </h2>
                 <p className={`text-[15px] ${t.textMid} leading-relaxed mb-8`}>
@@ -1205,7 +1212,6 @@ export default function IULLanding() {
                   <p className={`text-sm ${t.textMid}`}>Social Security • ITIN • Pasaporte • Matrícula Consular</p>
                 </div>
 
-                {/* Consultation image */}
                 <div className="mt-7 rounded-2xl overflow-hidden shadow-lg">
                   <img
                     src={familyHomeImg}
@@ -1214,86 +1220,207 @@ export default function IULLanding() {
                     width={512}
                     height={192}
                     loading="lazy" />
-                  
                 </div>
               </div>
             </Anim>
 
             <Anim delay={0.15}>
               <div className={`${t.card} border rounded-2xl p-9 backdrop-blur-xl`}>
-                {formState !== "success" ?
-                <form onSubmit={handleSubmit} noValidate>
-                    <h3 className={`text-2xl font-semibold ${t.text} mb-1.5 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                      Agenda tu Consulta
-                    </h3>
-                    <p className={`text-sm ${t.textMuted} mb-6 text-center`}>Te contactamos en menos de 24 horas.</p>
+                {formState !== "success" ? (
+                  <>
+                    {/* Progress bar */}
+                    <div className="flex items-center gap-1.5 mb-6">
+                      {[1,2,3,4,5].map((s) => (
+                        <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${step >= s ? "bg-[#1d9fa9]" : dark ? "bg-white/10" : "bg-black/10"}`} />
+                      ))}
+                    </div>
+                    <p className={`text-[11px] ${t.textMuted} mb-5 text-center tracking-wide`}>Paso {step} de 5</p>
 
-                    {[
-                  { n: "nombre" as const, l: "Nombre completo", ty: "text", p: "Tu nombre completo" },
-                  { n: "telefono" as const, l: "Teléfono / WhatsApp", ty: "tel", p: "+1 (___) ___-____" },
-                  { n: "email" as const, l: "Email", ty: "email", p: "tu@email.com" }].
-                  map((fi) =>
-                  <div key={fi.n} className="mb-4">
-                        <label htmlFor={fi.n} className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
-                          {fi.l} <span className="text-red-400">*</span>
-                        </label>
-                        <input
-                      id={fi.n}
-                      name={fi.n}
-                      type={fi.ty}
-                      placeholder={fi.p}
-                      required
-                      autoComplete={fi.n === "nombre" ? "name" : fi.n === "telefono" ? "tel" : "email"}
-                      value={form[fi.n]}
-                      onChange={(e) => updateField(fi.n, e.target.value)}
-                      className={`w-full p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30`} />
-                    
+                    {/* Step 1: Interés */}
+                    {step === 1 && (
+                      <div>
+                        <h3 className={`text-xl font-semibold ${t.text} mb-5 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                          ¿Qué te gustaría lograr con este plan?
+                        </h3>
+                        <div className="grid grid-cols-1 gap-3">
+                          {[
+                            { value: "Proteger a mi familia", icon: "🛡️" },
+                            { value: "Crear capital / ahorro", icon: "💰" },
+                            { value: "Ahorro a largo plazo / retiro", icon: "📈" },
+                            { value: "Protección por enfermedad", icon: "❤️" },
+                          ].map((opt) => (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              onClick={() => { updateField("interes", opt.value); setStep(2); }}
+                              className={`w-full p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all hover:border-[#1d9fa9] hover:shadow-md ${
+                                form.interes === opt.value
+                                  ? "border-[#1d9fa9] bg-[#1d9fa9]/10"
+                                  : `${t.divider} ${dark ? "bg-white/[0.02]" : "bg-black/[0.01]"}`
+                              }`}>
+                              <span className="text-2xl">{opt.icon}</span>
+                              <span className={`text-sm font-medium ${t.text}`}>{opt.value}</span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                  )}
+                    )}
 
-                    <div className="mb-6">
-                      <label htmlFor="interes" className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
-                        ¿Qué te interesa más?
-                      </label>
-                      <select
-                      id="interes"
-                      name="interes"
-                      value={form.interes}
-                      onChange={(e) => updateField("interes", e.target.value)}
-                      className={`w-full p-3.5 ${t.input} border rounded-lg text-sm outline-none appearance-none transition-colors focus:border-[#1d9fa9]`}>
-                      
-                        <option value="">Selecciona una opción</option>
-                        {["Protección familiar", "Plan de retiro", "Pagar hipoteca más rápido", "Proteger mi negocio", "Tengo ITIN y quiero opciones", "Solo quiero información"].map((o) =>
-                      <option key={o} value={o}>{o}</option>
-                      )}
-                      </select>
-                    </div>
+                    {/* Step 2: Año de nacimiento */}
+                    {step === 2 && (
+                      <div>
+                        <h3 className={`text-xl font-semibold ${t.text} mb-2 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                          ¿En qué año naciste?
+                        </h3>
+                        <p className={`text-sm ${t.textMuted} mb-6 text-center`}>Esto nos ayuda a calcular tu proyección personalizada.</p>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min="1940"
+                          max="2007"
+                          placeholder="Ej: 1985"
+                          value={form.anio_nacimiento}
+                          onChange={(e) => updateField("anio_nacimiento", e.target.value)}
+                          className={`w-full p-4 ${t.input} border rounded-xl text-center text-2xl font-bold outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30`}
+                          style={{ fontFamily: "'Playfair Display', serif" }}
+                        />
+                        <div className="flex gap-3 mt-6">
+                          <button type="button" onClick={() => setStep(1)} className={`flex-1 py-3 rounded-xl border ${t.divider} ${t.textMid} font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]`}>
+                            ← Atrás
+                          </button>
+                          <button
+                            type="button"
+                            disabled={!form.anio_nacimiento || parseInt(form.anio_nacimiento) < 1940 || parseInt(form.anio_nacimiento) > 2007}
+                            onClick={() => setStep(3)}
+                            className="flex-1 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            Siguiente →
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
-                    <button
-                    type="submit"
-                    disabled={formState === "loading"}
-                    className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-4 rounded-xl font-bold text-base tracking-wide cursor-pointer hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed">
-                    
-                      {formState === "loading" ? "Enviando..." : formState === "error" ? "Reintentar →" : "Quiero Mi Consulta Gratuita →"}
-                    </button>
-                    {formState === "error" &&
-                  <p className="text-xs text-red-500 mt-2 text-center">
-                        Hubo un problema al enviar. Por favor intenta de nuevo o contáctanos directamente por WhatsApp.
+                    {/* Step 3: Ahorro semanal */}
+                    {step === 3 && (
+                      <div>
+                        <h3 className={`text-xl font-semibold ${t.text} mb-2 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                          ¿Cuánto te gustaría ahorrar semanalmente?
+                        </h3>
+                        <p className={`text-sm ${t.textMuted} mb-6 text-center`}>Selecciona el monto que mejor se adapte a tu presupuesto.</p>
+                        <div className="grid grid-cols-3 gap-3">
+                          {["25", "50", "75", "100", "150", "200"].map((amt) => (
+                            <button
+                              key={amt}
+                              type="button"
+                              onClick={() => { updateField("ahorro_semanal", amt); setStep(4); }}
+                              className={`p-4 rounded-xl border text-center cursor-pointer transition-all hover:border-[#1d9fa9] hover:shadow-md ${
+                                form.ahorro_semanal === amt
+                                  ? "border-[#1d9fa9] bg-[#1d9fa9]/10"
+                                  : `${t.divider} ${dark ? "bg-white/[0.02]" : "bg-black/[0.01]"}`
+                              }`}>
+                              <div className="text-xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>${amt}</div>
+                              <div className={`text-[10px] ${t.textMuted} mt-1`}>/semana</div>
+                            </button>
+                          ))}
+                        </div>
+                        <button type="button" onClick={() => setStep(2)} className={`w-full mt-5 py-3 rounded-xl border ${t.divider} ${t.textMid} font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]`}>
+                          ← Atrás
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Step 4: Confirmación */}
+                    {step === 4 && (
+                      <div className="text-center">
+                        <div className="text-5xl mb-5">🎯</div>
+                        <h3 className={`text-xl font-semibold ${t.text} mb-3`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                          Si calificas, ¿te gustaría ver tus números personalizados?
+                        </h3>
+                        <p className={`text-sm ${t.textMuted} mb-7 leading-relaxed`}>
+                          Basado en tu perfil, podemos preparar una proyección real con cifras personalizadas para ti.
+                        </p>
+                        <div className="flex flex-col gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setStep(5)}
+                            className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-4 rounded-xl font-bold text-base cursor-pointer hover:shadow-lg transition-all">
+                            Sí, quiero ver mis números →
+                          </button>
+                          <button type="button" onClick={() => setStep(3)} className={`w-full py-3 rounded-xl border ${t.divider} ${t.textMid} font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]`}>
+                            ← Atrás
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 5: Datos de contacto */}
+                    {step === 5 && (
+                      <form onSubmit={handleSubmit} noValidate>
+                        <h3 className={`text-xl font-semibold ${t.text} mb-2 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                          ¡Último paso! Tus datos de contacto
+                        </h3>
+                        <p className={`text-sm ${t.textMuted} mb-6 text-center`}>Para enviarte tu proyección personalizada.</p>
+
+                        {[
+                          { n: "nombre" as const, l: "Nombre completo", ty: "text", p: "Tu nombre completo" },
+                          { n: "telefono" as const, l: "Teléfono / WhatsApp", ty: "tel", p: "+1 (___) ___-____" },
+                          { n: "email" as const, l: "Email", ty: "email", p: "tu@email.com" },
+                        ].map((fi) => (
+                          <div key={fi.n} className="mb-4">
+                            <label htmlFor={fi.n} className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
+                              {fi.l} <span className="text-red-400">*</span>
+                            </label>
+                            <input
+                              id={fi.n}
+                              name={fi.n}
+                              type={fi.ty}
+                              placeholder={fi.p}
+                              required
+                              autoComplete={fi.n === "nombre" ? "name" : fi.n === "telefono" ? "tel" : "email"}
+                              value={form[fi.n]}
+                              onChange={(e) => updateField(fi.n, e.target.value)}
+                              className={`w-full p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30`}
+                            />
+                          </div>
+                        ))}
+
+                        <button
+                          type="submit"
+                          disabled={formState === "loading"}
+                          className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-4 rounded-xl font-bold text-base tracking-wide cursor-pointer hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+                          {formState === "loading" ? "Enviando..." : formState === "error" ? "Reintentar →" : "Ver mis números personalizados →"}
+                        </button>
+                        {formState === "error" && (
+                          <p className="text-xs text-red-500 mt-2 text-center">
+                            Hubo un problema al enviar. Por favor intenta de nuevo.
+                          </p>
+                        )}
+                        <button type="button" onClick={() => setStep(4)} className={`w-full mt-3 py-3 rounded-xl border ${t.divider} ${t.textMid} font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]`}>
+                          ← Atrás
+                        </button>
+                        <p className={`text-[11px] ${t.textMuted} mt-3 text-center`}>Tu información es 100% confidencial. Sin spam.</p>
+                      </form>
+                    )}
+                  </>
+                ) : (
+                  /* ─── Pantalla Final de Conversión ─── */
+                  <div className="text-center py-8">
+                    <div className="text-5xl mb-5">✅</div>
+                    <h3 className={`text-2xl font-semibold ${t.text} mb-3`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                      Perfecto. Tus datos fueron recibidos correctamente.
+                    </h3>
+                    <p className={`text-[15px] ${t.textMid} leading-relaxed mb-6`}>
+                      Un asesor puede revisar tus cifras contigo <strong className="text-[#1d9fa9]">ahora mismo</strong>.
+                    </p>
+                    <div className={`${t.brandBg} border border-[#1d9fa9]/15 rounded-xl p-5 mb-5`}>
+                      <p className={`text-sm ${t.textMid}`}>
+                        📞 Te contactaremos en las próximas horas por <strong className={t.text}>WhatsApp o teléfono</strong> para agendar tu consulta gratuita.
                       </p>
-                  }
-                    <p className={`text-[11px] ${t.textMuted} mt-3 text-center`}>Tu información es 100% confidencial. Sin spam.</p>
-                  </form> :
-
-                <div className="text-center py-10">
-                    <div className={`w-14 h-14 rounded-full ${t.brandBg} mx-auto mb-5 flex items-center justify-center`}>
-                      <CheckIcon className="text-[#1d9fa9]" />
                     </div>
-                    <h3 className={`text-2xl ${t.text} mb-3`} style={{ fontFamily: "'Playfair Display', serif" }}>¡Recibido!</h3>
-                    <p className={`text-[15px] ${t.textMid} leading-relaxed`}>
-                      Te contactaremos en menos de 24 horas para agendar tu consulta gratuita.
+                    <p className={`text-xs ${t.textMuted}`}>
+                      Si prefieres, también puedes llamarnos directamente.
                     </p>
                   </div>
-                }
+                )}
               </div>
             </Anim>
           </div>

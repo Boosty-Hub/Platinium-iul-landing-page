@@ -16,6 +16,8 @@ export type Database = {
     Tables: {
       leads: {
         Row: {
+          ahorro_semanal: string | null
+          anio_nacimiento: number | null
           created_at: string
           email: string
           fuente: string | null
@@ -36,6 +38,8 @@ export type Database = {
           utm_term: string | null
         }
         Insert: {
+          ahorro_semanal?: string | null
+          anio_nacimiento?: number | null
           created_at?: string
           email: string
           fuente?: string | null
@@ -56,6 +60,8 @@ export type Database = {
           utm_term?: string | null
         }
         Update: {
+          ahorro_semanal?: string | null
+          anio_nacimiento?: number | null
           created_at?: string
           email?: string
           fuente?: string | null
