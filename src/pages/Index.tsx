@@ -676,7 +676,7 @@ export default function IULLanding() {
             <div className="overflow-hidden shadow-[#1d9fa9]/10 border-[#1d9fa9]/10 bg-black/0 shadow-none rounded-none border-0">
               <img
                   alt="Familia latina protegida con un plan IUL"
-                  className="w-full h-auto max-h-[300px] lg:max-h-none rounded-2xl lg:rounded-none object-contain"
+                  className="w-full h-auto max-h-[500px] lg:max-h-none rounded-2xl lg:rounded-none object-contain"
                   width={640}
                   height={384}
                   loading="eager" src="/lovable-uploads/3658c176-85e0-4ba2-80c5-30909eeb0c4d.webp" />
