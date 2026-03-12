@@ -679,7 +679,7 @@ export default function IULLanding() {
                   className="w-full h-auto max-h-[300px] lg:max-h-none object-cover rounded-2xl lg:rounded-none"
                   width={640}
                   height={384}
-                  loading="eager" src="/lovable-uploads/218051ed-db9a-4207-b89d-7c61af864cde.webp" />
+                  loading="eager" src="/lovable-uploads/3658c176-85e0-4ba2-80c5-30909eeb0c4d.webp" />
                 
             </div>
             {/* Floating stat card */}
