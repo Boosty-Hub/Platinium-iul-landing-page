@@ -1509,7 +1509,7 @@ export default function IULLanding() {
       {/* ─── FOOTER ────────────────────────────────────────── */}
       <footer className={`${t.bg2} ${t.divider} border-t py-14 px-6`} role="contentinfo">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 mb-10">
             <div>
               <div className="flex items-center gap-2.5 mb-4">
                 <img src="/logo.png" alt="Platinium Insurance Group" className="h-9 w-auto" width={36} height={36} loading="lazy" />
