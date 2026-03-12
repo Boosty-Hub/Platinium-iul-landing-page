@@ -673,7 +673,7 @@ export default function IULLanding() {
 
           {/* Hero Image */}
           <div className="hidden lg:block relative">
-            <div className="rounded-3xl overflow-hidden shadow-2xl shadow-[#1d9fa9]/10 border border-[#1d9fa9]/10">
+            <div className="overflow-hidden shadow-[#1d9fa9]/10 border-[#1d9fa9]/10 bg-black/0 shadow-none rounded-none border-0">
               <img
 
                   alt="Familia latina protegida con un plan IUL"
