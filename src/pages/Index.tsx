@@ -424,8 +424,9 @@ export default function IULLanding() {
   const [dark, setDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const scrollY = useScrollY();
-  const [form, setForm] = useState<LeadFormData>({ nombre: "", telefono: "", email: "", interes: "" });
+  const [form, setForm] = useState<LeadFormData>({ nombre: "", telefono: "", email: "", interes: "", anio_nacimiento: "", ahorro_semanal: "" });
   const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [step, setStep] = useState(1);
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const [tab, setTab] = useState(0);
 
