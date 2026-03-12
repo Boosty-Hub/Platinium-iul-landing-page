@@ -63,6 +63,8 @@ serve(async (req) => {
         name: `IUL Lead - ${lead.nombre}`,
         custom_fields_values: [
           { field_name: "Interés", values: [{ value: lead.interes || "No especificado" }] },
+          { field_name: "Año Nacimiento", values: [{ value: lead.anio_nacimiento?.toString() || "" }] },
+          { field_name: "Ahorro Semanal", values: [{ value: lead.ahorro_semanal ? `$${lead.ahorro_semanal}/semana` : "" }] },
           { field_name: "UTM Source", values: [{ value: lead.utm_source || "" }] },
           { field_name: "UTM Campaign", values: [{ value: lead.utm_campaign || "" }] },
         ],
