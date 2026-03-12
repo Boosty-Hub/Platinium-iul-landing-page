@@ -1450,8 +1450,8 @@ export default function IULLanding() {
                     <h4 className={`text-lg font-semibold ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
                       ¿Prefieres hablar directamente?
                     </h4>
-                    <p className={`text-sm ${t.textMuted} mt-1`}>
-                      Llámanos o escríbenos por WhatsApp. Estamos disponibles de lunes a viernes, 9am – 6pm.
+                     <p className={`text-sm ${t.textMuted} mt-1`}>
+                      Llámanos o escríbenos por WhatsApp. Lunes a viernes, 10:00 A.M. a 5:00 P.M.
                     </p>
                   </div>
                 </div>
