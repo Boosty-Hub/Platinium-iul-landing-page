@@ -1522,6 +1522,7 @@ export default function IULLanding() {
                 Asesoría financiera especializada en la comunidad hispana de Miami. Protección, retiro y crecimiento financiero con transparencia.
               </p>
             </div>
+            {/* Navegación */}
             <nav aria-label="Navegación del pie de página">
               <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">Navegación</h4>
               {NAV_LINKS.map((l) =>
@@ -1530,17 +1531,52 @@ export default function IULLanding() {
                 </a>
               )}
             </nav>
+
+            {/* Horarios */}
             <div>
-              <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">Contacto</h4>
-              <address className={`text-sm ${t.textMuted} leading-loose not-italic`}>
-                Miami, Florida<br />
-                {/* TODO: Reemplazar con datos reales */}
-                +1 (786) XXX-XXXX<br />
-                info@platiniuminsuranceusa.com
-              </address>
+              <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">🕒 Horarios de Atención</h4>
+              <div className={`text-sm ${t.textMuted} leading-relaxed space-y-1`}>
+                <p>Lunes a Viernes: 10:00 A.M. a 5:00 P.M.</p>
+                <p>Sábado: Cerrado</p>
+                <p>Domingo: Cerrado</p>
+              </div>
+            </div>
+
+            {/* Contacto */}
+            <div>
+              <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">📞 Contacto</h4>
+              <div className={`text-sm ${t.textMuted} space-y-2`}>
+                <a href="tel:+17869562771" className={`block ${t.textMuted} no-underline hover:text-[#1d9fa9] transition-colors`}>(786) 956-2771</a>
+                <a href="https://wa.me/17866787863" target="_blank" rel="noopener noreferrer" className="block text-[#25D366] no-underline hover:opacity-80 transition-opacity">
+                  WhatsApp: +1 (786) 678-7863
+                </a>
+                <a href="https://www.instagram.com/platiniuminsurancegroup" target="_blank" rel="noopener noreferrer" className={`block ${t.textMuted} no-underline hover:text-[#E4405F] transition-colors`}>
+                  📸 @platiniuminsurancegroup
+                </a>
+              </div>
+            </div>
+
+            {/* Oficinas */}
+            <div>
+              <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">📍 Oficinas</h4>
+              <div className={`text-sm ${t.textMuted} space-y-3 leading-relaxed`}>
+                <div>
+                  <p className="font-semibold text-[#1d9fa9]">Miami, FL (Central)</p>
+                  <p>5775 Waterford District Dr #170, Miami, FL 33126</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-[#1d9fa9]">Orlando, FL</p>
+                  <p>13550 Village Park Dr, Orlando, FL 32837</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-[#1d9fa9]">Houston, TX</p>
+                  <p>16225 Park Ten Place, Of. 475, 4to Piso, Houston, TX 77084</p>
+                </div>
+              </div>
             </div>
           </div>
-          <div className={`${t.divider} border-t pt-5 flex flex-col sm:flex-row justify-between gap-3`}>
+
+          <div className={`${t.divider} border-t pt-5 mt-10 flex flex-col sm:flex-row justify-between gap-3`}>
             <p className={`text-[11px] ${t.textMuted} opacity-60`}>© {new Date().getFullYear()} Platinium Insurance Group. Todos los derechos reservados.</p>
             <p className={`text-[10px] ${t.textMuted} opacity-50 max-w-lg`}>
               Descargo: Este sitio es informativo y no constituye asesoría financiera, legal o fiscal. El IUL es un producto de seguro, no una inversión regulada por la SEC. Consulte con un asesor licenciado.
