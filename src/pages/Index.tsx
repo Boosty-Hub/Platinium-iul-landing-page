@@ -838,7 +838,7 @@ export default function IULLanding() {
               )}
             </div>
             <Anim delay={0.3}>
-              <div className="hidden lg:block rounded-3xl overflow-hidden shadow-xl shadow-[#1d9fa9]/10 border border-[#1d9fa9]/10">
+              <div className="rounded-3xl overflow-hidden shadow-xl shadow-[#1d9fa9]/10 border border-[#1d9fa9]/10">
                 <img
                   src={consultationImg}
                   alt="Asesor financiero en consulta con una familia latina"
