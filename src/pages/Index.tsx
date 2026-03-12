@@ -605,7 +605,7 @@ export default function IULLanding() {
       </nav>
 
       {/* ─── HERO ──────────────────────────────────────────── */}
-      <section className="min-h-screen flex items-center relative overflow-hidden" aria-label="Inicio">
+      <section className="min-h-screen flex flex-col justify-center relative overflow-hidden" aria-label="Inicio">
         {/* Decorative */}
         <div className="absolute top-[8%] right-[3%] w-80 h-80 rounded-full border border-[#1d9fa9]/[0.06] animate-[spin_80s_linear_infinite] pointer-events-none" />
         <div className="absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" />
@@ -672,34 +672,35 @@ export default function IULLanding() {
           </div>
 
           {/* Hero Image */}
-          <div className="hidden lg:block relative">
+          <div className="relative order-first lg:order-none">
             <div className="overflow-hidden shadow-[#1d9fa9]/10 border-[#1d9fa9]/10 bg-black/0 shadow-none rounded-none border-0">
               <img
-
                   alt="Familia latina protegida con un plan IUL"
-                  className="w-full h-auto object-cover"
+                  className="w-full h-auto max-h-[300px] lg:max-h-none object-cover rounded-2xl lg:rounded-none"
                   width={640}
                   height={384}
                   loading="eager" src="/lovable-uploads/218051ed-db9a-4207-b89d-7c61af864cde.webp" />
                 
             </div>
             {/* Floating stat card */}
-            <div className={`absolute -bottom-5 -left-5 ${t.card} border rounded-2xl p-5 backdrop-blur-xl shadow-xl`}>
+            <div className={`absolute ${t.card} border rounded-2xl p-5 backdrop-blur-xl shadow-xl`} style={{ bottom: '3rem', left: '0rem' }}>
               <div className="text-3xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>$200K+</div>
               <div className={`text-xs ${t.textMuted} mt-1`}>Valor potencial en 20 años<br />con solo $250/mes</div>
             </div>
           </div>
         </div>
 
+        {/* Scroll indicator - own row */}
+        <div className="flex items-center justify-center mt-10 lg:mt-14">
+          <div className="flex flex-col items-center gap-2 animate-bounce">
+            <span className={`text-[10px] tracking-[2px] ${t.textMuted} uppercase`}>Descubre más</span>
+            <svg className="w-5 h-5 text-[#1d9fa9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <polyline points="19 12 12 19 5 12" />
+            </svg>
+          </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-9 left-1/2 -translate-x-1/2 flex-col gap-2 animate-bounce py-[15px] flex items-center justify-start pb-[40px]">
-          <span className={`text-[10px] tracking-[2px] ${t.textMuted} uppercase`}>Descubre más</span>
-          <svg className="w-5 h-5 text-[#1d9fa9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <polyline points="19 12 12 19 5 12" />
-          </svg>
         </div>
       </section>
 
@@ -837,7 +838,7 @@ export default function IULLanding() {
               )}
             </div>
             <Anim delay={0.3}>
-              <div className="hidden lg:block rounded-3xl overflow-hidden shadow-xl shadow-[#1d9fa9]/10 border border-[#1d9fa9]/10">
+              <div className="rounded-3xl overflow-hidden shadow-xl shadow-[#1d9fa9]/10 border border-[#1d9fa9]/10">
                 <img
                   src={consultationImg}
                   alt="Asesor financiero en consulta con una familia latina"
@@ -1205,7 +1206,7 @@ export default function IULLanding() {
                 </div>
 
                 {/* Consultation image */}
-                <div className="mt-7 rounded-2xl overflow-hidden shadow-lg hidden md:block">
+                <div className="mt-7 rounded-2xl overflow-hidden shadow-lg">
                   <img
                     src={familyHomeImg}
                     alt="Familia latina en su nuevo hogar"
