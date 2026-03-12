@@ -354,6 +354,8 @@ interface LeadFormData {
   telefono: string;
   email: string;
   interes: string;
+  anio_nacimiento: string;
+  ahorro_semanal: string;
 }
 
 function getUTMParams(): Record<string, string> {
