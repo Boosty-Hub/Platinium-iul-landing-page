@@ -1205,7 +1205,7 @@ export default function IULLanding() {
                 </div>
 
                 {/* Consultation image */}
-                <div className="mt-7 rounded-2xl overflow-hidden shadow-lg hidden md:block">
+                <div className="mt-7 rounded-2xl overflow-hidden shadow-lg">
                   <img
                     src={familyHomeImg}
                     alt="Familia latina en su nuevo hogar"
