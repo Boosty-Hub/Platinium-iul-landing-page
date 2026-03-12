@@ -672,7 +672,7 @@ export default function IULLanding() {
           </div>
 
           {/* Hero Image */}
-          <div className="hidden lg:block relative">
+          <div className="relative order-first lg:order-none">
             <div className="overflow-hidden shadow-[#1d9fa9]/10 border-[#1d9fa9]/10 bg-black/0 shadow-none rounded-none border-0">
               <img
 
