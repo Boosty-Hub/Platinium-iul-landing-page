@@ -672,7 +672,7 @@ export default function IULLanding() {
           </div>
 
           {/* Hero Image */}
-          <div className="hidden lg:block relative">
+          <div className="relative order-first lg:order-none">
             <div className="overflow-hidden shadow-[#1d9fa9]/10 border-[#1d9fa9]/10 bg-black/0 shadow-none rounded-none border-0">
               <img
 
@@ -694,7 +694,7 @@ export default function IULLanding() {
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-9 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+        <div className="relative mt-10 lg:absolute lg:bottom-9 lg:left-1/2 lg:-translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
           <span className={`text-[10px] tracking-[2px] ${t.textMuted} uppercase`}>Descubre más</span>
           <svg className="w-5 h-5 text-[#1d9fa9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <line x1="12" y1="5" x2="12" y2="19" />
