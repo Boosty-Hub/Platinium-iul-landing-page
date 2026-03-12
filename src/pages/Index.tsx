@@ -462,7 +462,9 @@ export default function IULLanding() {
       nombre: form.nombre.trim().slice(0, 100),
       telefono: form.telefono.trim().slice(0, 20),
       email: form.email.trim().toLowerCase().slice(0, 100),
-      interes: form.interes.slice(0, 50)
+      interes: form.interes.slice(0, 50),
+      anio_nacimiento: form.anio_nacimiento,
+      ahorro_semanal: form.ahorro_semanal
     };
 
     setFormState("loading");
