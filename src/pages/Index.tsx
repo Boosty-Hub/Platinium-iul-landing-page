@@ -684,7 +684,7 @@ export default function IULLanding() {
                 
             </div>
             {/* Floating stat card */}
-            <div className={`absolute -bottom-5 -left-5 ${t.card} border rounded-2xl p-5 backdrop-blur-xl shadow-xl`}>
+            <div className={`absolute ${t.card} border rounded-2xl p-5 backdrop-blur-xl shadow-xl`} style={{ bottom: '2rem', left: '1rem' }}>
               <div className="text-3xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>$200K+</div>
               <div className={`text-xs ${t.textMuted} mt-1`}>Valor potencial en 20 años<br />con solo $250/mes</div>
             </div>
