@@ -701,7 +701,6 @@ export default function IULLanding() {
             <polyline points="19 12 12 19 5 12" />
           </svg>
         </div>
-        </div>
       </section>
 
       {/* ─── STATS BAR ─────────────────────────────────────── */}
