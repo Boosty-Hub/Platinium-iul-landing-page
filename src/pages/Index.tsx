@@ -402,8 +402,37 @@ async function submitLead(data: LeadFormData): Promise<{ok: boolean;leadId?: str
       return { ok: false };
     }
 
-    // 2. Sincronizar con Kommo via Edge Function (fire-and-forget)
-    // No bloqueamos la UI — el lead ya está seguro en Supabase
+    // 2. Enviar a n8n webhook (fire-and-forget)
+    const webhookPayload = {
+      lead_id: lead?.id,
+      nombre: data.nombre,
+      telefono: data.telefono,
+      email: data.email,
+      interes: data.interes || "",
+      anio_nacimiento: data.anio_nacimiento || null,
+      ahorro_semanal: data.ahorro_semanal || null,
+      fuente: "landing-iul",
+      referrer: document.referrer || "direct",
+      utm_source: utms.utm_source || null,
+      utm_medium: utms.utm_medium || null,
+      utm_campaign: utms.utm_campaign || null,
+      utm_content: utms.utm_content || null,
+      utm_term: utms.utm_term || null,
+      notas: `Año nacimiento: ${data.anio_nacimiento || 'N/A'} | Ahorro semanal: $${data.ahorro_semanal || 'N/A'}`,
+      created_at: new Date().toISOString(),
+    };
+
+    fetch("https://n8n.security.boosty.digital/webhook/form-kommo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(webhookPayload),
+    })
+      .then((res) => {
+        if (!res.ok) console.warn("n8n webhook error (non-blocking):", res.status);
+      })
+      .catch((err) => console.warn("n8n webhook failed (non-blocking):", err));
+
+    // 3. Sincronizar con Kommo via Edge Function (fire-and-forget)
     if (lead?.id) {
       supabase.functions.
       invoke("sync-lead-to-kommo", {
