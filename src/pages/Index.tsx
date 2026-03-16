@@ -482,6 +482,21 @@ export default function IULLanding() {
     e.preventDefault();
     if (formState === "loading") return;
 
+    // Anti-bot: honeypot check
+    if (honeypot) {
+      console.warn("Bot detected (honeypot)");
+      setFormState("success"); // fake success to not alert bot
+      return;
+    }
+
+    // Anti-bot: minimum time check (< 3 seconds = bot)
+    const elapsed = Date.now() - formLoadedAt.current;
+    if (elapsed < 3000) {
+      console.warn("Bot detected (too fast:", elapsed, "ms)");
+      setFormState("success");
+      return;
+    }
+
     // Basic validation
     const phone = form.telefono.replace(/\D/g, "");
     if (phone.length < 10) {
