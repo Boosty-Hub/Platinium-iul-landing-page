@@ -1440,6 +1440,20 @@ export default function IULLanding() {
                             </div>
                           ))}
 
+                          {/* Honeypot - invisible to humans */}
+                          <div className="absolute opacity-0 -z-10 h-0 overflow-hidden" aria-hidden="true">
+                            <label htmlFor="website_url">Website</label>
+                            <input
+                              id="website_url"
+                              name="website_url"
+                              type="text"
+                              tabIndex={-1}
+                              autoComplete="off"
+                              value={honeypot}
+                              onChange={(e) => setHoneypot(e.target.value)}
+                            />
+                          </div>
+
                           <button
                             type="submit"
                             disabled={formState === "loading"}
