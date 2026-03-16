@@ -520,7 +520,7 @@ export default function IULLanding() {
     setFormState("loading");
     const result = await submitLead(sanitized);
     setFormState(result.ok ? "success" : "error");
-  }, [form, formState]);
+  }, [form, formState, honeypot]);
 
   const updateField = useCallback((field: keyof LeadFormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
