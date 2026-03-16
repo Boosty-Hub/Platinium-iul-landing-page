@@ -460,6 +460,8 @@ export default function IULLanding() {
   const [form, setForm] = useState<LeadFormData>({ nombre: "", telefono: "", email: "", interes: "", anio_nacimiento: "", ahorro_semanal: "" });
   const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [step, setStep] = useState(1);
+  const [honeypot, setHoneypot] = useState("");
+  const formLoadedAt = useRef(Date.now());
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const [tab, setTab] = useState(0);
 
@@ -479,6 +481,21 @@ export default function IULLanding() {
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (formState === "loading") return;
+
+    // Anti-bot: honeypot check
+    if (honeypot) {
+      console.warn("Bot detected (honeypot)");
+      setFormState("success"); // fake success to not alert bot
+      return;
+    }
+
+    // Anti-bot: minimum time check (< 3 seconds = bot)
+    const elapsed = Date.now() - formLoadedAt.current;
+    if (elapsed < 3000) {
+      console.warn("Bot detected (too fast:", elapsed, "ms)");
+      setFormState("success");
+      return;
+    }
 
     // Basic validation
     const phone = form.telefono.replace(/\D/g, "");
@@ -503,7 +520,7 @@ export default function IULLanding() {
     setFormState("loading");
     const result = await submitLead(sanitized);
     setFormState(result.ok ? "success" : "error");
-  }, [form, formState]);
+  }, [form, formState, honeypot]);
 
   const updateField = useCallback((field: keyof LeadFormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -1422,6 +1439,20 @@ export default function IULLanding() {
                               />
                             </div>
                           ))}
+
+                          {/* Honeypot - invisible to humans */}
+                          <div className="absolute opacity-0 -z-10 h-0 overflow-hidden" aria-hidden="true">
+                            <label htmlFor="website_url">Website</label>
+                            <input
+                              id="website_url"
+                              name="website_url"
+                              type="text"
+                              tabIndex={-1}
+                              autoComplete="off"
+                              value={honeypot}
+                              onChange={(e) => setHoneypot(e.target.value)}
+                            />
+                          </div>
 
                           <button
                             type="submit"
