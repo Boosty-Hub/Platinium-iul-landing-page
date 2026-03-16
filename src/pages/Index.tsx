@@ -373,11 +373,13 @@ function getUTMParams(): Record<string, string> {
 async function submitLead(data: LeadFormData): Promise<{ok: boolean;leadId?: string;}> {
   try {
     const utms = getUTMParams();
+    const leadId = crypto.randomUUID();
 
-    // 1. Insertar en Supabase
-    const { data: lead, error } = await supabase.
+    // 1. Insertar en Supabase (sin .select() para evitar 401 con anon)
+    const { error } = await supabase.
     from("leads").
     insert({
+      id: leadId,
       nombre: data.nombre,
       telefono: data.telefono,
       email: data.email,
@@ -393,9 +395,7 @@ async function submitLead(data: LeadFormData): Promise<{ok: boolean;leadId?: str
       utm_campaign: utms.utm_campaign || null,
       utm_content: utms.utm_content || null,
       utm_term: utms.utm_term || null
-    }).
-    select("id").
-    single();
+    });
 
     if (error) {
       console.error("Error insertando lead en Supabase:", error);
