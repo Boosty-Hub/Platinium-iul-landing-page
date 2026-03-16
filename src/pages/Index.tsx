@@ -404,7 +404,7 @@ async function submitLead(data: LeadFormData): Promise<{ok: boolean;leadId?: str
 
     // 2. Enviar a n8n webhook (fire-and-forget)
     const webhookPayload = {
-      lead_id: lead?.id,
+      lead_id: leadId,
       nombre: data.nombre,
       telefono: data.telefono,
       email: data.email,
