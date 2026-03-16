@@ -433,18 +433,16 @@ async function submitLead(data: LeadFormData): Promise<{ok: boolean;leadId?: str
       .catch((err) => console.warn("n8n webhook failed (non-blocking):", err));
 
     // 3. Sincronizar con Kommo via Edge Function (fire-and-forget)
-    if (lead?.id) {
-      supabase.functions.
-      invoke("sync-lead-to-kommo", {
-        body: { lead_id: lead.id }
-      }).
-      then((res) => {
-        if (res.error) console.warn("Kommo sync error (no-blocking):", res.error);
-      }).
-      catch((err) => console.warn("Kommo sync failed (no-blocking):", err));
-    }
+    supabase.functions.
+    invoke("sync-lead-to-kommo", {
+      body: { lead_id: leadId }
+    }).
+    then((res) => {
+      if (res.error) console.warn("Kommo sync error (no-blocking):", res.error);
+    }).
+    catch((err) => console.warn("Kommo sync failed (no-blocking):", err));
 
-    return { ok: true, leadId: lead?.id };
+    return { ok: true, leadId };
   } catch (err) {
     console.error("Error en submitLead:", err);
     return { ok: false };
