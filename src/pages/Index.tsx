@@ -373,11 +373,13 @@ function getUTMParams(): Record<string, string> {
 async function submitLead(data: LeadFormData): Promise<{ok: boolean;leadId?: string;}> {
   try {
     const utms = getUTMParams();
+    const leadId = crypto.randomUUID();
 
-    // 1. Insertar en Supabase
-    const { data: lead, error } = await supabase.
+    // 1. Insertar en Supabase (sin .select() para evitar 401 con anon)
+    const { error } = await supabase.
     from("leads").
     insert({
+      id: leadId,
       nombre: data.nombre,
       telefono: data.telefono,
       email: data.email,
@@ -393,9 +395,7 @@ async function submitLead(data: LeadFormData): Promise<{ok: boolean;leadId?: str
       utm_campaign: utms.utm_campaign || null,
       utm_content: utms.utm_content || null,
       utm_term: utms.utm_term || null
-    }).
-    select("id").
-    single();
+    });
 
     if (error) {
       console.error("Error insertando lead en Supabase:", error);
@@ -404,7 +404,7 @@ async function submitLead(data: LeadFormData): Promise<{ok: boolean;leadId?: str
 
     // 2. Enviar a n8n webhook (fire-and-forget)
     const webhookPayload = {
-      lead_id: lead?.id,
+      lead_id: leadId,
       nombre: data.nombre,
       telefono: data.telefono,
       email: data.email,
@@ -433,18 +433,16 @@ async function submitLead(data: LeadFormData): Promise<{ok: boolean;leadId?: str
       .catch((err) => console.warn("n8n webhook failed (non-blocking):", err));
 
     // 3. Sincronizar con Kommo via Edge Function (fire-and-forget)
-    if (lead?.id) {
-      supabase.functions.
-      invoke("sync-lead-to-kommo", {
-        body: { lead_id: lead.id }
-      }).
-      then((res) => {
-        if (res.error) console.warn("Kommo sync error (no-blocking):", res.error);
-      }).
-      catch((err) => console.warn("Kommo sync failed (no-blocking):", err));
-    }
+    supabase.functions.
+    invoke("sync-lead-to-kommo", {
+      body: { lead_id: leadId }
+    }).
+    then((res) => {
+      if (res.error) console.warn("Kommo sync error (no-blocking):", res.error);
+    }).
+    catch((err) => console.warn("Kommo sync failed (no-blocking):", err));
 
-    return { ok: true, leadId: lead?.id };
+    return { ok: true, leadId };
   } catch (err) {
     console.error("Error en submitLead:", err);
     return { ok: false };
