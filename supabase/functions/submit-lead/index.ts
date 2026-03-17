@@ -172,76 +172,7 @@ serve(async (req) => {
       }).catch((err) => console.warn("n8n webhook failed:", err));
     }
 
-    // Kommo sync (fire-and-forget, reusing existing edge function logic inline)
-    const KOMMO_WEBHOOK = Deno.env.get("KOMMO_WEBHOOK_URL");
-    if (KOMMO_WEBHOOK) {
-      const { data: lead } = await supabase
-        .from("leads")
-        .select("*")
-        .eq("id", leadId)
-        .single();
-
-      if (lead) {
-        const kommoPayload = {
-          source_name: "Landing IUL - platiniuminsuranceusa.com",
-          source_uid: "platinium-iul-landing",
-          created_at: Math.floor(new Date(lead.created_at).getTime() / 1000),
-          metadata: {
-            form_id: "iul-consulta",
-            form_name: "Consulta Gratuita IUL",
-            form_page: "https://platiniuminsuranceusa.com",
-            form_sent_at: lead.created_at,
-            referer: lead.referrer || "direct",
-            ip: lead.ip_address || "",
-          },
-          contact: {
-            name: lead.nombre,
-            first_name: lead.nombre.split(" ")[0],
-            last_name: lead.nombre.split(" ").slice(1).join(" ") || "",
-            custom_fields_values: [
-              { field_code: "PHONE", values: [{ value: lead.telefono, enum_code: "WORK" }] },
-              { field_code: "EMAIL", values: [{ value: lead.email, enum_code: "WORK" }] },
-            ],
-          },
-          leads: [{
-            name: `IUL Lead - ${lead.nombre}`,
-            custom_fields_values: [
-              { field_name: "Interés", values: [{ value: lead.interes || "No especificado" }] },
-              { field_name: "Año Nacimiento", values: [{ value: lead.anio_nacimiento?.toString() || "" }] },
-              { field_name: "Ahorro Semanal", values: [{ value: lead.ahorro_semanal ? `$${lead.ahorro_semanal}/semana` : "" }] },
-              { field_name: "UTM Source", values: [{ value: lead.utm_source || "" }] },
-              { field_name: "UTM Campaign", values: [{ value: lead.utm_campaign || "" }] },
-            ],
-            tags: [
-              { name: "IUL" },
-              { name: "Landing Web" },
-              { name: lead.interes || "General" },
-            ],
-          }],
-        };
-
-        fetch(KOMMO_WEBHOOK, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(kommoPayload),
-        })
-          .then(async (res) => {
-            const kommoSynced = res.ok;
-            let kommoLeadId = null;
-            if (kommoSynced) {
-              try {
-                const d = await res.json();
-                kommoLeadId = d?.id || d?._embedded?.leads?.[0]?.id || null;
-              } catch {}
-            }
-            await supabase
-              .from("leads")
-              .update({ kommo_synced: kommoSynced, kommo_lead_id: kommoLeadId?.toString() })
-              .eq("id", leadId);
-          })
-          .catch((err) => console.warn("Kommo sync failed:", err));
-      }
-    }
+    // Kommo sync is handled by n8n workflow, no need to send directly
 
     return new Response(
       JSON.stringify({ ok: true, lead_id: leadId }),
