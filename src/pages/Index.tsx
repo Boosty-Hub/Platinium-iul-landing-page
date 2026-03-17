@@ -469,7 +469,7 @@ export default function IULLanding() {
     };
 
     setFormState("loading");
-    const result = await submitLead(sanitized);
+    const result = await submitLead(sanitized, formLoadedAt.current);
     setFormState(result.ok ? "success" : "error");
   }, [form, formState, honeypot]);
 
