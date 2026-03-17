@@ -370,79 +370,32 @@ function getUTMParams(): Record<string, string> {
   return result;
 }
 
-async function submitLead(data: LeadFormData): Promise<{ok: boolean;leadId?: string;}> {
+async function submitLead(data: LeadFormData, formLoadedAt: number): Promise<{ok: boolean;leadId?: string;}> {
   try {
     const utms = getUTMParams();
-    const leadId = crypto.randomUUID();
 
-    // 1. Insertar en Supabase (sin .select() para evitar 401 con anon)
-    const { error } = await supabase.
-    from("leads").
-    insert({
-      id: leadId,
-      nombre: data.nombre,
-      telefono: data.telefono,
-      email: data.email,
-      interes: data.interes || "",
-      fuente: "landing-iul",
-      referrer: document.referrer || "direct",
-      user_agent: navigator.userAgent.slice(0, 500),
-      anio_nacimiento: data.anio_nacimiento ? parseInt(data.anio_nacimiento) : null,
-      ahorro_semanal: data.ahorro_semanal || null,
-      notas: `Año nacimiento: ${data.anio_nacimiento || 'N/A'} | Ahorro semanal: $${data.ahorro_semanal || 'N/A'}`,
-      utm_source: utms.utm_source || null,
-      utm_medium: utms.utm_medium || null,
-      utm_campaign: utms.utm_campaign || null,
-      utm_content: utms.utm_content || null,
-      utm_term: utms.utm_term || null
+    const res = await supabase.functions.invoke("submit-lead", {
+      body: {
+        nombre: data.nombre,
+        telefono: data.telefono,
+        email: data.email,
+        interes: data.interes || "",
+        anio_nacimiento: data.anio_nacimiento || null,
+        ahorro_semanal: data.ahorro_semanal || null,
+        notas: `Año nacimiento: ${data.anio_nacimiento || 'N/A'} | Ahorro semanal: $${data.ahorro_semanal || 'N/A'}`,
+        referrer: document.referrer || "direct",
+        form_loaded_at: formLoadedAt,
+        ...utms,
+      },
     });
 
-    if (error) {
-      console.error("Error insertando lead en Supabase:", error);
+    if (res.error) {
+      console.error("Error en submit-lead:", res.error);
       return { ok: false };
     }
 
-    // 2. Enviar a n8n webhook (fire-and-forget)
-    const webhookPayload = {
-      lead_id: leadId,
-      nombre: data.nombre,
-      telefono: data.telefono,
-      email: data.email,
-      interes: data.interes || "",
-      anio_nacimiento: data.anio_nacimiento || null,
-      ahorro_semanal: data.ahorro_semanal || null,
-      fuente: "landing-iul",
-      referrer: document.referrer || "direct",
-      utm_source: utms.utm_source || null,
-      utm_medium: utms.utm_medium || null,
-      utm_campaign: utms.utm_campaign || null,
-      utm_content: utms.utm_content || null,
-      utm_term: utms.utm_term || null,
-      notas: `Año nacimiento: ${data.anio_nacimiento || 'N/A'} | Ahorro semanal: $${data.ahorro_semanal || 'N/A'}`,
-      created_at: new Date().toISOString(),
-    };
-
-    fetch("https://n8n.security.boosty.digital/webhook/form-kommo", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(webhookPayload),
-    })
-      .then((res) => {
-        if (!res.ok) console.warn("n8n webhook error (non-blocking):", res.status);
-      })
-      .catch((err) => console.warn("n8n webhook failed (non-blocking):", err));
-
-    // 3. Sincronizar con Kommo via Edge Function (fire-and-forget)
-    supabase.functions.
-    invoke("sync-lead-to-kommo", {
-      body: { lead_id: leadId }
-    }).
-    then((res) => {
-      if (res.error) console.warn("Kommo sync error (no-blocking):", res.error);
-    }).
-    catch((err) => console.warn("Kommo sync failed (no-blocking):", err));
-
-    return { ok: true, leadId };
+    const result = res.data as { ok: boolean; lead_id?: string };
+    return { ok: result.ok, leadId: result.lead_id };
   } catch (err) {
     console.error("Error en submitLead:", err);
     return { ok: false };
