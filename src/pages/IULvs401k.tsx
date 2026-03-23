@@ -13,9 +13,9 @@ export default function IULvs401k() {
       {({ t, dark }) => (
         <>
           <SEOHead
-            title="IUL vs 401k: Comparación Completa en Español | 2026"
-            description="Compara IUL vs 401k vs Roth IRA: ventajas fiscales, acceso al dinero, protección familiar. Guía completa para hispanos en EE.UU."
-            keywords="IUL vs 401k, comparación IUL 401k, IUL vs Roth IRA, mejor plan de retiro, IUL o 401k para hispanos"
+            title="IUL vs 401k para Hispanos | Comparativa Completa | Platinium Insurance Miami"
+            description="¿Qué conviene más: un IUL o un 401k? Te explicamos las diferencias en español para que decidas según tu situación en Miami. Sin letras pequeñas."
+            keywords="IUL vs 401k, diferencias IUL y 401k, qué es mejor IUL o 401k, iul o 401k cuál conviene más, diferencia entre 401k y seguro de vida, puedo tener IUL y 401k al mismo tiempo, ventajas del IUL sobre el 401k, IUL vs Roth IRA, penalidades del 401k para hispanos, retiro libre de impuestos IUL, mejor plan de retiro hispanos Miami"
             canonical={`${DOMAIN}/iul-vs-401k`}
             jsonLd={[
               {
