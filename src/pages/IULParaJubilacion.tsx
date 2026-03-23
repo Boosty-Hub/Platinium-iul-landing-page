@@ -24,7 +24,7 @@ export default function IULParaJubilacion() {
                 itemListElement: [
                   { "@type": "ListItem", position: 1, name: "Inicio", item: DOMAIN },
                   { "@type": "ListItem", position: 2, name: "Seguro de Vida IUL", item: `${DOMAIN}/seguro-de-vida-iul` },
-                  { "@type": "ListItem", position: 3, name: "IUL para Jubilación", item: `${DOMAIN}/iul-para-jubilacion` },
+                  { "@type": "ListItem", position: 3, name: "Jubilación sin 401k", item: `${DOMAIN}/jubilacion-sin-401k` },
                 ],
               },
               {
