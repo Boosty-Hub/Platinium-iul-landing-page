@@ -38,7 +38,7 @@ export default function IULParaJubilacion() {
             ]}
           />
 
-          <Breadcrumbs items={[{ label: "Seguro de Vida IUL", href: "/seguro-de-vida-iul" }, { label: "IUL para Jubilación" }]} t={t} />
+          <Breadcrumbs items={[{ label: "Seguro de Vida IUL", href: "/seguro-de-vida-iul" }, { label: "Jubilación sin 401k" }]} t={t} />
 
           {/* HERO */}
           <section className="pt-8 pb-20 px-6">
