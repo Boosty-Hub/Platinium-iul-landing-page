@@ -13,10 +13,10 @@ export default function IULParaJubilacion() {
       {({ t, dark }) => (
         <>
           <SEOHead
-            title="Ahorro para Jubilación sin 401k | Plan de Retiro IUL"
-            description="¿Sin 401k ni pensión? El IUL te permite construir un plan de retiro con crecimiento indexado y acceso libre de impuestos. Consulta gratis."
-            keywords="ahorro para jubilación sin 401k, seguro de vida con ahorro, plan de retiro IUL, retiro sin pensión, IUL para jubilación, ahorro para retiro latinos"
-            canonical={`${DOMAIN}/iul-para-jubilacion`}
+            title="Jubilación para Hispanos sin 401k Miami | Seguro IUL | Platinium Insurance"
+            description="¿Trabajas por tu cuenta o no tienes 401k? El IUL es tu alternativa para jubilarte con ingresos libres de impuestos. Asesoría en español en Miami. Cotiza gratis."
+            keywords="ahorro para jubilación sin 401k, IUL vs 401k, plan de jubilación para hispanos, retiro sin 401k Miami, cómo jubilarme si no tengo 401k, cómo ahorrar para el retiro siendo inmigrante, alternativas al 401k para hispanos, plan de retiro para trabajadores independientes, jubilación para hispanos Estados Unidos, ingreso libre de impuestos jubilación, plan de retiro trabajador por cuenta propia Florida, 401k vs IUL diferencias"
+            canonical={`${DOMAIN}/jubilacion-sin-401k`}
             jsonLd={[
               {
                 "@context": "https://schema.org",
