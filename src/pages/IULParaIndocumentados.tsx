@@ -24,10 +24,10 @@ export default function IULParaIndocumentados() {
       {({ t, dark }) => (
         <>
           <SEOHead
-            title="Seguro de Vida para Indocumentados con ITIN | Sin SSN"
-            description="¿Tienes ITIN pero no SSN? Puedes aplicar a un seguro de vida IUL. Protege a tu familia y ahorra para el futuro. Explicación en español."
-            keywords="seguro de vida para indocumentados, IUL con ITIN, seguro de vida sin SSN, seguro sin seguro social, seguro de vida para inmigrantes, ITIN insurance"
-            canonical={`${DOMAIN}/iul-para-indocumentados`}
+            title="Seguro de Vida con ITIN Miami | Para Inmigrantes sin Seguro Social | Platinium"
+            description="¿Tienes ITIN pero no Social Security? Puedes tener un seguro de vida IUL legal en Miami. Aceptamos pasaporte e ITIN. Confidencial. Cotiza gratis en español."
+            keywords="seguro de vida para indocumentados, seguro de vida con ITIN, seguro de vida sin seguro social, seguro de vida inmigrante Miami, seguro de vida sin número de seguro social, seguro de vida con itin number, puedo tener seguro de vida siendo indocumentado, seguro de vida para inmigrante sin papeles, aseguranza de vida con pasaporte, seguro de vida para inmigrantes Florida, póliza de vida para hispanos sin documentos, seguro de vida sin social security Miami, seguro de vida con matricula consular, requisitos seguro de vida inmigrante"
+            canonical={`${DOMAIN}/seguro-vida-itin`}
             jsonLd={[
               {
                 "@context": "https://schema.org",
@@ -40,7 +40,7 @@ export default function IULParaIndocumentados() {
                 itemListElement: [
                   { "@type": "ListItem", position: 1, name: "Inicio", item: DOMAIN },
                   { "@type": "ListItem", position: 2, name: "Seguro de Vida IUL", item: `${DOMAIN}/seguro-de-vida-iul` },
-                  { "@type": "ListItem", position: 3, name: "IUL para Indocumentados", item: `${DOMAIN}/iul-para-indocumentados` },
+                  { "@type": "ListItem", position: 3, name: "Seguro con ITIN", item: `${DOMAIN}/seguro-vida-itin` },
                 ],
               },
             ]}
@@ -56,9 +56,9 @@ export default function IULParaIndocumentados() {
                   <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">🌎 Acceso con ITIN</span>
                 </div>
                 <h1 className={`text-4xl sm:text-5xl font-normal leading-[1.1] mb-6 ${t.text}`} style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-                  Seguro de Vida IUL con ITIN —{" "}
+                  Seguro de vida con ITIN —{" "}
                   <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
-                    Sin Necesidad de Seguro Social
+                    sin necesitar Social Security
                   </span>
                 </h1>
                 <p className={`text-lg ${t.textMid} max-w-2xl mx-auto leading-relaxed`}>
@@ -174,7 +174,7 @@ export default function IULParaIndocumentados() {
               <Anim delay={0.3}>
                 <div className="mt-8 text-center flex flex-wrap justify-center gap-4">
                   <Link to="/seguro-de-vida-iul" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">← ¿Qué es el IUL?</Link>
-                  <Link to="/iul-para-jubilacion" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">IUL para Jubilación →</Link>
+                  <Link to="/jubilacion-sin-401k" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">Jubilación sin 401k →</Link>
                 </div>
               </Anim>
             </div>

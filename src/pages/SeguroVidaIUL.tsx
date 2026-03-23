@@ -21,7 +21,7 @@ export default function SeguroVidaIUL() {
           <SEOHead
             title="Seguro de Vida Universal Indexado (IUL) Explicado en Español"
             description="Guía completa del IUL: cómo funciona, beneficios, costos y para quién es ideal. Información clara en español para hispanos en EE.UU."
-            keywords="seguro de vida universal indexado, seguro de vida IUL, IUL en español, qué es un IUL, cómo funciona el IUL, IUL para hispanos"
+            keywords="seguro de vida universal indexado, seguro de vida IUL, IUL en español, qué es un IUL, cómo funciona el IUL, IUL para hispanos, seguro de vida que genera dinero, póliza de vida con valor en efectivo, seguro de vida permanente hispanos Florida, seguro de vida que crece con el mercado Miami"
             canonical={`${DOMAIN}/seguro-de-vida-iul`}
             jsonLd={[
               {
@@ -184,11 +184,12 @@ export default function SeguroVidaIUL() {
               </Anim>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {[
-                  { title: "IUL para Jubilación", desc: "Sin 401k ni pensión? El IUL es tu plan de retiro.", href: "/iul-para-jubilacion", icon: "📈" },
-                  { title: "IUL con ITIN", desc: "Aplica sin SSN. Solo necesitas ITIN y tax returns.", href: "/iul-para-indocumentados", icon: "🌎" },
+                  { title: "Jubilación sin 401k", desc: "Sin 401k ni pensión? El IUL es tu plan de retiro en Miami.", href: "/jubilacion-sin-401k", icon: "📈" },
+                  { title: "Seguro con ITIN", desc: "Aplica sin SSN. Solo necesitas ITIN y tax returns.", href: "/seguro-vida-itin", icon: "🌎" },
                   { title: "IUL vs 401(k)", desc: "Compara ventajas fiscales, acceso y protección.", href: "/iul-vs-401k", icon: "⚖️" },
                   { title: "Protección Familiar", desc: "Asegura el futuro de tu familia con cobertura permanente.", href: "/iul-proteccion-familiar", icon: "🏠" },
-                  { title: "Para Emprendedores", desc: "Ideal para dueños de negocio y contratistas 1099.", href: "/iul-para-emprendedores", icon: "💼" },
+                  { title: "Para Emprendedores", desc: "Ideal para dueños de negocio y contratistas 1099 en Miami-Dade.", href: "/iul-emprendedores", icon: "💼" },
+                  { title: "Beneficios en Vida", desc: "Usa tu seguro si te enfermas. No solo cuando mueras.", href: "/beneficios-en-vida", icon: "❤️" },
                   { title: "Consulta Gratuita", desc: "Agenda una sesión personalizada sin compromiso.", href: "/contacto", icon: "📞" },
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.08}>

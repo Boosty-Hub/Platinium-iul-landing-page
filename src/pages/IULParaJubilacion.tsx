@@ -13,10 +13,10 @@ export default function IULParaJubilacion() {
       {({ t, dark }) => (
         <>
           <SEOHead
-            title="Ahorro para Jubilación sin 401k | Plan de Retiro IUL"
-            description="¿Sin 401k ni pensión? El IUL te permite construir un plan de retiro con crecimiento indexado y acceso libre de impuestos. Consulta gratis."
-            keywords="ahorro para jubilación sin 401k, seguro de vida con ahorro, plan de retiro IUL, retiro sin pensión, IUL para jubilación, ahorro para retiro latinos"
-            canonical={`${DOMAIN}/iul-para-jubilacion`}
+            title="Jubilación para Hispanos sin 401k Miami | Seguro IUL | Platinium Insurance"
+            description="¿Trabajas por tu cuenta o no tienes 401k? El IUL es tu alternativa para jubilarte con ingresos libres de impuestos. Asesoría en español en Miami. Cotiza gratis."
+            keywords="ahorro para jubilación sin 401k, IUL vs 401k, plan de jubilación para hispanos, retiro sin 401k Miami, cómo jubilarme si no tengo 401k, cómo ahorrar para el retiro siendo inmigrante, alternativas al 401k para hispanos, plan de retiro para trabajadores independientes, jubilación para hispanos Estados Unidos, ingreso libre de impuestos jubilación, plan de retiro trabajador por cuenta propia Florida, 401k vs IUL diferencias"
+            canonical={`${DOMAIN}/jubilacion-sin-401k`}
             jsonLd={[
               {
                 "@context": "https://schema.org",
@@ -24,7 +24,7 @@ export default function IULParaJubilacion() {
                 itemListElement: [
                   { "@type": "ListItem", position: 1, name: "Inicio", item: DOMAIN },
                   { "@type": "ListItem", position: 2, name: "Seguro de Vida IUL", item: `${DOMAIN}/seguro-de-vida-iul` },
-                  { "@type": "ListItem", position: 3, name: "IUL para Jubilación", item: `${DOMAIN}/iul-para-jubilacion` },
+                  { "@type": "ListItem", position: 3, name: "Jubilación sin 401k", item: `${DOMAIN}/jubilacion-sin-401k` },
                 ],
               },
               {
@@ -38,7 +38,7 @@ export default function IULParaJubilacion() {
             ]}
           />
 
-          <Breadcrumbs items={[{ label: "Seguro de Vida IUL", href: "/seguro-de-vida-iul" }, { label: "IUL para Jubilación" }]} t={t} />
+          <Breadcrumbs items={[{ label: "Seguro de Vida IUL", href: "/seguro-de-vida-iul" }, { label: "Jubilación sin 401k" }]} t={t} />
 
           {/* HERO */}
           <section className="pt-8 pb-20 px-6">
@@ -48,13 +48,13 @@ export default function IULParaJubilacion() {
                   <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">📈 Plan de Retiro</span>
                 </div>
                 <h1 className={`text-4xl sm:text-5xl font-normal leading-[1.1] mb-6 ${t.text}`} style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-                  Plan de Retiro con IUL:{" "}
+                  Planifica tu jubilación en Miami{" "}
                   <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
-                    Ahorra para tu Jubilación sin 401(k)
+                    sin necesitar un 401(k)
                   </span>
                 </h1>
                 <p className={`text-lg ${t.textMid} max-w-2xl mx-auto leading-relaxed`}>
-                  Si eres contratista 1099, trabajador independiente o simplemente no tienes acceso a un 401(k), el IUL es tu vehículo para construir un retiro digno con <strong className="text-[#1d9fa9]">crecimiento indexado y acceso libre de impuestos</strong>.
+                  Si eres contratista 1099, trabajador independiente o simplemente no tienes acceso a un 401(k) en Miami-Dade, el IUL es tu vehículo para construir un retiro digno con <strong className="text-[#1d9fa9]">crecimiento indexado y acceso libre de impuestos</strong>.
                 </p>
               </Anim>
             </div>
@@ -182,7 +182,7 @@ export default function IULParaJubilacion() {
               <Anim delay={0.3}>
                 <div className="mt-10 text-center flex flex-wrap justify-center gap-4">
                   <Link to="/iul-vs-401k" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">Compara IUL vs 401(k) →</Link>
-                  <Link to="/iul-para-indocumentados" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">¿Tienes ITIN? Aplica aquí →</Link>
+                  <Link to="/seguro-vida-itin" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">¿Tienes ITIN? Aplica aquí →</Link>
                 </div>
               </Anim>
             </div>

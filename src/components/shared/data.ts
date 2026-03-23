@@ -38,12 +38,12 @@ export const FAQS = [
 ];
 
 export const BENEFITS = [
-  { icon: "🏠", title: "Protección Familiar", desc: "Asegura el futuro de tu familia con un beneficio por fallecimiento que cubre hipoteca, deudas y nivel de vida. Tu legado, garantizado.", link: "/iul-proteccion-familiar" },
-  { icon: "📈", title: "Plan de Retiro", desc: "Construye tu jubilación con crecimiento indexado al mercado y acceso a tu dinero libre de impuestos mediante préstamos de la póliza.", link: "/iul-para-jubilacion" },
+  { icon: "🏠", title: "Protección Familiar", desc: "Asegura el futuro de tu familia con un beneficio por fallecimiento que cubre hipoteca, deudas y nivel de vida. Tu legado, garantizado.", link: "/proteccion-familiar" },
+  { icon: "📈", title: "Plan de Retiro", desc: "Construye tu jubilación con crecimiento indexado al mercado y acceso a tu dinero libre de impuestos mediante préstamos de la póliza.", link: "/jubilacion-sin-401k" },
   { icon: "🏡", title: "Paga tu Hipoteca", desc: "Usa el valor acumulado para liquidar tu hipoteca en 15-20 años en vez de 30. Tu casa libre de deudas, más rápido.", link: "/seguro-de-vida-iul" },
-  { icon: "❤️", title: "Beneficios en Vida", desc: "Riders para enfermedades crónicas, críticas y terminales. Accede a tu beneficio cuando más lo necesitas, sin esperar.", link: "/seguro-vida-sin-examen-medico" },
-  { icon: "💼", title: "Negocio Familiar", desc: "Protege tu negocio y planifica la sucesión patrimonial. Ideal para dueños de restaurantes, construcción y comercio.", link: "/iul-para-emprendedores" },
-  { icon: "🌎", title: "Acceso con ITIN", desc: "Aplica con ITIN, pasaporte o matrícula consular. Tu estatus migratorio no te impide proteger a tu familia.", link: "/iul-para-indocumentados" },
+  { icon: "❤️", title: "Beneficios en Vida", desc: "Riders para enfermedades crónicas, críticas y terminales. Accede a tu beneficio cuando más lo necesitas, sin esperar.", link: "/beneficios-en-vida" },
+  { icon: "💼", title: "Negocio Familiar", desc: "Protege tu negocio y planifica la sucesión patrimonial. Ideal para dueños de restaurantes, construcción y comercio.", link: "/iul-emprendedores" },
+  { icon: "🌎", title: "Acceso con ITIN", desc: "Aplica con ITIN, pasaporte o matrícula consular. Tu estatus migratorio no te impide proteger a tu familia.", link: "/seguro-vida-itin" },
 ];
 
 export const STEPS = [
@@ -88,9 +88,11 @@ export const TESTIMONIALS = [
 
 export const SERVICE_PAGES = [
   { label: "¿Qué es el IUL?", href: "/seguro-de-vida-iul" },
-  { label: "IUL para Jubilación", href: "/iul-para-jubilacion" },
-  { label: "IUL para Indocumentados", href: "/iul-para-indocumentados" },
+  { label: "Jubilación sin 401k", href: "/jubilacion-sin-401k" },
+  { label: "Seguro con ITIN", href: "/seguro-vida-itin" },
   { label: "IUL vs 401(k)", href: "/iul-vs-401k" },
-  { label: "Protección Familiar", href: "/iul-proteccion-familiar" },
-  { label: "IUL para Emprendedores", href: "/iul-para-emprendedores" },
+  { label: "Protección Familiar", href: "/proteccion-familiar" },
+  { label: "Para Emprendedores", href: "/iul-emprendedores" },
+  { label: "Sin Examen Médico", href: "/seguro-vida-sin-examen-medico" },
+  { label: "Beneficios en Vida", href: "/beneficios-en-vida" },
 ];
