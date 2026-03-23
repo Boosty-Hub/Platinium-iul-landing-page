@@ -21,7 +21,7 @@ export default function SeguroVidaIUL() {
           <SEOHead
             title="Seguro de Vida Universal Indexado (IUL) Explicado en Español"
             description="Guía completa del IUL: cómo funciona, beneficios, costos y para quién es ideal. Información clara en español para hispanos en EE.UU."
-            keywords="seguro de vida universal indexado, seguro de vida IUL, IUL en español, qué es un IUL, cómo funciona el IUL, IUL para hispanos"
+            keywords="seguro de vida universal indexado, seguro de vida IUL, IUL en español, qué es un IUL, cómo funciona el IUL, IUL para hispanos, seguro de vida que genera dinero, póliza de vida con valor en efectivo, seguro de vida permanente hispanos Florida, seguro de vida que crece con el mercado Miami"
             canonical={`${DOMAIN}/seguro-de-vida-iul`}
             jsonLd={[
               {
