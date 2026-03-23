@@ -172,7 +172,7 @@ export default function IULvs401k() {
 
               <Anim delay={0.3}>
                 <div className="mt-10 text-center flex flex-wrap justify-center gap-4">
-                  <Link to="/iul-para-jubilacion" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">← IUL para Jubilación</Link>
+                  <Link to="/jubilacion-sin-401k" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">← Jubilación sin 401k</Link>
                   <Link to="/seguro-de-vida-iul" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">¿Qué es el IUL? →</Link>
                 </div>
               </Anim>

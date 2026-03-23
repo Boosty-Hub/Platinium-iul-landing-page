@@ -48,13 +48,13 @@ export default function IULParaJubilacion() {
                   <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">📈 Plan de Retiro</span>
                 </div>
                 <h1 className={`text-4xl sm:text-5xl font-normal leading-[1.1] mb-6 ${t.text}`} style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-                  Plan de Retiro con IUL:{" "}
+                  Planifica tu jubilación en Miami{" "}
                   <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
-                    Ahorra para tu Jubilación sin 401(k)
+                    sin necesitar un 401(k)
                   </span>
                 </h1>
                 <p className={`text-lg ${t.textMid} max-w-2xl mx-auto leading-relaxed`}>
-                  Si eres contratista 1099, trabajador independiente o simplemente no tienes acceso a un 401(k), el IUL es tu vehículo para construir un retiro digno con <strong className="text-[#1d9fa9]">crecimiento indexado y acceso libre de impuestos</strong>.
+                  Si eres contratista 1099, trabajador independiente o simplemente no tienes acceso a un 401(k) en Miami-Dade, el IUL es tu vehículo para construir un retiro digno con <strong className="text-[#1d9fa9]">crecimiento indexado y acceso libre de impuestos</strong>.
                 </p>
               </Anim>
             </div>

@@ -188,7 +188,8 @@ export default function SeguroVidaIUL() {
                   { title: "Seguro con ITIN", desc: "Aplica sin SSN. Solo necesitas ITIN y tax returns.", href: "/seguro-vida-itin", icon: "🌎" },
                   { title: "IUL vs 401(k)", desc: "Compara ventajas fiscales, acceso y protección.", href: "/iul-vs-401k", icon: "⚖️" },
                   { title: "Protección Familiar", desc: "Asegura el futuro de tu familia con cobertura permanente.", href: "/iul-proteccion-familiar", icon: "🏠" },
-                  { title: "Para Emprendedores", desc: "Ideal para dueños de negocio y contratistas 1099.", href: "/iul-para-emprendedores", icon: "💼" },
+                  { title: "Para Emprendedores", desc: "Ideal para dueños de negocio y contratistas 1099 en Miami-Dade.", href: "/iul-emprendedores", icon: "💼" },
+                  { title: "Beneficios en Vida", desc: "Usa tu seguro si te enfermas. No solo cuando mueras.", href: "/beneficios-en-vida", icon: "❤️" },
                   { title: "Consulta Gratuita", desc: "Agenda una sesión personalizada sin compromiso.", href: "/contacto", icon: "📞" },
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.08}>
