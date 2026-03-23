@@ -174,7 +174,7 @@ export default function IULParaIndocumentados() {
               <Anim delay={0.3}>
                 <div className="mt-8 text-center flex flex-wrap justify-center gap-4">
                   <Link to="/seguro-de-vida-iul" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">← ¿Qué es el IUL?</Link>
-                  <Link to="/iul-para-jubilacion" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">IUL para Jubilación →</Link>
+                  <Link to="/jubilacion-sin-401k" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">Jubilación sin 401k →</Link>
                 </div>
               </Anim>
             </div>

@@ -88,9 +88,11 @@ export const TESTIMONIALS = [
 
 export const SERVICE_PAGES = [
   { label: "¿Qué es el IUL?", href: "/seguro-de-vida-iul" },
-  { label: "IUL para Jubilación", href: "/iul-para-jubilacion" },
-  { label: "IUL para Indocumentados", href: "/iul-para-indocumentados" },
+  { label: "Jubilación sin 401k", href: "/jubilacion-sin-401k" },
+  { label: "Seguro con ITIN", href: "/seguro-vida-itin" },
   { label: "IUL vs 401(k)", href: "/iul-vs-401k" },
-  { label: "Protección Familiar", href: "/iul-proteccion-familiar" },
-  { label: "IUL para Emprendedores", href: "/iul-para-emprendedores" },
+  { label: "Protección Familiar", href: "/proteccion-familiar" },
+  { label: "Para Emprendedores", href: "/iul-emprendedores" },
+  { label: "Sin Examen Médico", href: "/seguro-vida-sin-examen-medico" },
+  { label: "Beneficios en Vida", href: "/beneficios-en-vida" },
 ];

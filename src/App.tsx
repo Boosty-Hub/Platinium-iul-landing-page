@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +11,10 @@ const IULParaJubilacion = lazy(() => import("./pages/IULParaJubilacion.tsx"));
 const IULParaIndocumentados = lazy(() => import("./pages/IULParaIndocumentados.tsx"));
 const IULvs401k = lazy(() => import("./pages/IULvs401k.tsx"));
 const Contacto = lazy(() => import("./pages/Contacto.tsx"));
+const ProteccionFamiliar = lazy(() => import("./pages/ProteccionFamiliar.tsx"));
+const IULEmprendedores = lazy(() => import("./pages/IULEmprendedores.tsx"));
+const SeguroSinExamen = lazy(() => import("./pages/SeguroSinExamen.tsx"));
+const BeneficiosEnVida = lazy(() => import("./pages/BeneficiosEnVida.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient();
@@ -25,10 +29,19 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/seguro-de-vida-iul" element={<SeguroVidaIUL />} />
-            <Route path="/iul-para-jubilacion" element={<IULParaJubilacion />} />
-            <Route path="/iul-para-indocumentados" element={<IULParaIndocumentados />} />
+            <Route path="/jubilacion-sin-401k" element={<IULParaJubilacion />} />
+            <Route path="/seguro-vida-itin" element={<IULParaIndocumentados />} />
             <Route path="/iul-vs-401k" element={<IULvs401k />} />
             <Route path="/contacto" element={<Contacto />} />
+            <Route path="/proteccion-familiar" element={<ProteccionFamiliar />} />
+            <Route path="/iul-emprendedores" element={<IULEmprendedores />} />
+            <Route path="/seguro-vida-sin-examen-medico" element={<SeguroSinExamen />} />
+            <Route path="/beneficios-en-vida" element={<BeneficiosEnVida />} />
+            {/* Redirects from old URLs */}
+            <Route path="/iul-para-jubilacion" element={<Navigate to="/jubilacion-sin-401k" replace />} />
+            <Route path="/iul-para-indocumentados" element={<Navigate to="/seguro-vida-itin" replace />} />
+            <Route path="/iul-proteccion-familiar" element={<Navigate to="/proteccion-familiar" replace />} />
+            <Route path="/iul-para-emprendedores" element={<Navigate to="/iul-emprendedores" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
