@@ -40,7 +40,7 @@ export default function IULParaIndocumentados() {
                 itemListElement: [
                   { "@type": "ListItem", position: 1, name: "Inicio", item: DOMAIN },
                   { "@type": "ListItem", position: 2, name: "Seguro de Vida IUL", item: `${DOMAIN}/seguro-de-vida-iul` },
-                  { "@type": "ListItem", position: 3, name: "IUL para Indocumentados", item: `${DOMAIN}/iul-para-indocumentados` },
+                  { "@type": "ListItem", position: 3, name: "Seguro con ITIN", item: `${DOMAIN}/seguro-vida-itin` },
                 ],
               },
             ]}
