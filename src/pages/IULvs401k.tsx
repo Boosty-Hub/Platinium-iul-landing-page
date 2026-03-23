@@ -42,7 +42,7 @@ export default function IULvs401k() {
                 <h1 className={`text-4xl sm:text-5xl font-normal leading-[1.1] mb-6 ${t.text}`} style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                   IUL vs 401(k):{" "}
                   <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
-                    ¿Cuál es Mejor para tu Retiro?
+                    ¿cuál es mejor para los hispanos en Miami?
                   </span>
                 </h1>
                 <p className={`text-lg ${t.textMid} max-w-2xl mx-auto leading-relaxed`}>
