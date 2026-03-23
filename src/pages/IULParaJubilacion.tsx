@@ -182,7 +182,7 @@ export default function IULParaJubilacion() {
               <Anim delay={0.3}>
                 <div className="mt-10 text-center flex flex-wrap justify-center gap-4">
                   <Link to="/iul-vs-401k" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">Compara IUL vs 401(k) →</Link>
-                  <Link to="/iul-para-indocumentados" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">¿Tienes ITIN? Aplica aquí →</Link>
+                  <Link to="/seguro-vida-itin" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">¿Tienes ITIN? Aplica aquí →</Link>
                 </div>
               </Anim>
             </div>
