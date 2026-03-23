@@ -61,7 +61,7 @@ export function Navbar({ t, dark, setDark }: NavbarProps) {
               >
                 <Link
                   to={l.href}
-                  className={`${t.textMid} hover:text-[#1d9fa9] text-sm font-medium transition-colors no-underline inline-flex items-center gap-1`}
+                  className={`${t.textMid} hover:text-[#1d9fa9] text-sm font-medium transition-colors no-underline inline-flex items-center gap-1 py-2`}
                 >
                   {l.label}
                   <svg className={`w-3 h-3 transition-transform ${dropdownOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -69,17 +69,24 @@ export function Navbar({ t, dark, setDark }: NavbarProps) {
                   </svg>
                 </Link>
                 {dropdownOpen && (
-                  <div className={`absolute top-full left-0 mt-2 w-64 ${dark ? "bg-[#0F2229]" : "bg-white"} border ${t.divider} rounded-xl shadow-xl p-2 z-50`}>
-                    {SERVICE_PAGES.map((sp) => (
-                      <Link
-                        key={sp.href}
-                        to={sp.href}
-                        className={`block px-4 py-2.5 text-sm ${t.textMid} no-underline rounded-lg hover:bg-[#1d9fa9]/10 hover:text-[#1d9fa9] transition-colors`}
-                      >
-                        {sp.label}
-                      </Link>
-                    ))}
-                  </div>
+                  <>
+                    {/* Invisible bridge to prevent gap between trigger and dropdown */}
+                    <div className="absolute top-full left-0 w-full h-3" />
+                    <div className={`absolute top-full left-0 pt-3 z-50`}>
+                      <div className={`w-64 ${dark ? "bg-[#0F2229]" : "bg-white"} border ${t.divider} rounded-xl shadow-xl p-2`}>
+                        {SERVICE_PAGES.map((sp) => (
+                          <Link
+                            key={sp.href}
+                            to={sp.href}
+                            onClick={() => setDropdownOpen(false)}
+                            className={`block px-4 py-2.5 text-sm ${t.textMid} no-underline rounded-lg hover:bg-[#1d9fa9]/10 hover:text-[#1d9fa9] transition-colors`}
+                          >
+                            {sp.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
             ) : (
