@@ -24,10 +24,10 @@ export default function IULParaIndocumentados() {
       {({ t, dark }) => (
         <>
           <SEOHead
-            title="Seguro de Vida para Indocumentados con ITIN | Sin SSN"
-            description="¿Tienes ITIN pero no SSN? Puedes aplicar a un seguro de vida IUL. Protege a tu familia y ahorra para el futuro. Explicación en español."
-            keywords="seguro de vida para indocumentados, IUL con ITIN, seguro de vida sin SSN, seguro sin seguro social, seguro de vida para inmigrantes, ITIN insurance"
-            canonical={`${DOMAIN}/iul-para-indocumentados`}
+            title="Seguro de Vida con ITIN Miami | Para Inmigrantes sin Seguro Social | Platinium"
+            description="¿Tienes ITIN pero no Social Security? Puedes tener un seguro de vida IUL legal en Miami. Aceptamos pasaporte e ITIN. Confidencial. Cotiza gratis en español."
+            keywords="seguro de vida para indocumentados, seguro de vida con ITIN, seguro de vida sin seguro social, seguro de vida inmigrante Miami, seguro de vida sin número de seguro social, seguro de vida con itin number, puedo tener seguro de vida siendo indocumentado, seguro de vida para inmigrante sin papeles, aseguranza de vida con pasaporte, seguro de vida para inmigrantes Florida, póliza de vida para hispanos sin documentos, seguro de vida sin social security Miami, seguro de vida con matricula consular, requisitos seguro de vida inmigrante"
+            canonical={`${DOMAIN}/seguro-vida-itin`}
             jsonLd={[
               {
                 "@context": "https://schema.org",
