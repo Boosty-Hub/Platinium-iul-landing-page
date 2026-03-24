@@ -375,28 +375,82 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true }: L
                         </h3>
                         <p className={`text-sm ${t.textMuted} mb-6 text-center`}>Para enviarte tu proyección personalizada.</p>
 
-                        {[
-                          { n: "nombre" as const, l: "Nombre completo", ty: "text", p: "Tu nombre completo" },
-                          { n: "telefono" as const, l: "Teléfono / WhatsApp", ty: "tel", p: "+1 (___) ___-____" },
-                          { n: "email" as const, l: "Email", ty: "email", p: "tu@email.com" },
-                        ].map((fi) => (
-                          <div key={fi.n} className="mb-4">
-                            <label htmlFor={fi.n} className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
-                              {fi.l} <span className="text-red-400">*</span>
-                            </label>
+                        {/* Nombre */}
+                        <div className="mb-4">
+                          <label htmlFor="nombre" className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
+                            Nombre completo <span className="text-red-400">*</span>
+                          </label>
+                          <input
+                            id="nombre"
+                            name="nombre"
+                            type="text"
+                            placeholder="Tu nombre completo"
+                            required
+                            autoComplete="name"
+                            value={form.nombre}
+                            onChange={(e) => updateField("nombre", e.target.value)}
+                            className={`w-full p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30`}
+                          />
+                        </div>
+
+                        {/* Teléfono con código de país */}
+                        <div className="mb-4">
+                          <label htmlFor="telefono" className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
+                            Teléfono / WhatsApp <span className="text-red-400">*</span>
+                          </label>
+                          <div className="flex gap-2">
+                            <select
+                              value={countryCode}
+                              onChange={(e) => { setCountryCode(e.target.value); setPhoneError(""); }}
+                              className={`w-[110px] shrink-0 p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30 appearance-none cursor-pointer`}
+                              aria-label="Código de país"
+                            >
+                              {COUNTRY_CODES.map((c) => (
+                                <option key={c.code} value={c.code}>
+                                  {c.flag} {c.code}
+                                </option>
+                              ))}
+                            </select>
                             <input
-                              id={fi.n}
-                              name={fi.n}
-                              type={fi.ty}
-                              placeholder={fi.p}
+                              id="telefono"
+                              name="telefono"
+                              type="tel"
+                              inputMode="numeric"
+                              placeholder={countryCode === "+1" || countryCode === "+1809" ? "(305) 555-1234" : "Número de teléfono"}
                               required
-                              autoComplete={fi.n === "nombre" ? "name" : fi.n === "telefono" ? "tel" : "email"}
-                              value={form[fi.n]}
-                              onChange={(e) => updateField(fi.n, e.target.value)}
-                              className={`w-full p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30`}
+                              autoComplete="tel-national"
+                              value={form.telefono}
+                              onChange={(e) => {
+                                const raw = e.target.value.replace(/[^\d]/g, "").slice(0, 15);
+                                const display = formatPhoneDisplay(raw, countryCode);
+                                updateField("telefono", display);
+                                setPhoneError("");
+                              }}
+                              className={`flex-1 p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30 ${phoneError ? "border-red-400" : ""}`}
                             />
                           </div>
-                        ))}
+                          {phoneError && (
+                            <p className="text-xs text-red-400 mt-1.5">{phoneError}</p>
+                          )}
+                        </div>
+
+                        {/* Email */}
+                        <div className="mb-4">
+                          <label htmlFor="email" className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
+                            Email <span className="text-red-400">*</span>
+                          </label>
+                          <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            placeholder="tu@email.com"
+                            required
+                            autoComplete="email"
+                            value={form.email}
+                            onChange={(e) => updateField("email", e.target.value)}
+                            className={`w-full p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30`}
+                          />
+                        </div>
 
                         <div className="absolute opacity-0 -z-10 h-0 overflow-hidden" aria-hidden="true">
                           <label htmlFor="website_url">Website</label>
