@@ -164,7 +164,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true }: L
       const result = await submitLead(sanitized, formLoadedAt.current);
       setFormState(result.ok ? "success" : "error");
     },
-    [form, formState, honeypot]
+    [form, formState, honeypot, countryCode]
   );
 
   const updateField = useCallback((field: keyof LeadFormData, value: string) => {
