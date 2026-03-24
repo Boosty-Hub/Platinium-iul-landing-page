@@ -14,6 +14,57 @@ interface LeadFormData {
   ahorro_semanal: string;
 }
 
+const COUNTRY_CODES = [
+  { code: "+1", flag: "🇺🇸", label: "US/CA" },
+  { code: "+52", flag: "🇲🇽", label: "MX" },
+  { code: "+57", flag: "🇨🇴", label: "CO" },
+  { code: "+58", flag: "🇻🇪", label: "VE" },
+  { code: "+54", flag: "🇦🇷", label: "AR" },
+  { code: "+56", flag: "🇨🇱", label: "CL" },
+  { code: "+51", flag: "🇵🇪", label: "PE" },
+  { code: "+593", flag: "🇪🇨", label: "EC" },
+  { code: "+502", flag: "🇬🇹", label: "GT" },
+  { code: "+503", flag: "🇸🇻", label: "SV" },
+  { code: "+504", flag: "🇭🇳", label: "HN" },
+  { code: "+505", flag: "🇳🇮", label: "NI" },
+  { code: "+506", flag: "🇨🇷", label: "CR" },
+  { code: "+507", flag: "🇵🇦", label: "PA" },
+  { code: "+53", flag: "🇨🇺", label: "CU" },
+  { code: "+1809", flag: "🇩🇴", label: "DO" },
+  { code: "+55", flag: "🇧🇷", label: "BR" },
+];
+
+// Min digits for the local number (after country code)
+const MIN_LOCAL_DIGITS: Record<string, number> = {
+  "+1": 10, "+52": 10, "+57": 10, "+58": 10, "+54": 10,
+  "+56": 9, "+51": 9, "+593": 9, "+502": 8, "+503": 8,
+  "+504": 8, "+505": 8, "+506": 8, "+507": 8, "+53": 8,
+  "+1809": 10, "+55": 11,
+};
+
+function formatPhoneDisplay(digits: string, countryCode: string): string {
+  if (countryCode === "+1" || countryCode === "+1809") {
+    // Format as (XXX) XXX-XXXX
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+  }
+  return digits;
+}
+
+function validatePhone(rawPhone: string, countryCode: string): { valid: boolean; fullNumber: string; error?: string } {
+  const digits = rawPhone.replace(/\D/g, "");
+  const minDigits = MIN_LOCAL_DIGITS[countryCode] || 8;
+  if (digits.length < minDigits) {
+    return { valid: false, fullNumber: "", error: `El número debe tener al menos ${minDigits} dígitos` };
+  }
+  if (digits.length > 15) {
+    return { valid: false, fullNumber: "", error: "El número es demasiado largo" };
+  }
+  const fullNumber = `${countryCode}${digits}`;
+  return { valid: true, fullNumber };
+}
+
 function getUTMParams(): Record<string, string> {
   const params = new URLSearchParams(window.location.search);
   const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
