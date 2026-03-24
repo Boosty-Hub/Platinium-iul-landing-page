@@ -122,6 +122,8 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true }: L
     anio_nacimiento: "",
     ahorro_semanal: "",
   });
+  const [countryCode, setCountryCode] = useState("+1");
+  const [phoneError, setPhoneError] = useState("");
   const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [step, setStep] = useState(defaultInteres ? 2 : 1);
   const [honeypot, setHoneypot] = useState("");
