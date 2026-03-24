@@ -142,18 +142,19 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true }: L
         setFormState("success");
         return;
       }
-      const phone = form.telefono.replace(/\D/g, "");
-      if (phone.length < 10) {
-        alert("Por favor ingresa un número de teléfono válido.");
+      const phoneValidation = validatePhone(form.telefono, countryCode);
+      if (!phoneValidation.valid) {
+        setPhoneError(phoneValidation.error || "Número inválido");
         return;
       }
+      setPhoneError("");
       if (!form.email.includes("@") || !form.email.includes(".")) {
         alert("Por favor ingresa un email válido.");
         return;
       }
       const sanitized: LeadFormData = {
         nombre: form.nombre.trim().slice(0, 100),
-        telefono: form.telefono.trim().slice(0, 20),
+        telefono: phoneValidation.fullNumber.slice(0, 20),
         email: form.email.trim().toLowerCase().slice(0, 100),
         interes: form.interes.slice(0, 50),
         anio_nacimiento: form.anio_nacimiento,
