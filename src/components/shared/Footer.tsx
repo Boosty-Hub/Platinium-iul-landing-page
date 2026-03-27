@@ -47,9 +47,9 @@ export function Footer({ t }: FooterProps) {
           <div>
             <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">Contacto</h4>
             <div className={`text-sm ${t.textMuted} space-y-3`}>
-              <a href="tel:+16893082809" className={`flex items-center gap-2.5 ${t.textMuted} no-underline hover:text-[#1d9fa9] transition-colors`}>
+              <a href="tel:+17869562771" className={`flex items-center gap-2.5 ${t.textMuted} no-underline hover:text-[#1d9fa9] transition-colors`}>
                 <Phone className="w-4 h-4 shrink-0 text-[#1d9fa9]" />
-                (689) 308-2809
+                (786) 956-2771
               </a>
               <a href="https://wa.me/17866787863" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 text-[#25D366] no-underline hover:opacity-80 transition-opacity">
                 <WhatsAppIcon className="w-4 h-4 shrink-0" />
