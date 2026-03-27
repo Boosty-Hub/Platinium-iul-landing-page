@@ -14,57 +14,6 @@ interface LeadFormData {
   ahorro_semanal: string;
 }
 
-const COUNTRY_CODES = [
-  { code: "+1", flag: "🇺🇸", label: "US/CA" },
-  { code: "+52", flag: "🇲🇽", label: "MX" },
-  { code: "+57", flag: "🇨🇴", label: "CO" },
-  { code: "+58", flag: "🇻🇪", label: "VE" },
-  { code: "+54", flag: "🇦🇷", label: "AR" },
-  { code: "+56", flag: "🇨🇱", label: "CL" },
-  { code: "+51", flag: "🇵🇪", label: "PE" },
-  { code: "+593", flag: "🇪🇨", label: "EC" },
-  { code: "+502", flag: "🇬🇹", label: "GT" },
-  { code: "+503", flag: "🇸🇻", label: "SV" },
-  { code: "+504", flag: "🇭🇳", label: "HN" },
-  { code: "+505", flag: "🇳🇮", label: "NI" },
-  { code: "+506", flag: "🇨🇷", label: "CR" },
-  { code: "+507", flag: "🇵🇦", label: "PA" },
-  { code: "+53", flag: "🇨🇺", label: "CU" },
-  { code: "+1809", flag: "🇩🇴", label: "DO" },
-  { code: "+55", flag: "🇧🇷", label: "BR" },
-];
-
-// Min digits for the local number (after country code)
-const MIN_LOCAL_DIGITS: Record<string, number> = {
-  "+1": 10, "+52": 10, "+57": 10, "+58": 10, "+54": 10,
-  "+56": 9, "+51": 9, "+593": 9, "+502": 8, "+503": 8,
-  "+504": 8, "+505": 8, "+506": 8, "+507": 8, "+53": 8,
-  "+1809": 10, "+55": 11,
-};
-
-function formatPhoneDisplay(digits: string, countryCode: string): string {
-  if (countryCode === "+1" || countryCode === "+1809") {
-    // Format as (XXX) XXX-XXXX
-    if (digits.length <= 3) return digits;
-    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
-  }
-  return digits;
-}
-
-function validatePhone(rawPhone: string, countryCode: string): { valid: boolean; fullNumber: string; error?: string } {
-  const digits = rawPhone.replace(/\D/g, "");
-  const minDigits = MIN_LOCAL_DIGITS[countryCode] || 8;
-  if (digits.length < minDigits) {
-    return { valid: false, fullNumber: "", error: `El número debe tener al menos ${minDigits} dígitos` };
-  }
-  if (digits.length > 15) {
-    return { valid: false, fullNumber: "", error: "El número es demasiado largo" };
-  }
-  const fullNumber = `${countryCode}${digits}`;
-  return { valid: true, fullNumber };
-}
-
 function getUTMParams(): Record<string, string> {
   const params = new URLSearchParams(window.location.search);
   const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
@@ -122,8 +71,6 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true }: L
     anio_nacimiento: "",
     ahorro_semanal: "",
   });
-  const [countryCode, setCountryCode] = useState("+1");
-  const [phoneError, setPhoneError] = useState("");
   const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [step, setStep] = useState(defaultInteres ? 2 : 1);
   const [honeypot, setHoneypot] = useState("");
@@ -142,19 +89,18 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true }: L
         setFormState("success");
         return;
       }
-      const phoneValidation = validatePhone(form.telefono, countryCode);
-      if (!phoneValidation.valid) {
-        setPhoneError(phoneValidation.error || "Número inválido");
+      const phone = form.telefono.replace(/\D/g, "");
+      if (phone.length < 10) {
+        alert("Por favor ingresa un número de teléfono válido.");
         return;
       }
-      setPhoneError("");
       if (!form.email.includes("@") || !form.email.includes(".")) {
         alert("Por favor ingresa un email válido.");
         return;
       }
       const sanitized: LeadFormData = {
         nombre: form.nombre.trim().slice(0, 100),
-        telefono: phoneValidation.fullNumber.slice(0, 20),
+        telefono: form.telefono.trim().slice(0, 20),
         email: form.email.trim().toLowerCase().slice(0, 100),
         interes: form.interes.slice(0, 50),
         anio_nacimiento: form.anio_nacimiento,
@@ -164,7 +110,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true }: L
       const result = await submitLead(sanitized, formLoadedAt.current);
       setFormState(result.ok ? "success" : "error");
     },
-    [form, formState, honeypot, countryCode]
+    [form, formState, honeypot]
   );
 
   const updateField = useCallback((field: keyof LeadFormData, value: string) => {
@@ -375,82 +321,28 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true }: L
                         </h3>
                         <p className={`text-sm ${t.textMuted} mb-6 text-center`}>Para enviarte tu proyección personalizada.</p>
 
-                        {/* Nombre */}
-                        <div className="mb-4">
-                          <label htmlFor="nombre" className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
-                            Nombre completo <span className="text-red-400">*</span>
-                          </label>
-                          <input
-                            id="nombre"
-                            name="nombre"
-                            type="text"
-                            placeholder="Tu nombre completo"
-                            required
-                            autoComplete="name"
-                            value={form.nombre}
-                            onChange={(e) => updateField("nombre", e.target.value)}
-                            className={`w-full p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30`}
-                          />
-                        </div>
-
-                        {/* Teléfono con código de país */}
-                        <div className="mb-4">
-                          <label htmlFor="telefono" className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
-                            Teléfono / WhatsApp <span className="text-red-400">*</span>
-                          </label>
-                          <div className="flex gap-2">
-                            <select
-                              value={countryCode}
-                              onChange={(e) => { setCountryCode(e.target.value); setPhoneError(""); }}
-                              className={`w-[110px] shrink-0 p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30 appearance-none cursor-pointer`}
-                              aria-label="Código de país"
-                            >
-                              {COUNTRY_CODES.map((c) => (
-                                <option key={c.code} value={c.code}>
-                                  {c.flag} {c.code}
-                                </option>
-                              ))}
-                            </select>
+                        {[
+                          { n: "nombre" as const, l: "Nombre completo", ty: "text", p: "Tu nombre completo" },
+                          { n: "telefono" as const, l: "Teléfono / WhatsApp", ty: "tel", p: "+1 (___) ___-____" },
+                          { n: "email" as const, l: "Email", ty: "email", p: "tu@email.com" },
+                        ].map((fi) => (
+                          <div key={fi.n} className="mb-4">
+                            <label htmlFor={fi.n} className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
+                              {fi.l} <span className="text-red-400">*</span>
+                            </label>
                             <input
-                              id="telefono"
-                              name="telefono"
-                              type="tel"
-                              inputMode="numeric"
-                              placeholder={countryCode === "+1" || countryCode === "+1809" ? "(305) 555-1234" : "Número de teléfono"}
+                              id={fi.n}
+                              name={fi.n}
+                              type={fi.ty}
+                              placeholder={fi.p}
                               required
-                              autoComplete="tel-national"
-                              value={form.telefono}
-                              onChange={(e) => {
-                                const raw = e.target.value.replace(/[^\d]/g, "").slice(0, 15);
-                                const display = formatPhoneDisplay(raw, countryCode);
-                                updateField("telefono", display);
-                                setPhoneError("");
-                              }}
-                              className={`flex-1 p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30 ${phoneError ? "border-red-400" : ""}`}
+                              autoComplete={fi.n === "nombre" ? "name" : fi.n === "telefono" ? "tel" : "email"}
+                              value={form[fi.n]}
+                              onChange={(e) => updateField(fi.n, e.target.value)}
+                              className={`w-full p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30`}
                             />
                           </div>
-                          {phoneError && (
-                            <p className="text-xs text-red-400 mt-1.5">{phoneError}</p>
-                          )}
-                        </div>
-
-                        {/* Email */}
-                        <div className="mb-4">
-                          <label htmlFor="email" className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
-                            Email <span className="text-red-400">*</span>
-                          </label>
-                          <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            placeholder="tu@email.com"
-                            required
-                            autoComplete="email"
-                            value={form.email}
-                            onChange={(e) => updateField("email", e.target.value)}
-                            className={`w-full p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30`}
-                          />
-                        </div>
+                        ))}
 
                         <div className="absolute opacity-0 -z-10 h-0 overflow-hidden" aria-hidden="true">
                           <label htmlFor="website_url">Website</label>

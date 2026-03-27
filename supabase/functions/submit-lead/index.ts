@@ -41,9 +41,7 @@ function validateLead(body: Record<string, unknown>): { valid: boolean; error?: 
 
   // Required fields
   if (nombre.length < 2 || nombre.length > 200) return { valid: false, error: "Nombre inválido (2-200 caracteres)" };
-  // Phone must start with + and have 8-18 digits total
-  const phoneDigits = telefono.replace(/\D/g, "");
-  if (phoneDigits.length < 8 || phoneDigits.length > 18) return { valid: false, error: "Teléfono inválido — incluye código de país y número completo" };
+  if (telefono.length < 7 || telefono.length > 40) return { valid: false, error: "Teléfono inválido (7-40 caracteres)" };
   if (!EMAIL_RE.test(email) || email.length > 254) return { valid: false, error: "Email inválido" };
 
   // Optional fields
