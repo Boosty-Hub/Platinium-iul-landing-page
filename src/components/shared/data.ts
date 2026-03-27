@@ -81,7 +81,7 @@ export const TABS = [
 ];
 
 export const TESTIMONIALS = [
-  { name: "María González", role: "Emprendedora, Miami", text: "Cuando llegué a este país solo tenía mi ITIN y muchos sueños. Nunca pensé que podría tener un plan de retiro formal. Hoy, después de 4 años con mi IUL, tengo protección para mi familia y un fondo que crece cada año. Mi asesora me explicó todo de la mejora manera, sin letras pequeñas.", stars: 5, img: testimonial1Img },
+  { name: "María González", role: "Emprendedora, Miami", text: "Cuando llegué a este país solo tenía mi ITIN y muchos sueños. Nunca pensé que podría tener un plan de retiro formal. Hoy, después de 4 años con mi IUL, tengo protección para mi familia y un fondo que crece cada año. Mi asesora me explicó todo en español, sin letra pequeña.", stars: 5, img: testimonial1Img },
   { name: "Carlos Mendoza", role: "Transportista, Doral", text: "Como camionero independiente no tenía 401(k) ni beneficios. Mi agente me explicó todo con números reales, sin promesas falsas. Ahora tengo un plan que protege a mis hijos y me está ayudando a pagar mi casa más rápido. Mi única queja es no haber empezado antes.", stars: 5, img: testimonial2Img },
   { name: "Ana Patricia Ruiz", role: "Dueña de restaurante, Hialeah", text: "Al principio pensé que era demasiado bueno para ser verdad. Pero me mostraron los costos, los límites y los escenarios reales. Entendí que no es mágico, es una herramienta poderosa cuando se usa bien. Hoy duermo tranquila sabiendo que mi familia está protegida pase lo que pase.", stars: 5, img: testimonial3Img },
 ];
