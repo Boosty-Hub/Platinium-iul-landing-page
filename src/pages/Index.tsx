@@ -447,7 +447,7 @@ export default function HomePage() {
                   <Link to="/contacto" className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-9 py-4 rounded-lg font-bold no-underline hover:shadow-xl transition-all text-center">
                     Agenda tu Consulta Gratis
                   </Link>
-                  <a href="tel:+17869562771" className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold no-underline hover:bg-[#1d9fa9]/10 transition-all inline-flex items-center justify-center gap-2">
+                  <a <a href="tel:+16893082809" className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold no-underline hover:bg-[#1d9fa9]/10 transition-all inline-flex items-center justify-center gap-2"> className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold no-underline hover:bg-[#1d9fa9]/10 transition-all inline-flex items-center justify-center gap-2">
                     Llámanos ahora
                   </a>
                 </div>
