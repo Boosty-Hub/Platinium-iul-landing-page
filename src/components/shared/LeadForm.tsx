@@ -195,10 +195,10 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                     key={opt.value}
                     type="button"
                     onClick={() => updateField("interes", opt.value)}
-                    className={`w-full p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all hover:border-[#1d9fa9] hover:shadow-md ${
+                    className={`w-full p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all hover:border-[#1d9fa9] hover:shadow-[0_0_12px_rgba(29,159,169,0.25)] ${
                       form.interes === opt.value
-                        ? "border-[#1d9fa9] bg-[#1d9fa9]/10"
-                        : `${t.divider} ${dark ? "bg-white/[0.02]" : "bg-black/[0.01]"}`
+                        ? "border-[#1d9fa9] bg-[#1d9fa9]/10 shadow-[0_0_12px_rgba(29,159,169,0.2)]"
+                        : `border-[#1d9fa9]/30 ${dark ? "bg-white/[0.02]" : "bg-black/[0.01]"}`
                     }`}
                   >
                     <span className="text-2xl">{opt.icon}</span>
