@@ -260,10 +260,10 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                     key={amt}
                     type="button"
                     onClick={() => updateField("ahorro_semanal", amt)}
-                    className={`p-4 rounded-xl border text-center cursor-pointer transition-all hover:border-[#1d9fa9] hover:shadow-md ${
+                    className={`p-4 rounded-xl border text-center cursor-pointer transition-all hover:border-[#1d9fa9] hover:shadow-[0_0_12px_rgba(29,159,169,0.25)] ${
                       form.ahorro_semanal === amt
-                        ? "border-[#1d9fa9] bg-[#1d9fa9]/10"
-                        : `${t.divider} ${dark ? "bg-white/[0.02]" : "bg-black/[0.01]"}`
+                        ? "border-[#1d9fa9] bg-[#1d9fa9]/10 shadow-[0_0_12px_rgba(29,159,169,0.2)]"
+                        : `border-[#1d9fa9]/30 ${dark ? "bg-white/[0.02]" : "bg-black/[0.01]"}`
                     }`}
                   >
                     <div className="text-xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>${amt}</div>
