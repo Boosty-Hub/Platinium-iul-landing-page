@@ -23,7 +23,7 @@ export function getThemeClasses(dark: boolean) {
         textMuted: "text-[#7A9BA3]",
         nav: "bg-[#FAFCFC]/92",
         divider: "border-[#1d9fa9]/10",
-        input: "bg-black/[0.02] border-[#1d9fa9]/20 text-[#1A2E33]",
+        input: "bg-[#E8F4F6] border-[#1d9fa9]/30 text-[#1A2E33]",
         brandBg: "bg-[#1d9fa9]/[0.05]",
         dangerBg: "bg-red-500/[0.03]",
         successBg: "bg-[#1d9fa9]/[0.04]",
