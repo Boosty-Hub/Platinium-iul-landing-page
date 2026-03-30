@@ -50,7 +50,7 @@ const JSON_LD = [
     "@type": "Service",
     name: "Seguro de Vida Universal Indexado (IUL)",
     provider: { "@type": "InsuranceAgency", name: "Platinium Insurance Group" },
-    description: "Seguro de vida permanente con acumulación de valor indexado al mercado, protección familiar y plan de retiro para la comunidad hispana en Miami.",
+    description: "Seguro de vida permanente con acumulación de valor indexado al mercado, protección familiar y plan de retiro para la comunidad hispana en Estados Unidos.",
     areaServed: { "@type": "State", name: "Florida" },
     audience: { "@type": "Audience", audienceType: "Hispanos y latinos en Estados Unidos" },
   },
