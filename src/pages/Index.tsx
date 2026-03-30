@@ -11,9 +11,9 @@ import { FAQS, BENEFITS, STEPS, BANK_VS_IUL, FULL_COMPARISON, TABS, TESTIMONIALS
 import consultationImg from "@/assets/consultation.jpg";
 
 const SEO = {
-  title: "Seguro de Vida IUL Miami | Ahorro + Protección para Hispanos | Platinium Insurance",
-  description: "Protege a tu familia y construye tu retiro con un seguro IUL en Miami. Aceptamos ITIN. Atención en español. Cotiza gratis hoy.",
-  keywords: "seguro de vida IUL, seguro de vida con ahorro, seguro de vida universal indexado, IUL Miami, seguro de vida para hispanos Miami, seguro de vida que genera dinero, seguro de vida que sirve en vida, qué es un seguro IUL en español, cómo funciona el IUL, seguro de vida que crece con el mercado, seguro de vida permanente hispanos Florida, póliza de vida con valor en efectivo, IUL para latinos, agente de seguros IUL Miami, cotización IUL gratis",
+  title: "Seguro de Vida IUL en Estados Unidos | Ahorro + Protección para Hispanos | Platinium Insurance",
+  description: "Protege a tu familia y construye tu retiro con un seguro IUL en Estados Unidos. Aceptamos ITIN. Atención en español. Cotiza gratis hoy.",
+  keywords: "seguro de vida IUL, seguro de vida con ahorro, seguro de vida universal indexado, IUL Estados Unidos, seguro de vida para hispanos, seguro de vida que genera dinero, seguro de vida que sirve en vida, qué es un seguro IUL en español, cómo funciona el IUL, seguro de vida que crece con el mercado, seguro de vida permanente hispanos, póliza de vida con valor en efectivo, IUL para latinos, agente de seguros IUL, cotización IUL gratis",
 };
 
 const JSON_LD = [
