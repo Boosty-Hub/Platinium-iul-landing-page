@@ -111,9 +111,11 @@ interface LeadFormProps {
   dark: boolean;
   defaultInteres?: string;
   showSidebar?: boolean;
+  inline?: boolean;
+  sidebarContent?: React.ReactNode;
 }
 
-export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true }: LeadFormProps) {
+export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inline = false, sidebarContent }: LeadFormProps) {
   const [form, setForm] = useState<LeadFormData>({
     nombre: "",
     telefono: "",
