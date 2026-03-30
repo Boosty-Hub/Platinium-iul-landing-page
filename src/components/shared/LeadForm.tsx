@@ -173,6 +173,69 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
     setForm((prev) => ({ ...prev, [field]: value }));
   }, []);
 
+  const formCard = (
+          <Anim delay={inline ? 0 : 0.15}>
+            <div className={`${t.card} border rounded-2xl p-9 backdrop-blur-xl`}>
+              <div className="text-center mb-6">
+                <div className="inline-flex items-center gap-2 mb-3">
+                  <svg className="w-5 h-5 text-[#1d9fa9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                  <span className="text-xs tracking-[2px] text-[#1d9fa9] uppercase font-bold">Agenda tu llamada</span>
+                </div>
+                <h3 className={`text-2xl font-semibold ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                  Recibe una consulta <span className="italic text-[#1d9fa9]">personalizada</span>
+                </h3>
+                <p className={`text-sm ${t.textMuted} mt-2`}>Completa estos pasos rápidos y un asesor te contactará.</p>
+              </div>
+
+  if (inline) {
+    return formCard;
+  }
+
+  const defaultSidebar = (
+    <Anim delay={0.1}>
+      <div>
+        <h3
+          className={`text-2xl font-semibold ${t.text} mb-5`}
+          style={{ fontFamily: "'Playfair Display', serif" }}
+        >
+          ¿Qué incluye tu consulta?
+        </h3>
+        {[
+          "Consulta de 20-30 min por Zoom o WhatsApp",
+          "Análisis personalizado de tu situación",
+          "Proyección con números reales, sin promesas falsas",
+          "Te explicamos todo en español, sin jerga financiera",
+        ].map((x, i) => (
+          <div key={i} className="flex items-center gap-3 mb-3.5">
+            <CheckIcon className="text-[#1d9fa9]" />
+            <span className={`text-sm ${t.text}`}>{x}</span>
+          </div>
+        ))}
+        <div className={`mt-7 p-5 ${t.brandBg} border border-[#1d9fa9]/15 rounded-xl`}>
+          <div className="text-xs text-[#1d9fa9] font-bold mb-1.5 tracking-wide">DOCUMENTOS ACEPTADOS</div>
+          <p className={`text-sm ${t.textMid}`}>Social Security • ITIN • Pasaporte • Matrícula Consular</p>
+        </div>
+        <div className="mt-7 rounded-2xl overflow-hidden shadow-lg">
+          <img
+            src={familyHomeImg}
+            alt="Familia latina en su nuevo hogar"
+            className="w-full h-48 object-cover"
+            width={512}
+            height={192}
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </Anim>
+  );
+
+  const sidebar = sidebarContent ? <Anim delay={0.1}>{sidebarContent}</Anim> : defaultSidebar;
+
   return (
     <section id="consulta" className={`${t.bg2} py-24 px-6`} aria-labelledby="form-heading">
       <div className="max-w-6xl mx-auto">
@@ -193,43 +256,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
         </Anim>
 
         <div className={`grid ${showSidebar ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1 max-w-xl mx-auto"} gap-8 items-start`}>
-          {showSidebar && (
-            <Anim delay={0.1}>
-              <div>
-                <h3
-                  className={`text-2xl font-semibold ${t.text} mb-5`}
-                  style={{ fontFamily: "'Playfair Display', serif" }}
-                >
-                  ¿Qué incluye tu consulta?
-                </h3>
-                {[
-                  "Consulta de 20-30 min por Zoom o WhatsApp",
-                  "Análisis personalizado de tu situación",
-                  "Proyección con números reales, sin promesas falsas",
-                  "Te explicamos todo en español, sin jerga financiera",
-                ].map((x, i) => (
-                  <div key={i} className="flex items-center gap-3 mb-3.5">
-                    <CheckIcon className="text-[#1d9fa9]" />
-                    <span className={`text-sm ${t.text}`}>{x}</span>
-                  </div>
-                ))}
-                <div className={`mt-7 p-5 ${t.brandBg} border border-[#1d9fa9]/15 rounded-xl`}>
-                  <div className="text-xs text-[#1d9fa9] font-bold mb-1.5 tracking-wide">DOCUMENTOS ACEPTADOS</div>
-                  <p className={`text-sm ${t.textMid}`}>Social Security • ITIN • Pasaporte • Matrícula Consular</p>
-                </div>
-                <div className="mt-7 rounded-2xl overflow-hidden shadow-lg">
-                  <img
-                    src={familyHomeImg}
-                    alt="Familia latina en su nuevo hogar"
-                    className="w-full h-48 object-cover"
-                    width={512}
-                    height={192}
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-            </Anim>
-          )}
+          {showSidebar && sidebar}
 
           <Anim delay={0.15}>
             <div className={`${t.card} border rounded-2xl p-9 backdrop-blur-xl`}>
