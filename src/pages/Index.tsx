@@ -76,7 +76,7 @@ export default function HomePage() {
                 <div className="max-w-xl">
                   <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-5 py-2 mb-7 animate-[fadeUp_0.8s_ease]`}>
                     <span className="w-2 h-2 rounded-full bg-[#1d9fa9] shadow-[0_0_8px_rgba(29,159,169,0.5)]" />
-                    <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">Asesoría Financiera para Latinos en Miami</span>
+                    <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">Asesoría Financiera para Latinos en Estados Unidos</span>
                   </div>
 
                   <h1
