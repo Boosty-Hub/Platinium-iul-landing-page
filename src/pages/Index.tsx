@@ -416,8 +416,18 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* LEAD FORM */}
-          <LeadForm t={t} dark={dark} />
+          {/* LEAD FORM with hero image as sidebar */}
+          <LeadForm t={t} dark={dark} sidebarContent={
+            <div className="relative">
+              <div className="overflow-hidden rounded-2xl">
+                <img alt="Familia latina protegida con un plan IUL" className="w-full h-auto object-contain" width={640} height={384} loading="lazy" src="/lovable-uploads/3658c176-85e0-4ba2-80c5-30909eeb0c4d.webp" />
+              </div>
+              <div className={`absolute ${t.card} border rounded-2xl p-5 backdrop-blur-xl shadow-xl`} style={{ bottom: "3rem", left: "0rem" }}>
+                <div className="text-3xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>$200K+</div>
+                <div className={`text-xs ${t.textMuted} mt-1`}>Valor potencial en 20 años<br />con solo $250/mes</div>
+              </div>
+            </div>
+          } />
 
           {/* CONTACT BAR */}
           <div className="px-6 pb-12">
