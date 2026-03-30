@@ -162,19 +162,10 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   const formCard = (
     <div className={`${t.card} border rounded-2xl p-9 backdrop-blur-xl`}>
       <div className="text-center mb-6">
-        <div className="inline-flex items-center gap-2 mb-3">
-          <svg className="w-5 h-5 text-[#1d9fa9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-            <line x1="16" y1="2" x2="16" y2="6" />
-            <line x1="8" y1="2" x2="8" y2="6" />
-            <line x1="3" y1="10" x2="21" y2="10" />
-          </svg>
-          <span className="text-xs tracking-[2px] text-[#1d9fa9] uppercase font-bold">Agenda tu llamada</span>
-        </div>
         <h3 className={`text-2xl font-semibold ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
           Recibe una consulta <span className="italic text-[#1d9fa9]">personalizada</span>
         </h3>
-        <p className={`text-sm ${t.textMuted} mt-2`}>Completa estos pasos rápidos y un asesor te contactará.</p>
+        <p className={`text-sm ${t.textMuted} mt-2`}>Completa estos pasos rápidos y un asesor te llamará para revisar tu plan.</p>
       </div>
 
       {formState !== "success" ? (
