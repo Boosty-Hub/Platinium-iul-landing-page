@@ -11,9 +11,9 @@ import { FAQS, BENEFITS, STEPS, BANK_VS_IUL, FULL_COMPARISON, TABS, TESTIMONIALS
 import consultationImg from "@/assets/consultation.jpg";
 
 const SEO = {
-  title: "Seguro de Vida IUL Miami | Ahorro + Protección para Hispanos | Platinium Insurance",
-  description: "Protege a tu familia y construye tu retiro con un seguro IUL en Miami. Aceptamos ITIN. Atención en español. Cotiza gratis hoy.",
-  keywords: "seguro de vida IUL, seguro de vida con ahorro, seguro de vida universal indexado, IUL Miami, seguro de vida para hispanos Miami, seguro de vida que genera dinero, seguro de vida que sirve en vida, qué es un seguro IUL en español, cómo funciona el IUL, seguro de vida que crece con el mercado, seguro de vida permanente hispanos Florida, póliza de vida con valor en efectivo, IUL para latinos, agente de seguros IUL Miami, cotización IUL gratis",
+  title: "Seguro de Vida IUL en Estados Unidos | Ahorro + Protección para Hispanos | Platinium Insurance",
+  description: "Protege a tu familia y construye tu retiro con un seguro IUL en Estados Unidos. Aceptamos ITIN. Atención en español. Cotiza gratis hoy.",
+  keywords: "seguro de vida IUL, seguro de vida con ahorro, seguro de vida universal indexado, IUL Estados Unidos, seguro de vida para hispanos, seguro de vida que genera dinero, seguro de vida que sirve en vida, qué es un seguro IUL en español, cómo funciona el IUL, seguro de vida que crece con el mercado, seguro de vida permanente hispanos, póliza de vida con valor en efectivo, IUL para latinos, agente de seguros IUL, cotización IUL gratis",
 };
 
 const JSON_LD = [
@@ -50,7 +50,7 @@ const JSON_LD = [
     "@type": "Service",
     name: "Seguro de Vida Universal Indexado (IUL)",
     provider: { "@type": "InsuranceAgency", name: "Platinium Insurance Group" },
-    description: "Seguro de vida permanente con acumulación de valor indexado al mercado, protección familiar y plan de retiro para la comunidad hispana en Miami.",
+    description: "Seguro de vida permanente con acumulación de valor indexado al mercado, protección familiar y plan de retiro para la comunidad hispana en Estados Unidos.",
     areaServed: { "@type": "State", name: "Florida" },
     audience: { "@type": "Audience", audienceType: "Hispanos y latinos en Estados Unidos" },
   },
@@ -76,7 +76,7 @@ export default function HomePage() {
                 <div className="max-w-xl">
                   <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-5 py-2 mb-7 animate-[fadeUp_0.8s_ease]`}>
                     <span className="w-2 h-2 rounded-full bg-[#1d9fa9] shadow-[0_0_8px_rgba(29,159,169,0.5)]" />
-                    <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">Asesoría Financiera para Latinos en Miami</span>
+                    <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">Asesoría Financiera para Latinos en Estados Unidos</span>
                   </div>
 
                   <h1
@@ -117,14 +117,8 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <div className="relative order-first lg:order-none">
-                  <div className="overflow-hidden">
-                    <img alt="Familia latina protegida con un plan IUL" className="w-full h-auto max-h-[500px] lg:max-h-none rounded-2xl lg:rounded-none object-contain" width={640} height={384} loading="eager" src="/lovable-uploads/3658c176-85e0-4ba2-80c5-30909eeb0c4d.webp" />
-                  </div>
-                  <div className={`absolute ${t.card} border rounded-2xl p-5 backdrop-blur-xl shadow-xl`} style={{ bottom: "3rem", left: "0rem" }}>
-                    <div className="text-3xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>$200K+</div>
-                    <div className={`text-xs ${t.textMuted} mt-1`}>Valor potencial en 20 años<br />con solo $250/mes</div>
-                  </div>
+                <div className="order-first lg:order-none">
+                  <LeadForm t={t} dark={dark} inline />
                 </div>
               </div>
 
@@ -422,8 +416,18 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* LEAD FORM */}
-          <LeadForm t={t} dark={dark} />
+          {/* LEAD FORM with hero image as sidebar */}
+          <LeadForm t={t} dark={dark} sidebarContent={
+            <div className="relative">
+              <div className="overflow-hidden rounded-2xl">
+                <img alt="Familia latina protegida con un plan IUL" className="w-full h-auto object-contain" width={640} height={384} loading="lazy" src="/lovable-uploads/3658c176-85e0-4ba2-80c5-30909eeb0c4d.webp" />
+              </div>
+              <div className={`absolute ${t.card} border rounded-2xl p-5 backdrop-blur-xl shadow-xl`} style={{ bottom: "3rem", left: "0rem" }}>
+                <div className="text-3xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>$200K+</div>
+                <div className={`text-xs ${t.textMuted} mt-1`}>Valor potencial en 20 años<br />con solo $250/mes</div>
+              </div>
+            </div>
+          } />
 
           {/* CONTACT BAR */}
           <div className="px-6 pb-12">
