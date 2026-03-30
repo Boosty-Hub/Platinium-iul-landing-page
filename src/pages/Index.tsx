@@ -122,6 +122,8 @@ export default function HomePage() {
                 </div>
               </div>
 
+              <ContactBar t={t} />
+
               <div className="flex items-center justify-center mt-10 lg:mt-14">
                 <div className="flex flex-col items-center gap-2 animate-bounce">
                   <span className={`text-[10px] tracking-[2px] ${t.textMuted} uppercase`}>Descubre más</span>
@@ -130,8 +132,6 @@ export default function HomePage() {
                   </svg>
                 </div>
               </div>
-
-              <ContactBar t={t} />
             </div>
           </section>
 
