@@ -192,6 +192,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
               <h3 className={`text-xl font-semibold ${t.text} mb-5 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
                 ¿Qué te gustaría lograr con este plan?
               </h3>
+              <p className={`text-sm ${t.textMuted} mb-5 text-center`}>Selecciona una opción</p>
               <div className="grid grid-cols-1 gap-3">
                 {[
                   { value: "Proteger a mi familia", icon: "🛡️" },
@@ -202,7 +203,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                   <button
                     key={opt.value}
                     type="button"
-                    onClick={() => { updateField("interes", opt.value); setStep(2); }}
+                    onClick={() => updateField("interes", opt.value)}
                     className={`w-full p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all hover:border-[#1d9fa9] hover:shadow-md ${
                       form.interes === opt.value
                         ? "border-[#1d9fa9] bg-[#1d9fa9]/10"
@@ -214,6 +215,14 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                   </button>
                 ))}
               </div>
+              <button
+                type="button"
+                disabled={!form.interes}
+                onClick={() => setStep(2)}
+                className="w-full mt-5 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3.5 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Continuar →
+              </button>
             </div>
 
             {/* Step 2: Año de nacimiento */}
