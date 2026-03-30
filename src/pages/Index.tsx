@@ -130,6 +130,8 @@ export default function HomePage() {
                   </svg>
                 </div>
               </div>
+
+              <ContactBar t={t} />
             </div>
           </section>
 
