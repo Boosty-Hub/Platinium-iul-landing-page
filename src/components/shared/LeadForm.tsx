@@ -161,12 +161,13 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
 
   // Selection button styles
   const selBtnBase = "w-full p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all duration-300";
-  const selBtnIdle = "bg-[#1d9fa9]/10 text-white border-[#1d9fa9]/30 hover:shadow-[0_0_20px_rgba(29,159,169,0.35)] hover:border-[#1d9fa9]/60 hover:bg-[#1d9fa9]/20";
-  const selBtnActive = "bg-[#1d9fa9]/25 text-white border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]";
+  const selBtnText = dark ? "text-white" : "text-[#0B1A1E]";
+  const selBtnIdle = `bg-[#1d9fa9]/10 ${selBtnText} border-[#1d9fa9]/30 hover:shadow-[0_0_20px_rgba(29,159,169,0.35)] hover:border-[#1d9fa9]/60 hover:bg-[#1d9fa9]/20`;
+  const selBtnActive = `bg-[#1d9fa9]/25 ${selBtnText} border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]`;
 
   const amtBtnBase = "p-4 rounded-xl border text-center cursor-pointer transition-all duration-300";
-  const amtBtnIdle = "bg-[#1d9fa9]/10 text-white border-[#1d9fa9]/30 hover:shadow-[0_0_20px_rgba(29,159,169,0.35)] hover:border-[#1d9fa9]/60 hover:bg-[#1d9fa9]/20";
-  const amtBtnActive = "bg-[#1d9fa9]/25 text-white border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]";
+  const amtBtnIdle = `bg-[#1d9fa9]/10 ${selBtnText} border-[#1d9fa9]/30 hover:shadow-[0_0_20px_rgba(29,159,169,0.35)] hover:border-[#1d9fa9]/60 hover:bg-[#1d9fa9]/20`;
+  const amtBtnActive = `bg-[#1d9fa9]/25 ${selBtnText} border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]`;
 
   const formCard = (
     <div className={`${t.card} border rounded-2xl p-9 backdrop-blur-xl`}>
