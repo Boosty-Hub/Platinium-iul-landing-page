@@ -176,10 +176,10 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   const formCard = (
     <div className={`${t.card} border rounded-2xl p-4 sm:p-9 backdrop-blur-xl shadow-sm`}>
       <div className="text-center mb-3 sm:mb-6">
-        <h3 className="text-lg sm:text-2xl font-bold" style={{ color: textColor }}>
+        <h3 className={`text-lg sm:text-2xl font-bold ${dark ? "text-[#E4EEF0]" : "text-[#1A2E33]"}`}>
           ¡Cotiza tu IUL <span className="text-[#1d9fa9]">Gratis</span> ahora!
         </h3>
-        <p className="text-xs sm:text-sm mt-1" style={{ color: mutedColor }}>Completa el formulario</p>
+        <p className={`text-xs sm:text-sm mt-1 ${dark ? "text-[#6A8E98]" : "text-[#7A9BA3]"}`}>Completa el formulario</p>
       </div>
 
       {formState !== "success" ? (
