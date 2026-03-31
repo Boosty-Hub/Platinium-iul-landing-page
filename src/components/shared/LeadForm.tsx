@@ -159,6 +159,10 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
     setForm((prev) => ({ ...prev, [field]: value }));
   }, []);
 
+  // Explicit color values for reliable rendering
+  const textColor = dark ? "#E4EEF0" : "#1A2E33";
+  const mutedColor = dark ? "#6A8E98" : "#7A9BA3";
+
   // Selection button styles
   const selBtnBase = "w-full p-3 sm:p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all duration-300";
   const selBtnText = dark ? "text-white" : "text-[#0B1A1E]";
