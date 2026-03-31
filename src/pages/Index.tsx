@@ -94,9 +94,10 @@ export default function HomePage() {
             <div className="absolute top-[8%] right-[3%] w-80 h-80 rounded-full border border-[#1d9fa9]/[0.06] animate-[spin_80s_linear_infinite] pointer-events-none" />
             <div className="absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" />
 
-            <div className="max-w-7xl mx-auto px-6 relative z-10 pt-[120px] pb-[20px]">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-                <div className="max-w-xl">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 pt-20 sm:pt-[120px] pb-[20px]">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
+                {/* Hero text - hidden on mobile, visible on lg */}
+                <div className="max-w-xl hidden lg:block">
                   <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-5 py-2 mb-7 animate-[fadeUp_0.8s_ease]`}>
                     <span className="w-2 h-2 rounded-full bg-[#1d9fa9] shadow-[0_0_8px_rgba(29,159,169,0.5)]" />
                     <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">Asesoría Financiera para Latinos en Estados Unidos</span>
@@ -140,7 +141,27 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <div className="order-first lg:order-none">
+                {/* Mobile compact hero text + form */}
+                <div className="lg:hidden text-center mb-2">
+                  <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-4 py-1.5 mb-4`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1d9fa9]" />
+                    <span className="text-[10px] text-[#1d9fa9] font-bold tracking-[1px] uppercase">Asesoría para Latinos en EE.UU.</span>
+                  </div>
+                  <h1
+                    className={`text-2xl sm:text-3xl font-normal leading-[1.15] mb-3 ${t.text}`}
+                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                  >
+                    Protege a tu familia.{" "}
+                    <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
+                      Construye tu retiro.
+                    </span>
+                  </h1>
+                  <p className={`text-sm ${t.textMid} mb-1`}>
+                    Con un <strong className={t.text}>Indexed Universal Life (IUL)</strong>
+                  </p>
+                </div>
+
+                <div>
                   <LeadForm t={t} dark={dark} inline />
                 </div>
               </div>
