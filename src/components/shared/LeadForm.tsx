@@ -180,12 +180,12 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
 
       {formState !== "success" ? (
         <>
-          <div className="flex items-center gap-1.5 mb-6">
+          <div className="flex items-center gap-1.5 mb-4 sm:mb-6">
             {[1, 2, 3, 4, 5].map((s) => (
               <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= s ? "bg-[#1d9fa9]" : dark ? "bg-white/10" : "bg-black/10"}`} />
             ))}
           </div>
-          <p className={`text-[11px] ${t.textMuted} mb-5 text-center tracking-wide`}>Paso {step} de 5</p>
+          <p className={`text-[11px] ${t.textMuted} mb-4 sm:mb-5 text-center tracking-wide`}>Paso {step} de 5</p>
 
           <div className="relative overflow-hidden">
             {/* Step 1: Interés */}
