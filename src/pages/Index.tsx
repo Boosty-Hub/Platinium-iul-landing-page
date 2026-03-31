@@ -97,25 +97,25 @@ export default function HomePage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 pt-20 sm:pt-24 lg:pt-[120px] pb-5">
               {/* Mobile hero text */}
               <div className="lg:hidden text-center mb-5">
-                <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-4 py-1.5 mb-3`}>
+                <div className="inline-flex items-center gap-2 bg-[#1d9fa9]/10 border border-[#1d9fa9]/20 rounded-full px-4 py-1.5 mb-3">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#1d9fa9]" />
-                  <span className="text-[10px] text-[#1d9fa9] font-bold tracking-[1px] uppercase">Asesoría para Latinos en EE.UU.</span>
+                  <span className="text-[10px] font-bold tracking-[1px] uppercase" style={{ color: "#1d9fa9" }}>Asesoría para Latinos en EE.UU.</span>
                 </div>
                 <h1
-                  className={`text-2xl sm:text-3xl font-normal leading-[1.15] mb-2 ${t.text}`}
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                  className="text-2xl sm:text-3xl font-normal leading-[1.15] mb-2"
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif", color: dark ? "#E4EEF0" : "#0B1A1E" }}
                 >
                   Protege a tu familia.{" "}
-                  <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
+                  <span className="font-bold italic" style={{ background: "linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                     Construye tu retiro.
                   </span>
                 </h1>
-                <p className={`text-sm ${t.textMid} mb-1`}>
-                  Con un <strong className={t.text}>Indexed Universal Life (IUL)</strong>
+                <p className="text-sm mb-1" style={{ color: dark ? "#94B3BB" : "#4A6B73" }}>
+                  Con un <strong style={{ color: dark ? "#E4EEF0" : "#0B1A1E" }}>Indexed Universal Life (IUL)</strong>
                 </p>
                 <div className="flex flex-wrap justify-center gap-3 mt-3">
-                  {[["ITIN ✓", ""], ["Piso 0%", ""], ["Gratis", ""]].map(([label], i) => (
-                    <span key={i} className="text-[11px] font-bold text-[#1d9fa9] bg-[#1d9fa9]/10 px-3 py-1 rounded-full">{label}</span>
+                  {["ITIN ✓", "Piso 0%", "Gratis"].map((label, i) => (
+                    <span key={i} className="text-[11px] font-bold px-3 py-1 rounded-full" style={{ color: "#1d9fa9", backgroundColor: "rgba(29,159,169,0.1)" }}>{label}</span>
                   ))}
                 </div>
               </div>
