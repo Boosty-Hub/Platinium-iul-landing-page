@@ -143,21 +143,21 @@ export default function HomePage() {
 
                 {/* Mobile compact hero text + form */}
                 <div className="lg:hidden text-center mb-2">
-                  <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-4 py-1.5 mb-4`}>
+                  <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-4 py-1.5 mb-3`}>
                     <span className="w-1.5 h-1.5 rounded-full bg-[#1d9fa9]" />
                     <span className="text-[10px] text-[#1d9fa9] font-bold tracking-[1px] uppercase">Asesoría para Latinos en EE.UU.</span>
                   </div>
                   <h1
-                    className={`text-2xl sm:text-3xl font-normal leading-[1.15] mb-3 ${t.text}`}
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                    className="text-[22px] sm:text-3xl font-normal leading-[1.15] mb-2"
+                    style={{ fontFamily: "'Playfair Display', Georgia, serif", color: dark ? "#E4EEF0" : "#1A2E33" }}
                   >
                     Protege a tu familia.{" "}
                     <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
                       Construye tu retiro.
                     </span>
                   </h1>
-                  <p className={`text-sm ${t.textMid} mb-1`}>
-                    Con un <strong className={t.text}>Indexed Universal Life (IUL)</strong>
+                  <p className="text-sm mb-1" style={{ color: dark ? "#94B3BB" : "#4A6B73" }}>
+                    Con un <strong style={{ color: dark ? "#E4EEF0" : "#1A2E33" }}>Indexed Universal Life (IUL)</strong>
                   </p>
                 </div>
 

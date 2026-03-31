@@ -159,6 +159,10 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
     setForm((prev) => ({ ...prev, [field]: value }));
   }, []);
 
+  // Explicit color values for reliable rendering
+  const textColor = dark ? "#E4EEF0" : "#1A2E33";
+  const mutedColor = dark ? "#6A8E98" : "#7A9BA3";
+
   // Selection button styles
   const selBtnBase = "w-full p-3 sm:p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all duration-300";
   const selBtnText = dark ? "text-white" : "text-[#0B1A1E]";
@@ -172,10 +176,10 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   const formCard = (
     <div className={`${t.card} border rounded-2xl p-4 sm:p-9 backdrop-blur-xl`}>
       <div className="text-center mb-3 sm:mb-6">
-        <h3 className={`text-lg sm:text-2xl font-bold ${t.text}`}>
+        <h3 className="text-lg sm:text-2xl font-bold" style={{ color: textColor }}>
           ¡Cotiza tu IUL <span className="text-[#1d9fa9]">Gratis</span> ahora!
         </h3>
-        <p className={`text-xs sm:text-sm ${t.textMuted} mt-1`}>Completa el formulario</p>
+        <p className="text-xs sm:text-sm mt-1" style={{ color: mutedColor }}>Completa el formulario</p>
       </div>
 
       {formState !== "success" ? (
@@ -185,12 +189,12 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
               <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= s ? "bg-[#1d9fa9]" : dark ? "bg-white/10" : "bg-black/10"}`} />
             ))}
           </div>
-          <p className={`text-[11px] ${t.textMuted} mb-4 sm:mb-5 text-center tracking-wide`}>Paso {step} de 5</p>
+          <p className="text-[11px] mb-4 sm:mb-5 text-center tracking-wide" style={{ color: mutedColor }}>Paso {step} de 5</p>
 
           <div className="relative overflow-hidden">
             {/* Step 1: Interés */}
             <div className={`transition-all duration-500 ease-out ${step === 1 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
-              <h3 className={`text-base sm:text-xl font-bold ${t.text} mb-3 sm:mb-5 text-center`}>
+              <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-5 text-center" style={{ color: textColor }}>
                 ¿Qué te gustaría lograr con este plan?
               </h3>
               <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
@@ -223,7 +227,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
 
             {/* Step 2: Año de nacimiento */}
             <div className={`transition-all duration-500 ease-out ${step === 2 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
-              <h3 className={`text-base sm:text-xl font-bold ${t.text} mb-4 sm:mb-6 text-center`}>
+              <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6 text-center" style={{ color: textColor }}>
                 ¿En qué año naciste?
               </h3>
               <input
@@ -254,7 +258,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
 
             {/* Step 3: Ahorro semanal */}
             <div className={`transition-all duration-500 ease-out ${step === 3 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
-              <h3 className={`text-base sm:text-xl font-bold ${t.text} mb-4 sm:mb-6 text-center`}>
+              <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6 text-center" style={{ color: textColor }}>
                 ¿Cuánto te gustaría ahorrar semanalmente?
               </h3>
               <div className="grid grid-cols-3 gap-3">
@@ -289,7 +293,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
             <div className={`transition-all duration-500 ease-out ${step === 4 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <div className="text-center">
                 <div className="text-4xl sm:text-5xl mb-4 sm:mb-5">🎯</div>
-                <h3 className={`text-base sm:text-xl font-bold ${t.text} mb-5 sm:mb-7`}>
+                <h3 className="text-base sm:text-xl font-bold mb-5 sm:mb-7" style={{ color: textColor }}>
                   Si calificas, ¿te gustaría ver tus números personalizados?
                 </h3>
                 <div className="flex flex-col gap-3">
@@ -306,7 +310,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
             {/* Step 5: Datos de contacto */}
             <div className={`transition-all duration-500 ease-out ${step === 5 ? "opacity-100 translate-x-0 max-h-[800px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <form onSubmit={handleSubmit} noValidate>
-                <h3 className={`text-base sm:text-xl font-bold ${t.text} mb-4 sm:mb-6 text-center`}>
+                <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6 text-center" style={{ color: textColor }}>
                   ¡Último paso! Tus datos de contacto
                 </h3>
 
