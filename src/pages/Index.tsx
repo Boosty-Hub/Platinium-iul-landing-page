@@ -62,7 +62,18 @@ const JSON_LD = [
   },
 ];
 
-const INSURANCE_LOGOS = Array(8).fill(null);
+const INSURANCE_LOGOS = [
+  { src: logoCigna, alt: "Cigna" },
+  { src: logoOscar, alt: "Oscar Health" },
+  { src: logoMolina, alt: "Molina Healthcare" },
+  { src: logoBluecross, alt: "Blue Cross Blue Shield" },
+  { src: logoUnited, alt: "UnitedHealthcare" },
+  { src: logoAetna, alt: "Aetna CVS Health" },
+  { src: logoFriday, alt: "Friday Health Plans" },
+  { src: logoFloridaBlue, alt: "Florida Blue" },
+  { src: logoNationalLife, alt: "National Life Group" },
+  { src: logoFidelity, alt: "Fidelity Investments" },
+];
 
 export default function HomePage() {
   const [tab, setTab] = useState(0);
