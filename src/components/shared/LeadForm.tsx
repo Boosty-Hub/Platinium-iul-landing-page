@@ -170,12 +170,12 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   const amtBtnActive = `bg-[#1d9fa9]/25 ${selBtnText} border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]`;
 
   const formCard = (
-    <div className={`${t.card} border rounded-2xl p-9 backdrop-blur-xl`}>
-      <div className="text-center mb-6">
-        <h3 className={`text-2xl font-semibold ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
+    <div className={`${t.card} border rounded-2xl p-5 sm:p-9 backdrop-blur-xl`}>
+      <div className="text-center mb-4 sm:mb-6">
+        <h3 className={`text-xl sm:text-2xl font-semibold ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
           ¡Cotiza tu IUL <span className="italic text-[#1d9fa9]">Gratis</span> ahora!
         </h3>
-        <p className={`text-sm ${t.textMuted} mt-2`}>Completa el formulario</p>
+        <p className={`text-sm ${t.textMuted} mt-1.5`}>Completa el formulario</p>
       </div>
 
       {formState !== "success" ? (
