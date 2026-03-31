@@ -193,7 +193,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
               <h3 className={`text-lg sm:text-xl font-semibold ${t.text} mb-4 sm:mb-5 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
                 ¿Qué te gustaría lograr con este plan?
               </h3>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
                 {[
                   { value: "Proteger a mi familia", icon: "🛡️" },
                   { value: "Crear capital / ahorro", icon: "💰" },
