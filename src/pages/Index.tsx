@@ -91,12 +91,37 @@ export default function HomePage() {
 
           {/* HERO */}
           <section className="lg:min-h-screen flex flex-col justify-center relative overflow-hidden" aria-label="Inicio">
-            <div className="absolute top-[8%] right-[3%] w-80 h-80 rounded-full border border-[#1d9fa9]/[0.06] animate-[spin_80s_linear_infinite] pointer-events-none" />
-            <div className="absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" />
+            <div className="absolute top-[8%] right-[3%] w-80 h-80 rounded-full border border-[#1d9fa9]/[0.06] animate-[spin_80s_linear_infinite] pointer-events-none hidden lg:block" />
+            <div className="absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none hidden lg:block" />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 pt-16 sm:pt-[120px] pb-[20px]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 pt-20 sm:pt-24 lg:pt-[120px] pb-5">
+              {/* Mobile hero text */}
+              <div className="lg:hidden text-center mb-5">
+                <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-4 py-1.5 mb-3`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#1d9fa9]" />
+                  <span className="text-[10px] text-[#1d9fa9] font-bold tracking-[1px] uppercase">Asesoría para Latinos en EE.UU.</span>
+                </div>
+                <h1
+                  className={`text-2xl sm:text-3xl font-normal leading-[1.15] mb-2 ${t.text}`}
+                  style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+                >
+                  Protege a tu familia.{" "}
+                  <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
+                    Construye tu retiro.
+                  </span>
+                </h1>
+                <p className={`text-sm ${t.textMid} mb-1`}>
+                  Con un <strong className={t.text}>Indexed Universal Life (IUL)</strong>
+                </p>
+                <div className="flex flex-wrap justify-center gap-3 mt-3">
+                  {[["ITIN ✓", ""], ["Piso 0%", ""], ["Gratis", ""]].map(([label], i) => (
+                    <span key={i} className="text-[11px] font-bold text-[#1d9fa9] bg-[#1d9fa9]/10 px-3 py-1 rounded-full">{label}</span>
+                  ))}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
-                {/* Hero text - hidden on mobile, visible on lg */}
+                {/* Hero text - desktop only */}
                 <div className="max-w-xl hidden lg:block">
                   <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-5 py-2 mb-7 animate-[fadeUp_0.8s_ease]`}>
                     <span className="w-2 h-2 rounded-full bg-[#1d9fa9] shadow-[0_0_8px_rgba(29,159,169,0.5)]" />
@@ -141,51 +166,50 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Mobile compact hero text + form */}
-                <div className="lg:hidden text-center mb-2">
-                  <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-4 py-1.5 mb-3`}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#1d9fa9]" />
-                    <span className="text-[10px] text-[#1d9fa9] font-bold tracking-[1px] uppercase">Asesoría para Latinos en EE.UU.</span>
-                  </div>
-                  <h1
-                    className="text-[22px] sm:text-3xl font-normal leading-[1.15] mb-2"
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif", color: dark ? "#E4EEF0" : "#1A2E33" }}
-                  >
-                    Protege a tu familia.{" "}
-                    <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
-                      Construye tu retiro.
-                    </span>
-                  </h1>
-                  <p className="text-sm mb-1" style={{ color: dark ? "#94B3BB" : "#4A6B73" }}>
-                    Con un <strong style={{ color: dark ? "#E4EEF0" : "#1A2E33" }}>Indexed Universal Life (IUL)</strong>
-                  </p>
-                </div>
-
+                {/* Form */}
                 <div>
                   <LeadForm t={t} dark={dark} inline />
                 </div>
               </div>
 
-              {/* Compact contact bar */}
-              <ContactBar t={t} compact />
+              {/* Mobile CTAs - call & whatsapp */}
+              <div className="lg:hidden mt-6">
+                <div className="flex gap-3">
+                  <a href="tel:+16893082809" className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-4 py-3 rounded-xl font-bold text-sm no-underline">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+                    </svg>
+                    Llamar
+                  </a>
+                  <a href="https://wa.me/17866787863" target="_blank" rel="noopener noreferrer" className="flex-1 inline-flex items-center justify-center gap-2 border-2 border-[#25D366] text-[#25D366] px-4 py-3 rounded-xl font-bold text-sm no-underline">
+                    <WhatsAppIcon />
+                    WhatsApp
+                  </a>
+                </div>
+              </div>
+
+              {/* Desktop contact bar */}
+              <div className="hidden lg:block">
+                <ContactBar t={t} compact />
+              </div>
 
               {/* Insurance logos marquee */}
-              <div className="mt-10 overflow-hidden rounded-xl">
+              <div className="mt-6 lg:mt-10 overflow-hidden rounded-xl">
                 <div className="flex items-center" style={{ animation: "marquee 30s linear infinite", width: "max-content" }}>
                   {[...INSURANCE_LOGOS, ...INSURANCE_LOGOS].map((logo, i) => (
-                    <div key={i} className={`flex items-center justify-center mx-8 shrink-0 h-16 ${dark ? "opacity-70 hover:opacity-100" : "opacity-60 hover:opacity-100"} transition-opacity`}>
-                      <img src={logo.src} alt={logo.alt} className={`h-12 w-auto max-w-[140px] object-contain ${dark ? "brightness-0 invert" : ""}`} />
+                    <div key={i} className={`flex items-center justify-center mx-4 sm:mx-8 shrink-0 h-10 sm:h-16 ${dark ? "opacity-70 hover:opacity-100" : "opacity-60 hover:opacity-100"} transition-opacity`}>
+                      <img src={logo.src} alt={logo.alt} className={`h-8 sm:h-12 w-auto max-w-[100px] sm:max-w-[140px] object-contain ${dark ? "brightness-0 invert" : ""}`} />
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Offices & Hours */}
-              <div className={`mt-10 ${t.card} border rounded-2xl p-8 backdrop-blur-xl max-w-6xl mx-auto`}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className={`mt-6 lg:mt-10 ${t.card} border rounded-2xl p-5 sm:p-8 backdrop-blur-xl max-w-6xl mx-auto`}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
                   <div>
-                    <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">📍 Oficinas</h4>
-                    <div className={`text-sm ${t.textMuted} space-y-3 leading-relaxed`}>
+                    <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-3 font-bold">📍 Oficinas</h4>
+                    <div className={`text-sm ${t.textMuted} space-y-2.5 leading-relaxed`}>
                       <div>
                         <p className="font-semibold text-[#1d9fa9]">Miami, FL (Central)</p>
                         <p>5775 Waterford District Dr #170, Miami, FL 33126</p>
@@ -201,7 +225,7 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">🕒 Horarios de Atención</h4>
+                    <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-3 font-bold">🕒 Horarios de Atención</h4>
                     <div className={`text-sm ${t.textMuted} leading-relaxed space-y-1`}>
                       <p>Lunes a Viernes: 10:00 A.M. a 5:00 P.M.</p>
                       <p>Sábado: Cerrado</p>
@@ -212,7 +236,7 @@ export default function HomePage() {
               </div>
 
               {/* Discover more */}
-              <div className="flex items-center justify-center mt-10 lg:mt-14">
+              <div className="flex items-center justify-center mt-8 lg:mt-14">
                 <div className="flex flex-col items-center gap-2 animate-bounce">
                   <span className={`text-[10px] tracking-[2px] ${t.textMuted} uppercase`}>Descubre más</span>
                   <svg className="w-5 h-5 text-[#1d9fa9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
