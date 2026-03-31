@@ -265,8 +265,8 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                     onClick={() => updateField("ahorro_semanal", amt)}
                     className={`${amtBtnBase} ${form.ahorro_semanal === amt ? amtBtnActive : amtBtnIdle}`}
                   >
-                    <div className="text-xl font-bold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>${amt}</div>
-                    <div className="text-[10px] text-white/60 mt-1">/semana</div>
+                    <div className={`text-xl font-bold ${dark ? "text-white" : "text-[#0B1A1E]"}`} style={{ fontFamily: "'Playfair Display', serif" }}>${amt}</div>
+                    <div className={`text-[10px] mt-1 ${dark ? "text-white/60" : "text-[#0B1A1E]/50"}`}>/semana</div>
                   </button>
                 ))}
               </div>
