@@ -94,52 +94,68 @@ export default function HomePage() {
           <>
             <SEOHead title={SEO.title} description={SEO.description} keywords={SEO.keywords} canonical={DOMAIN} jsonLd={JSON_LD} />
 
-            {/* HERO — single unified responsive structure */}
-            <section className="flex flex-col justify-center relative overflow-hidden" aria-label="Inicio">
-              <div className="absolute top-[8%] right-[3%] w-80 h-80 rounded-full border border-[#1d9fa9]/[0.06] animate-[spin_80s_linear_infinite] pointer-events-none hidden lg:block" />
-              <div className="absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none hidden lg:block" />
+            {/* HERO */}
+            <section aria-label="Inicio" style={{ position: 'relative' }}>
+              <div className="hidden lg:block absolute top-[8%] right-[3%] w-80 h-80 rounded-full border border-[#1d9fa9]/[0.06] animate-[spin_80s_linear_infinite] pointer-events-none" />
+              <div className="hidden lg:block absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" />
 
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 pt-20 lg:pt-[120px] pb-5">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
-                  {/* Hero text — always visible, responsive */}
-                  <div className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left">
-                    <div className="inline-flex items-center gap-2 bg-[#1d9fa9]/10 border border-[#1d9fa9]/20 rounded-full px-4 lg:px-5 py-1.5 lg:py-2 mb-4 lg:mb-7">
-                      <span className="w-1.5 lg:w-2 h-1.5 lg:h-2 rounded-full bg-[#1d9fa9] shadow-[0_0_8px_rgba(29,159,169,0.5)]" />
-                      <span className="text-[10px] lg:text-xs font-bold tracking-[1px] lg:tracking-[1.5px] uppercase" style={{ color: "#1d9fa9" }}>
+              <div className="max-w-7xl mx-auto px-4 sm:px-6" style={{ position: 'relative', zIndex: 10, paddingTop: '80px', paddingBottom: '20px' }}>
+                {/* Hero text — mobile: stacked above form */}
+                <div style={{ textAlign: 'center', marginBottom: '20px' }} className="lg:hidden">
+                  <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-3" style={{ backgroundColor: 'rgba(29,159,169,0.1)', border: '1px solid rgba(29,159,169,0.2)' }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#1d9fa9', display: 'inline-block' }} />
+                    <span style={{ color: '#1d9fa9', fontSize: '10px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const }}>
+                      Asesoría Financiera para Latinos en EE.UU.
+                    </span>
+                  </div>
+                  <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", color: textColor, fontSize: '24px', lineHeight: 1.15, marginBottom: '8px', fontWeight: 400 }}>
+                    Protege a tu familia.{" "}
+                    <span style={{ background: 'linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 700, fontStyle: 'italic' }}>
+                      Construye tu retiro.
+                    </span>
+                  </h1>
+                  <p style={{ color: mutedColor, fontSize: '13px' }}>Con un Indexed Universal Life (IUL).</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
+                    {[["Aplicable con ", "ITIN"], ["Piso garantizado ", "0%"], ["Consulta ", "100% gratis"]].map(([pre, bold], i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <CheckIcon className="text-[#1d9fa9]" />
+                        <span style={{ color: midColor, fontSize: '11px' }}>
+                          {pre}<strong style={{ color: textColor }}>{bold}</strong>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Desktop: two columns */}
+                <div className="hidden lg:grid lg:grid-cols-2 gap-10 items-center">
+                  <div className="text-left">
+                    <div className="inline-flex items-center gap-2 bg-[#1d9fa9]/10 border border-[#1d9fa9]/20 rounded-full px-5 py-2 mb-7">
+                      <span className="w-2 h-2 rounded-full bg-[#1d9fa9] shadow-[0_0_8px_rgba(29,159,169,0.5)]" />
+                      <span className="text-xs font-bold tracking-[1.5px] uppercase" style={{ color: "#1d9fa9" }}>
                         Asesoría Financiera para Latinos en EE.UU.
                       </span>
                     </div>
-
-                    <h1
-                      className="text-2xl sm:text-3xl lg:text-[56px] font-normal leading-[1.1] lg:leading-[1.08] mb-3 lg:mb-6"
-                      style={{ fontFamily: "'Playfair Display', Georgia, serif", color: textColor }}
-                    >
+                    <h1 className="text-[56px] font-normal leading-[1.08] mb-6" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: textColor }}>
                       Protege a tu familia.{" "}
-                      <span
-                        className="font-bold italic"
-                        style={{ background: "linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
-                      >
+                      <span className="font-bold italic" style={{ background: "linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                         Construye tu retiro.
                       </span>
-                      <br className="hidden lg:block" />
-                      <span className="block lg:inline text-[0.5em] lg:text-[0.55em] font-normal mt-1" style={{ color: mutedColor }}>
+                      <br />
+                      <span className="text-[0.55em] font-normal" style={{ color: mutedColor }}>
                         Con un Indexed Universal Life (IUL).
                       </span>
                     </h1>
-
-                    {/* Extended copy — desktop only */}
-                    <p className="hidden lg:block text-lg leading-relaxed max-w-xl mb-5" style={{ color: midColor }}>
+                    <p className="text-lg leading-relaxed max-w-xl mb-5" style={{ color: midColor }}>
                       Mientras tu dinero duerme en el banco ganando 0.05%, las familias con un{" "}
                       <strong style={{ color: textColor }}>IUL ganan hasta 12% anual</strong> vinculado al S&P 500 —{" "}
                       <strong style={{ color: textColor }}>sin riesgo de pérdida</strong> cuando el mercado cae.
                     </p>
-                    <p className="hidden lg:block text-base leading-relaxed max-w-xl mb-9" style={{ color: midColor }}>
+                    <p className="text-base leading-relaxed max-w-xl mb-9" style={{ color: midColor }}>
                       Protección permanente + plan de retiro + acceso a tu dinero sin penalidades.{" "}
                       <strong style={{ color: "#1d9fa9" }}>Todo en un solo instrumento.</strong>
                     </p>
-
-                    {/* CTAs — desktop only */}
-                    <div className="hidden lg:flex flex-col sm:flex-row gap-3.5 mb-10">
+                    <div className="flex gap-3.5 mb-10">
                       <Link to="/contacto" className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-9 py-4 rounded-lg font-bold text-base tracking-wide no-underline hover:shadow-xl hover:shadow-[#1d9fa9]/25 transition-all hover:-translate-y-0.5 text-center">
                         Agenda tu Consulta Gratis →
                       </Link>
@@ -147,24 +163,25 @@ export default function HomePage() {
                         ¿Cómo funciona el IUL?
                       </Link>
                     </div>
-
-                    {/* Guarantee badges — always visible */}
-                    <div className="flex flex-wrap justify-center lg:justify-start gap-3 lg:gap-6 mt-3 lg:mt-0" aria-label="Garantías">
+                    <div className="flex flex-wrap gap-6" aria-label="Garantías">
                       {[["Aplicable con ", "ITIN"], ["Piso garantizado ", "0%"], ["Consulta ", "100% gratis"]].map(([pre, bold], i) => (
-                        <div key={i} className="flex items-center gap-1.5 lg:gap-2">
+                        <div key={i} className="flex items-center gap-2">
                           <CheckIcon className="text-[#1d9fa9]" />
-                          <span className="text-[11px] lg:text-sm" style={{ color: midColor }}>
+                          <span className="text-sm" style={{ color: midColor }}>
                             {pre}<strong style={{ color: textColor }}>{bold}</strong>
                           </span>
                         </div>
                       ))}
                     </div>
                   </div>
-
-                  {/* Form */}
-                  <div className="mt-4 lg:mt-0">
+                  <div>
                     <LeadForm t={t} dark={dark} inline />
                   </div>
+                </div>
+
+                {/* Mobile: form below hero text */}
+                <div className="lg:hidden">
+                  <LeadForm t={t} dark={dark} inline />
                 </div>
 
                 {/* Contact bar — works on all sizes */}
