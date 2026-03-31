@@ -174,7 +174,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   const amtBtnActive = `bg-[#1d9fa9]/25 ${selBtnText} border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]`;
 
   const formCard = (
-    <div className={`${t.card} border rounded-2xl p-4 sm:p-9 backdrop-blur-xl`}>
+    <div className={`${t.card} border rounded-2xl p-4 sm:p-9 backdrop-blur-xl shadow-sm`}>
       <div className="text-center mb-3 sm:mb-6">
         <h3 className="text-lg sm:text-2xl font-bold" style={{ color: textColor }}>
           ¡Cotiza tu IUL <span className="text-[#1d9fa9]">Gratis</span> ahora!
