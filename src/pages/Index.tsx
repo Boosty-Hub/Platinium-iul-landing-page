@@ -25,20 +25,16 @@ const JSON_LD = [
     logo: `${DOMAIN}/logo.png`,
     image: `${DOMAIN}/og-image.jpg`,
     description: SEO.description,
-    telephone: "+1-786-956-2771",
+    telephone: "+1-689-308-2809",
     email: "info@platiniuminsuranceusa.com",
     address: { "@type": "PostalAddress", streetAddress: "5775 Waterford District Dr #170", addressLocality: "Miami", addressRegion: "FL", postalCode: "33126", addressCountry: "US" },
     geo: { "@type": "GeoCoordinates", latitude: 25.7617, longitude: -80.1918 },
     areaServed: [
-      { "@type": "City", name: "Miami" },
-      { "@type": "City", name: "Doral" },
-      { "@type": "City", name: "Hialeah" },
-      { "@type": "City", name: "Homestead" },
-      { "@type": "State", name: "Florida" },
+      { "@type": "Country", name: "United States" },
     ],
     priceRange: "$$",
-    openingHoursSpecification: { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], opens: "09:00", closes: "18:00" },
-    sameAs: ["https://www.instagram.com/platiniuminsurance", "https://www.facebook.com/platiniuminsurance"],
+    openingHoursSpecification: { "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], opens: "10:00", closes: "17:00" },
+    sameAs: ["https://www.instagram.com/platiniuminsurancegroup"],
   },
   {
     "@context": "https://schema.org",
@@ -51,10 +47,12 @@ const JSON_LD = [
     name: "Seguro de Vida Universal Indexado (IUL)",
     provider: { "@type": "InsuranceAgency", name: "Platinium Insurance Group" },
     description: "Seguro de vida permanente con acumulación de valor indexado al mercado, protección familiar y plan de retiro para la comunidad hispana en Estados Unidos.",
-    areaServed: { "@type": "State", name: "Florida" },
+    areaServed: { "@type": "Country", name: "United States" },
     audience: { "@type": "Audience", audienceType: "Hispanos y latinos en Estados Unidos" },
   },
 ];
+
+const INSURANCE_LOGOS = Array(8).fill(null);
 
 export default function HomePage() {
   const [tab, setTab] = useState(0);
@@ -122,8 +120,52 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <ContactBar t={t} />
+              {/* Compact contact bar */}
+              <ContactBar t={t} compact />
 
+              {/* Insurance logos marquee */}
+              <div className="mt-10 overflow-hidden rounded-xl">
+                <div className="flex items-center" style={{ animation: "marquee 20s linear infinite", width: "max-content" }}>
+                  {[...INSURANCE_LOGOS, ...INSURANCE_LOGOS].map((_, i) => (
+                    <div key={i} className={`flex items-center justify-center mx-6 shrink-0 w-28 h-14 rounded-lg ${dark ? "bg-white/5" : "bg-black/5"}`}>
+                      <span className={`text-xs font-bold ${t.textMuted}`}>Seguro {(i % 8) + 1}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Offices & Hours */}
+              <div className={`mt-10 ${t.card} border rounded-2xl p-8 backdrop-blur-xl max-w-6xl mx-auto`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div>
+                    <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">📍 Oficinas</h4>
+                    <div className={`text-sm ${t.textMuted} space-y-3 leading-relaxed`}>
+                      <div>
+                        <p className="font-semibold text-[#1d9fa9]">Miami, FL (Central)</p>
+                        <p>5775 Waterford District Dr #170, Miami, FL 33126</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-[#1d9fa9]">Orlando, FL</p>
+                        <p>13550 Village Park Dr, Orlando, FL 32837</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-[#1d9fa9]">Houston, TX</p>
+                        <p>16225 Park Ten Place, Of. 475, 4to Piso, Houston, TX 77084</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">🕒 Horarios de Atención</h4>
+                    <div className={`text-sm ${t.textMuted} leading-relaxed space-y-1`}>
+                      <p>Lunes a Viernes: 10:00 A.M. a 5:00 P.M.</p>
+                      <p>Sábado: Cerrado</p>
+                      <p>Domingo: Cerrado</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Discover more */}
               <div className="flex items-center justify-center mt-10 lg:mt-14">
                 <div className="flex flex-col items-center gap-2 animate-bounce">
                   <span className={`text-[10px] tracking-[2px] ${t.textMuted} uppercase`}>Descubre más</span>
