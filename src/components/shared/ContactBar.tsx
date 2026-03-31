@@ -13,7 +13,7 @@ export function ContactBar({ t, compact = false }: ContactBarProps) {
       <Anim delay={0.25}>
         <div className={`${t.card} border rounded-2xl p-4 sm:p-6 backdrop-blur-xl max-w-6xl mx-auto`}>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-            <h4 className="text-base sm:text-lg font-semibold" style={{ fontFamily: "'Playfair Display', serif", color: "#E4EEF0" }}>
+            <h4 className="text-base sm:text-lg font-semibold text-[#1da1aa]" style={{ fontFamily: "'Playfair Display', serif" }}>
               ¿Prefieres hablar ahora?
             </h4>
             <div className="flex w-full sm:w-auto gap-2 sm:gap-3 shrink-0">
