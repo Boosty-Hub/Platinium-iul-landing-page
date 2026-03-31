@@ -288,8 +288,8 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
             {/* Step 4: Confirmación */}
             <div className={`transition-all duration-500 ease-out ${step === 4 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <div className="text-center">
-                <div className="text-5xl mb-5">🎯</div>
-                <h3 className={`text-xl font-semibold ${t.text} mb-7`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                <div className="text-4xl sm:text-5xl mb-4 sm:mb-5">🎯</div>
+                <h3 className={`text-base sm:text-xl font-bold ${t.text} mb-5 sm:mb-7`}>
                   Si calificas, ¿te gustaría ver tus números personalizados?
                 </h3>
                 <div className="flex flex-col gap-3">
