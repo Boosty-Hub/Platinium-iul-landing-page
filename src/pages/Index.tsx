@@ -94,7 +94,7 @@ export default function HomePage() {
             <div className="absolute top-[8%] right-[3%] w-80 h-80 rounded-full border border-[#1d9fa9]/[0.06] animate-[spin_80s_linear_infinite] pointer-events-none" />
             <div className="absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 pt-20 sm:pt-[120px] pb-[20px]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 pt-16 sm:pt-[120px] pb-[20px]">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
                 {/* Hero text - hidden on mobile, visible on lg */}
                 <div className="max-w-xl hidden lg:block">
