@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { ThemeClasses } from "./theme";
-import { CheckIcon } from "./Icons";
+import { CheckIcon, WhatsAppIcon } from "./Icons";
 import familyHomeImg from "@/assets/family-home.jpg";
 import { Anim } from "./Anim";
 
@@ -159,13 +159,22 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
     setForm((prev) => ({ ...prev, [field]: value }));
   }, []);
 
+  // Selection button styles
+  const selBtnBase = "w-full p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all";
+  const selBtnIdle = "bg-[#0B1A1E] text-white border-white/10 hover:shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:border-white/30";
+  const selBtnActive = "bg-[#0B1A1E] text-white border-white/50 shadow-[0_0_20px_rgba(255,255,255,0.35)]";
+
+  const amtBtnBase = "p-4 rounded-xl border text-center cursor-pointer transition-all";
+  const amtBtnIdle = "bg-[#0B1A1E] text-white border-white/10 hover:shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:border-white/30";
+  const amtBtnActive = "bg-[#0B1A1E] text-white border-white/50 shadow-[0_0_20px_rgba(255,255,255,0.35)]";
+
   const formCard = (
     <div className={`${t.card} border rounded-2xl p-9 backdrop-blur-xl`}>
       <div className="text-center mb-6">
         <h3 className={`text-2xl font-semibold ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
-          Recibe una consulta <span className="italic text-[#1d9fa9]">personalizada</span>
+          ¡Cotiza tu IUL <span className="italic text-[#1d9fa9]">Gratis</span> ahora!
         </h3>
-        <p className={`text-sm ${t.textMuted} mt-2`}>Completa estos pasos rápidos y un asesor te llamará para revisar tu plan.</p>
+        <p className={`text-sm ${t.textMuted} mt-2`}>Completa el formulario</p>
       </div>
 
       {formState !== "success" ? (
@@ -183,7 +192,6 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
               <h3 className={`text-xl font-semibold ${t.text} mb-5 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
                 ¿Qué te gustaría lograr con este plan?
               </h3>
-              <p className={`text-sm ${t.textMuted} mb-5 text-center`}>Selecciona una opción</p>
               <div className="grid grid-cols-1 gap-3">
                 {[
                   { value: "Proteger a mi familia", icon: "🛡️" },
@@ -195,14 +203,10 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                     key={opt.value}
                     type="button"
                     onClick={() => updateField("interes", opt.value)}
-                    className={`w-full p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all hover:border-[#1d9fa9] hover:shadow-[0_0_12px_rgba(29,159,169,0.25)] ${
-                      form.interes === opt.value
-                        ? "border-[#1d9fa9] bg-[#1d9fa9]/10 shadow-[0_0_12px_rgba(29,159,169,0.2)]"
-                        : `border-[#1d9fa9]/30 ${dark ? "bg-white/[0.02]" : "bg-black/[0.01]"}`
-                    }`}
+                    className={`${selBtnBase} ${form.interes === opt.value ? selBtnActive : selBtnIdle}`}
                   >
                     <span className="text-2xl">{opt.icon}</span>
-                    <span className={`text-sm font-medium ${t.text}`}>{opt.value}</span>
+                    <span className="text-sm font-medium">{opt.value}</span>
                   </button>
                 ))}
               </div>
@@ -218,10 +222,9 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
 
             {/* Step 2: Año de nacimiento */}
             <div className={`transition-all duration-500 ease-out ${step === 2 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
-              <h3 className={`text-xl font-semibold ${t.text} mb-2 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
+              <h3 className={`text-xl font-semibold ${t.text} mb-6 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
                 ¿En qué año naciste?
               </h3>
-              <p className={`text-sm ${t.textMuted} mb-6 text-center`}>Esto nos ayuda a calcular tu proyección personalizada.</p>
               <input
                 type="number"
                 inputMode="numeric"
@@ -250,24 +253,19 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
 
             {/* Step 3: Ahorro semanal */}
             <div className={`transition-all duration-500 ease-out ${step === 3 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
-              <h3 className={`text-xl font-semibold ${t.text} mb-2 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
+              <h3 className={`text-xl font-semibold ${t.text} mb-6 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
                 ¿Cuánto te gustaría ahorrar semanalmente?
               </h3>
-              <p className={`text-sm ${t.textMuted} mb-6 text-center`}>Selecciona el monto que mejor se adapte a tu presupuesto.</p>
               <div className="grid grid-cols-3 gap-3">
                 {["25", "50", "75", "100", "150", "200"].map((amt) => (
                   <button
                     key={amt}
                     type="button"
                     onClick={() => updateField("ahorro_semanal", amt)}
-                    className={`p-4 rounded-xl border text-center cursor-pointer transition-all hover:border-[#1d9fa9] hover:shadow-[0_0_12px_rgba(29,159,169,0.25)] ${
-                      form.ahorro_semanal === amt
-                        ? "border-[#1d9fa9] bg-[#1d9fa9]/10 shadow-[0_0_12px_rgba(29,159,169,0.2)]"
-                        : `border-[#1d9fa9]/30 ${dark ? "bg-white/[0.02]" : "bg-black/[0.01]"}`
-                    }`}
+                    className={`${amtBtnBase} ${form.ahorro_semanal === amt ? amtBtnActive : amtBtnIdle}`}
                   >
-                    <div className="text-xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>${amt}</div>
-                    <div className={`text-[10px] ${t.textMuted} mt-1`}>/semana</div>
+                    <div className="text-xl font-bold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>${amt}</div>
+                    <div className="text-[10px] text-white/60 mt-1">/semana</div>
                   </button>
                 ))}
               </div>
@@ -290,12 +288,9 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
             <div className={`transition-all duration-500 ease-out ${step === 4 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <div className="text-center">
                 <div className="text-5xl mb-5">🎯</div>
-                <h3 className={`text-xl font-semibold ${t.text} mb-3`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                <h3 className={`text-xl font-semibold ${t.text} mb-7`} style={{ fontFamily: "'Playfair Display', serif" }}>
                   Si calificas, ¿te gustaría ver tus números personalizados?
                 </h3>
-                <p className={`text-sm ${t.textMuted} mb-7 leading-relaxed`}>
-                  Basado en tu perfil, podemos preparar una proyección real con cifras personalizadas para ti.
-                </p>
                 <div className="flex flex-col gap-3">
                   <button type="button" onClick={() => setStep(5)} className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-4 rounded-xl font-bold text-base cursor-pointer hover:shadow-lg transition-all">
                     Sí, quiero ver mis números →
@@ -310,10 +305,9 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
             {/* Step 5: Datos de contacto */}
             <div className={`transition-all duration-500 ease-out ${step === 5 ? "opacity-100 translate-x-0 max-h-[800px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <form onSubmit={handleSubmit} noValidate>
-                <h3 className={`text-xl font-semibold ${t.text} mb-2 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                <h3 className={`text-xl font-semibold ${t.text} mb-6 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
                   ¡Último paso! Tus datos de contacto
                 </h3>
-                <p className={`text-sm ${t.textMuted} mb-6 text-center`}>Para enviarte tu proyección personalizada.</p>
 
                 <div className="mb-4">
                   <label htmlFor={inline ? "nombre-hero" : "nombre"} className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
@@ -414,17 +408,23 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
         <div className="text-center py-8 animate-[fadeUp_0.6s_ease]">
           <div className="text-5xl mb-5">✅</div>
           <h3 className={`text-2xl font-semibold ${t.text} mb-3`} style={{ fontFamily: "'Playfair Display', serif" }}>
-            Perfecto. Tus datos fueron recibidos correctamente.
+            ¡Gracias por completar el formulario!
           </h3>
           <p className={`text-[15px] ${t.textMid} leading-relaxed mb-6`}>
-            Un asesor puede revisar tus cifras contigo <strong className="text-[#1d9fa9]">ahora mismo</strong>.
+            Estamos generando su cotización en PDF, atienda nuestra llamada para confirmar los datos telefónicamente.
           </p>
-          <div className={`${t.brandBg} border border-[#1d9fa9]/15 rounded-xl p-5 mb-5`}>
-            <p className={`text-sm ${t.textMid}`}>
-              📞 Te contactaremos en las próximas horas por <strong className={t.text}>WhatsApp o teléfono</strong> para agendar tu consulta gratuita.
-            </p>
-          </div>
-          <p className={`text-xs ${t.textMuted}`}>Si prefieres, también puedes llamarnos directamente.</p>
+          <p className={`text-sm ${t.textMuted} mb-5`}>
+            O si desea recibir aún más rápido su presupuesto:
+          </p>
+          <a
+            href="tel:+16893082809"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-8 py-4 rounded-xl font-bold text-base no-underline hover:shadow-lg transition-all"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+            </svg>
+            Llamar Ahora
+          </a>
         </div>
       )}
     </div>
