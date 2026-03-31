@@ -45,7 +45,7 @@ export function ContactBar({ t, compact = false }: ContactBarProps) {
               </svg>
             </div>
             <div>
-              <h4 className="text-base sm:text-lg font-semibold" style={{ fontFamily: "'Playfair Display', serif", color: "#E4EEF0" }}>
+              <h4 className="text-base sm:text-lg font-semibold text-[#1da1aa]" style={{ fontFamily: "'Playfair Display', serif" }}>
                 ¿Prefieres hablar directamente?
               </h4>
               <p className="text-xs sm:text-sm mt-1" style={{ color: "#6A8E98" }}>
