@@ -146,10 +146,10 @@ export default function HomePage() {
 
               {/* Insurance logos marquee */}
               <div className="mt-10 overflow-hidden rounded-xl">
-                <div className="flex items-center" style={{ animation: "marquee 20s linear infinite", width: "max-content" }}>
-                  {[...INSURANCE_LOGOS, ...INSURANCE_LOGOS].map((_, i) => (
-                    <div key={i} className={`flex items-center justify-center mx-6 shrink-0 w-28 h-14 rounded-lg ${dark ? "bg-white/5" : "bg-black/5"}`}>
-                      <span className={`text-xs font-bold ${t.textMuted}`}>Seguro {(i % 8) + 1}</span>
+                <div className="flex items-center" style={{ animation: "marquee 30s linear infinite", width: "max-content" }}>
+                  {[...INSURANCE_LOGOS, ...INSURANCE_LOGOS].map((logo, i) => (
+                    <div key={i} className={`flex items-center justify-center mx-8 shrink-0 h-16 ${dark ? "opacity-70 hover:opacity-100" : "opacity-60 hover:opacity-100"} transition-opacity`}>
+                      <img src={logo.src} alt={logo.alt} className={`h-12 w-auto max-w-[140px] object-contain ${dark ? "brightness-0 invert" : ""}`} />
                     </div>
                   ))}
                 </div>
