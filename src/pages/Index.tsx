@@ -75,6 +75,8 @@ const INSURANCE_LOGOS = [
   { src: logoFloridaBlue, alt: "Florida Blue" },
   { src: logoNationalLife, alt: "National Life Group" },
   { src: logoFidelity, alt: "Fidelity Investments" },
+  { src: logoAmeritas, alt: "Ameritas" },
+  { src: logoAmericanAmicable, alt: "American Amicable" },
 ];
 
 export default function HomePage() {
