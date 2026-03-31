@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { lazy, Suspense } from "react";
+import { GeoGate } from "@/components/shared/GeoGate";
 
 const Index = lazy(() => import("./pages/Index.tsx"));
 const SeguroVidaIUL = lazy(() => import("./pages/SeguroVidaIUL.tsx"));
@@ -25,26 +26,28 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Suspense fallback={<div className="min-h-screen" />}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/seguro-de-vida-iul" element={<SeguroVidaIUL />} />
-            <Route path="/jubilacion-sin-401k" element={<IULParaJubilacion />} />
-            <Route path="/seguro-vida-itin" element={<IULParaIndocumentados />} />
-            <Route path="/iul-vs-401k" element={<IULvs401k />} />
-            <Route path="/contacto" element={<Contacto />} />
-            <Route path="/proteccion-familiar" element={<ProteccionFamiliar />} />
-            <Route path="/iul-emprendedores" element={<IULEmprendedores />} />
-            <Route path="/seguro-vida-sin-examen-medico" element={<SeguroSinExamen />} />
-            <Route path="/beneficios-en-vida" element={<BeneficiosEnVida />} />
-            {/* Redirects from old URLs */}
-            <Route path="/iul-para-jubilacion" element={<Navigate to="/jubilacion-sin-401k" replace />} />
-            <Route path="/iul-para-indocumentados" element={<Navigate to="/seguro-vida-itin" replace />} />
-            <Route path="/iul-proteccion-familiar" element={<Navigate to="/proteccion-familiar" replace />} />
-            <Route path="/iul-para-emprendedores" element={<Navigate to="/iul-emprendedores" replace />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+        <GeoGate>
+          <Suspense fallback={<div className="min-h-screen" />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/seguro-de-vida-iul" element={<SeguroVidaIUL />} />
+              <Route path="/jubilacion-sin-401k" element={<IULParaJubilacion />} />
+              <Route path="/seguro-vida-itin" element={<IULParaIndocumentados />} />
+              <Route path="/iul-vs-401k" element={<IULvs401k />} />
+              <Route path="/contacto" element={<Contacto />} />
+              <Route path="/proteccion-familiar" element={<ProteccionFamiliar />} />
+              <Route path="/iul-emprendedores" element={<IULEmprendedores />} />
+              <Route path="/seguro-vida-sin-examen-medico" element={<SeguroSinExamen />} />
+              <Route path="/beneficios-en-vida" element={<BeneficiosEnVida />} />
+              {/* Redirects from old URLs */}
+              <Route path="/iul-para-jubilacion" element={<Navigate to="/jubilacion-sin-401k" replace />} />
+              <Route path="/iul-para-indocumentados" element={<Navigate to="/seguro-vida-itin" replace />} />
+              <Route path="/iul-proteccion-familiar" element={<Navigate to="/proteccion-familiar" replace />} />
+              <Route path="/iul-para-emprendedores" element={<Navigate to="/iul-emprendedores" replace />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </GeoGate>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
