@@ -8,6 +8,16 @@ import { CheckIcon, StarIcon } from "@/components/shared/Icons";
 import { LeadForm } from "@/components/shared/LeadForm";
 import { ContactBar } from "@/components/shared/ContactBar";
 import { FAQS, BENEFITS, STEPS, BANK_VS_IUL, FULL_COMPARISON, TABS, TESTIMONIALS } from "@/components/shared/data";
+import logoCigna from "@/assets/logos/cigna.svg";
+import logoOscar from "@/assets/logos/oscar.svg";
+import logoMolina from "@/assets/logos/molina.svg";
+import logoBluecross from "@/assets/logos/bluecross.svg";
+import logoUnited from "@/assets/logos/unitedhealthcare.svg";
+import logoAetna from "@/assets/logos/aetna.svg";
+import logoFriday from "@/assets/logos/friday.svg";
+import logoFloridaBlue from "@/assets/logos/floridablue.svg";
+import logoNationalLife from "@/assets/logos/nationallife.webp";
+import logoFidelity from "@/assets/logos/fidelity.svg";
 import consultationImg from "@/assets/consultation.jpg";
 
 const SEO = {
@@ -52,7 +62,18 @@ const JSON_LD = [
   },
 ];
 
-const INSURANCE_LOGOS = Array(8).fill(null);
+const INSURANCE_LOGOS = [
+  { src: logoCigna, alt: "Cigna" },
+  { src: logoOscar, alt: "Oscar Health" },
+  { src: logoMolina, alt: "Molina Healthcare" },
+  { src: logoBluecross, alt: "Blue Cross Blue Shield" },
+  { src: logoUnited, alt: "UnitedHealthcare" },
+  { src: logoAetna, alt: "Aetna CVS Health" },
+  { src: logoFriday, alt: "Friday Health Plans" },
+  { src: logoFloridaBlue, alt: "Florida Blue" },
+  { src: logoNationalLife, alt: "National Life Group" },
+  { src: logoFidelity, alt: "Fidelity Investments" },
+];
 
 export default function HomePage() {
   const [tab, setTab] = useState(0);
@@ -125,10 +146,10 @@ export default function HomePage() {
 
               {/* Insurance logos marquee */}
               <div className="mt-10 overflow-hidden rounded-xl">
-                <div className="flex items-center" style={{ animation: "marquee 20s linear infinite", width: "max-content" }}>
-                  {[...INSURANCE_LOGOS, ...INSURANCE_LOGOS].map((_, i) => (
-                    <div key={i} className={`flex items-center justify-center mx-6 shrink-0 w-28 h-14 rounded-lg ${dark ? "bg-white/5" : "bg-black/5"}`}>
-                      <span className={`text-xs font-bold ${t.textMuted}`}>Seguro {(i % 8) + 1}</span>
+                <div className="flex items-center" style={{ animation: "marquee 30s linear infinite", width: "max-content" }}>
+                  {[...INSURANCE_LOGOS, ...INSURANCE_LOGOS].map((logo, i) => (
+                    <div key={i} className={`flex items-center justify-center mx-8 shrink-0 h-16 ${dark ? "opacity-70 hover:opacity-100" : "opacity-60 hover:opacity-100"} transition-opacity`}>
+                      <img src={logo.src} alt={logo.alt} className={`h-12 w-auto max-w-[140px] object-contain ${dark ? "brightness-0 invert" : ""}`} />
                     </div>
                   ))}
                 </div>
