@@ -194,7 +194,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
           <div className="relative overflow-hidden">
             {/* Step 1: Interés */}
             <div className={`transition-all duration-500 ease-out ${step === 1 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
-              <h3 className={`text-base sm:text-xl font-bold ${t.text} mb-3 sm:mb-5 text-center`}>
+              <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-5 text-center" style={{ color: textColor }}>
                 ¿Qué te gustaría lograr con este plan?
               </h3>
               <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
