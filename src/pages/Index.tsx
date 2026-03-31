@@ -102,7 +102,7 @@ export default function HomePage() {
               <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 pt-20 lg:pt-[120px] pb-5">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
                   {/* Hero text — always visible, responsive */}
-                  <div className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left">
+                  <div className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left" style={{ background: 'red' }}>
                     <div className="inline-flex items-center gap-2 bg-[#1d9fa9]/10 border border-[#1d9fa9]/20 rounded-full px-4 lg:px-5 py-1.5 lg:py-2 mb-4 lg:mb-7">
                       <span className="w-1.5 lg:w-2 h-1.5 lg:h-2 rounded-full bg-[#1d9fa9] shadow-[0_0_8px_rgba(29,159,169,0.5)]" />
                       <span className="text-[10px] lg:text-xs font-bold tracking-[1px] lg:tracking-[1.5px] uppercase" style={{ color: "#1d9fa9" }}>
