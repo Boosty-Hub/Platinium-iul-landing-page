@@ -160,13 +160,13 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   }, []);
 
   // Selection button styles
-  const selBtnBase = "w-full p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all";
-  const selBtnIdle = "bg-[#0B1A1E] text-white border-white/10 hover:shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:border-white/30";
-  const selBtnActive = "bg-[#0B1A1E] text-white border-white/50 shadow-[0_0_20px_rgba(255,255,255,0.35)]";
+  const selBtnBase = "w-full p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all duration-300";
+  const selBtnIdle = "bg-[#1d9fa9]/10 text-white border-[#1d9fa9]/30 hover:shadow-[0_0_20px_rgba(29,159,169,0.35)] hover:border-[#1d9fa9]/60 hover:bg-[#1d9fa9]/20";
+  const selBtnActive = "bg-[#1d9fa9]/25 text-white border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]";
 
-  const amtBtnBase = "p-4 rounded-xl border text-center cursor-pointer transition-all";
-  const amtBtnIdle = "bg-[#0B1A1E] text-white border-white/10 hover:shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:border-white/30";
-  const amtBtnActive = "bg-[#0B1A1E] text-white border-white/50 shadow-[0_0_20px_rgba(255,255,255,0.35)]";
+  const amtBtnBase = "p-4 rounded-xl border text-center cursor-pointer transition-all duration-300";
+  const amtBtnIdle = "bg-[#1d9fa9]/10 text-white border-[#1d9fa9]/30 hover:shadow-[0_0_20px_rgba(29,159,169,0.35)] hover:border-[#1d9fa9]/60 hover:bg-[#1d9fa9]/20";
+  const amtBtnActive = "bg-[#1d9fa9]/25 text-white border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]";
 
   const formCard = (
     <div className={`${t.card} border rounded-2xl p-9 backdrop-blur-xl`}>
