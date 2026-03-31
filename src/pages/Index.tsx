@@ -4,7 +4,7 @@ import { Layout } from "@/components/shared/Layout";
 import { SEOHead, DOMAIN } from "@/components/shared/SEOHead";
 import { Anim } from "@/components/shared/Anim";
 import { CountUp } from "@/components/shared/CountUp";
-import { CheckIcon, StarIcon } from "@/components/shared/Icons";
+import { CheckIcon, StarIcon, WhatsAppIcon } from "@/components/shared/Icons";
 import { LeadForm } from "@/components/shared/LeadForm";
 import { ContactBar } from "@/components/shared/ContactBar";
 import { FAQS, BENEFITS, STEPS, BANK_VS_IUL, FULL_COMPARISON, TABS, TESTIMONIALS } from "@/components/shared/data";
