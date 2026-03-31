@@ -8,6 +8,16 @@ import { CheckIcon, StarIcon } from "@/components/shared/Icons";
 import { LeadForm } from "@/components/shared/LeadForm";
 import { ContactBar } from "@/components/shared/ContactBar";
 import { FAQS, BENEFITS, STEPS, BANK_VS_IUL, FULL_COMPARISON, TABS, TESTIMONIALS } from "@/components/shared/data";
+import logoCigna from "@/assets/logos/cigna.svg";
+import logoOscar from "@/assets/logos/oscar.svg";
+import logoMolina from "@/assets/logos/molina.svg";
+import logoBluecross from "@/assets/logos/bluecross.svg";
+import logoUnited from "@/assets/logos/unitedhealthcare.svg";
+import logoAetna from "@/assets/logos/aetna.svg";
+import logoFriday from "@/assets/logos/friday.svg";
+import logoFloridaBlue from "@/assets/logos/floridablue.svg";
+import logoNationalLife from "@/assets/logos/nationallife.webp";
+import logoFidelity from "@/assets/logos/fidelity.svg";
 import consultationImg from "@/assets/consultation.jpg";
 
 const SEO = {
