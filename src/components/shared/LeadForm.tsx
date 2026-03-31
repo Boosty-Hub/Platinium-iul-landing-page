@@ -189,7 +189,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
               <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= s ? "bg-[#1d9fa9]" : dark ? "bg-white/10" : "bg-black/10"}`} />
             ))}
           </div>
-          <p className={`text-[11px] mb-4 sm:mb-5 text-center tracking-wide ${dark ? "text-[#6A8E98]" : "text-[#7A9BA3]"}`}>Paso {step} de 5</p>
+          <p className="text-[11px] mb-4 sm:mb-5 text-center tracking-wide" style={{ color: mutedColor }}>Paso {step} de 5</p>
 
           <div className="relative overflow-hidden">
             {/* Step 1: Interés */}
