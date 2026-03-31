@@ -160,7 +160,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   }, []);
 
   // Selection button styles
-  const selBtnBase = "w-full p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all duration-300";
+  const selBtnBase = "w-full p-3 sm:p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all duration-300";
   const selBtnText = dark ? "text-white" : "text-[#0B1A1E]";
   const selBtnIdle = `bg-[#1d9fa9]/10 ${selBtnText} border-[#1d9fa9]/30 hover:shadow-[0_0_20px_rgba(29,159,169,0.35)] hover:border-[#1d9fa9]/60 hover:bg-[#1d9fa9]/20`;
   const selBtnActive = `bg-[#1d9fa9]/25 ${selBtnText} border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]`;
@@ -170,30 +170,30 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   const amtBtnActive = `bg-[#1d9fa9]/25 ${selBtnText} border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]`;
 
   const formCard = (
-    <div className={`${t.card} border rounded-2xl p-9 backdrop-blur-xl`}>
-      <div className="text-center mb-6">
-        <h3 className={`text-2xl font-semibold ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
-          ¡Cotiza tu IUL <span className="italic text-[#1d9fa9]">Gratis</span> ahora!
+    <div className={`${t.card} border rounded-2xl p-4 sm:p-9 backdrop-blur-xl`}>
+      <div className="text-center mb-3 sm:mb-6">
+        <h3 className={`text-lg sm:text-2xl font-bold ${t.text}`}>
+          ¡Cotiza tu IUL <span className="text-[#1d9fa9]">Gratis</span> ahora!
         </h3>
-        <p className={`text-sm ${t.textMuted} mt-2`}>Completa el formulario</p>
+        <p className={`text-xs sm:text-sm ${t.textMuted} mt-1`}>Completa el formulario</p>
       </div>
 
       {formState !== "success" ? (
         <>
-          <div className="flex items-center gap-1.5 mb-6">
+          <div className="flex items-center gap-1.5 mb-4 sm:mb-6">
             {[1, 2, 3, 4, 5].map((s) => (
               <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= s ? "bg-[#1d9fa9]" : dark ? "bg-white/10" : "bg-black/10"}`} />
             ))}
           </div>
-          <p className={`text-[11px] ${t.textMuted} mb-5 text-center tracking-wide`}>Paso {step} de 5</p>
+          <p className={`text-[11px] ${t.textMuted} mb-4 sm:mb-5 text-center tracking-wide`}>Paso {step} de 5</p>
 
           <div className="relative overflow-hidden">
             {/* Step 1: Interés */}
             <div className={`transition-all duration-500 ease-out ${step === 1 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
-              <h3 className={`text-xl font-semibold ${t.text} mb-5 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
+              <h3 className={`text-base sm:text-xl font-bold ${t.text} mb-3 sm:mb-5 text-center`}>
                 ¿Qué te gustaría lograr con este plan?
               </h3>
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
                 {[
                   { value: "Proteger a mi familia", icon: "🛡️" },
                   { value: "Crear capital / ahorro", icon: "💰" },
@@ -223,7 +223,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
 
             {/* Step 2: Año de nacimiento */}
             <div className={`transition-all duration-500 ease-out ${step === 2 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
-              <h3 className={`text-xl font-semibold ${t.text} mb-6 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
+              <h3 className={`text-base sm:text-xl font-bold ${t.text} mb-4 sm:mb-6 text-center`}>
                 ¿En qué año naciste?
               </h3>
               <input
@@ -254,7 +254,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
 
             {/* Step 3: Ahorro semanal */}
             <div className={`transition-all duration-500 ease-out ${step === 3 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
-              <h3 className={`text-xl font-semibold ${t.text} mb-6 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
+              <h3 className={`text-base sm:text-xl font-bold ${t.text} mb-4 sm:mb-6 text-center`}>
                 ¿Cuánto te gustaría ahorrar semanalmente?
               </h3>
               <div className="grid grid-cols-3 gap-3">
@@ -288,8 +288,8 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
             {/* Step 4: Confirmación */}
             <div className={`transition-all duration-500 ease-out ${step === 4 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <div className="text-center">
-                <div className="text-5xl mb-5">🎯</div>
-                <h3 className={`text-xl font-semibold ${t.text} mb-7`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                <div className="text-4xl sm:text-5xl mb-4 sm:mb-5">🎯</div>
+                <h3 className={`text-base sm:text-xl font-bold ${t.text} mb-5 sm:mb-7`}>
                   Si calificas, ¿te gustaría ver tus números personalizados?
                 </h3>
                 <div className="flex flex-col gap-3">
@@ -306,7 +306,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
             {/* Step 5: Datos de contacto */}
             <div className={`transition-all duration-500 ease-out ${step === 5 ? "opacity-100 translate-x-0 max-h-[800px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <form onSubmit={handleSubmit} noValidate>
-                <h3 className={`text-xl font-semibold ${t.text} mb-6 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                <h3 className={`text-base sm:text-xl font-bold ${t.text} mb-4 sm:mb-6 text-center`}>
                   ¡Último paso! Tus datos de contacto
                 </h3>
 
