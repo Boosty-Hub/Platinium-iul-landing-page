@@ -18,6 +18,8 @@ import logoFriday from "@/assets/logos/friday.svg";
 import logoFloridaBlue from "@/assets/logos/floridablue.svg";
 import logoNationalLife from "@/assets/logos/nationallife.webp";
 import logoFidelity from "@/assets/logos/fidelity.svg";
+import logoAmeritas from "@/assets/logos/ameritas.svg";
+import logoAmericanAmicable from "@/assets/logos/americanamicable.svg";
 import consultationImg from "@/assets/consultation.jpg";
 
 const SEO = {
