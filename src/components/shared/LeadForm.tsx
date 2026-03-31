@@ -258,7 +258,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
 
             {/* Step 3: Ahorro semanal */}
             <div className={`transition-all duration-500 ease-out ${step === 3 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
-              <h3 className={`text-base sm:text-xl font-bold ${t.text} mb-4 sm:mb-6 text-center`}>
+              <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6 text-center" style={{ color: textColor }}>
                 ¿Cuánto te gustaría ahorrar semanalmente?
               </h3>
               <div className="grid grid-cols-3 gap-3">
