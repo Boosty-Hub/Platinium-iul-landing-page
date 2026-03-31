@@ -162,16 +162,24 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   // Explicit color values for reliable rendering
   const textColor = dark ? "#E4EEF0" : "#1A2E33";
   const mutedColor = dark ? "#6A8E98" : "#7A9BA3";
+  const midColor = dark ? "#94B3BB" : "#4A6B73";
+  const inputBg = dark ? "#0B2A33" : "#E8F4F6";
+  const inputBorder = "rgba(29,159,169,0.3)";
+  const dividerBorder = dark ? "rgba(29,159,169,0.1)" : "rgba(29,159,169,0.1)";
 
   // Selection button styles
-  const selBtnBase = "w-full p-3 sm:p-4 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all duration-300";
-  const selBtnText = dark ? "text-white" : "text-[#0B1A1E]";
-  const selBtnIdle = `bg-[#1d9fa9]/10 ${selBtnText} border-[#1d9fa9]/30 hover:shadow-[0_0_20px_rgba(29,159,169,0.35)] hover:border-[#1d9fa9]/60 hover:bg-[#1d9fa9]/20`;
-  const selBtnActive = `bg-[#1d9fa9]/25 ${selBtnText} border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]`;
+  const selBtnBase = "w-full p-3 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all duration-300";
+  const selBtnIdle = "border-[#1d9fa9]/30 hover:shadow-[0_0_20px_rgba(29,159,169,0.35)] hover:border-[#1d9fa9]/60";
+  const selBtnActive = "border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]";
 
-  const amtBtnBase = "p-4 rounded-xl border text-center cursor-pointer transition-all duration-300";
-  const amtBtnIdle = `bg-[#1d9fa9]/10 ${selBtnText} border-[#1d9fa9]/30 hover:shadow-[0_0_20px_rgba(29,159,169,0.35)] hover:border-[#1d9fa9]/60 hover:bg-[#1d9fa9]/20`;
-  const amtBtnActive = `bg-[#1d9fa9]/25 ${selBtnText} border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]`;
+  const amtBtnBase = "p-3 sm:p-4 rounded-xl border text-center cursor-pointer transition-all duration-300";
+  const amtBtnIdle = "border-[#1d9fa9]/30 hover:shadow-[0_0_20px_rgba(29,159,169,0.35)] hover:border-[#1d9fa9]/60";
+  const amtBtnActive = "border-[#1d9fa9] shadow-[0_0_25px_rgba(29,159,169,0.4)]";
+
+  const backBtnStyle = {
+    border: `1px solid ${dividerBorder}`,
+    color: midColor,
+  };
 
   const formCard = (
     <div className={`${t.card} border rounded-2xl p-4 sm:p-9 backdrop-blur-xl shadow-sm`}>
@@ -184,12 +192,12 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
 
       {formState !== "success" ? (
         <>
-          <div className="flex items-center gap-1.5 mb-4 sm:mb-6">
+          <div className="flex items-center gap-1.5 mb-3 sm:mb-6">
             {[1, 2, 3, 4, 5].map((s) => (
-              <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= s ? "bg-[#1d9fa9]" : dark ? "bg-white/10" : "bg-black/10"}`} />
+              <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= s ? "bg-[#1d9fa9]" : ""}`} style={step < s ? { backgroundColor: dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" } : undefined} />
             ))}
           </div>
-          <p className="text-[11px] mb-4 sm:mb-5 text-center tracking-wide" style={{ color: mutedColor }}>Paso {step} de 5</p>
+          <p className="text-[11px] mb-3 sm:mb-5 text-center tracking-wide" style={{ color: mutedColor }}>Paso {step} de 5</p>
 
           <div className="relative overflow-hidden">
             {/* Step 1: Interés */}
@@ -197,7 +205,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
               <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-5 text-center" style={{ color: textColor }}>
                 ¿Qué te gustaría lograr con este plan?
               </h3>
-              <div className="grid grid-cols-1 gap-2.5 sm:gap-3">
+              <div className="grid grid-cols-1 gap-2.5">
                 {[
                   { value: "Proteger a mi familia", icon: "🛡️" },
                   { value: "Crear capital / ahorro", icon: "💰" },
@@ -209,8 +217,9 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                     type="button"
                     onClick={() => updateField("interes", opt.value)}
                     className={`${selBtnBase} ${form.interes === opt.value ? selBtnActive : selBtnIdle}`}
+                    style={{ backgroundColor: form.interes === opt.value ? "rgba(29,159,169,0.25)" : "rgba(29,159,169,0.1)", color: textColor }}
                   >
-                    <span className="text-2xl">{opt.icon}</span>
+                    <span className="text-xl sm:text-2xl">{opt.icon}</span>
                     <span className="text-sm font-medium">{opt.value}</span>
                   </button>
                 ))}
@@ -219,7 +228,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 type="button"
                 disabled={!form.interes}
                 onClick={() => setStep(2)}
-                className="w-full mt-5 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3.5 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full mt-4 sm:mt-5 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3.5 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Continuar →
               </button>
@@ -238,18 +247,18 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 placeholder="Ej: 1985"
                 value={form.anio_nacimiento}
                 onChange={(e) => updateField("anio_nacimiento", e.target.value)}
-                className={`w-full p-4 ${t.input} border rounded-xl text-center text-2xl font-bold outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30`}
-                style={{ fontFamily: "'Playfair Display', serif" }}
+                className="w-full p-4 border rounded-xl text-center text-2xl font-bold outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30"
+                style={{ fontFamily: "'Playfair Display', serif", backgroundColor: inputBg, borderColor: inputBorder, color: textColor }}
               />
-              <div className="flex gap-3 mt-6">
-                <button type="button" onClick={() => setStep(defaultInteres ? 2 : 1)} className={`flex-1 py-3 rounded-xl border ${t.divider} ${t.textMid} font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]`}>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6">
+                <button type="button" onClick={() => setStep(defaultInteres ? 2 : 1)} className="sm:flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
                   ← Atrás
                 </button>
                 <button
                   type="button"
                   disabled={!form.anio_nacimiento || parseInt(form.anio_nacimiento) < 1940 || parseInt(form.anio_nacimiento) > 2007}
                   onClick={() => setStep(3)}
-                  className="flex-1 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="sm:flex-1 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Siguiente →
                 </button>
@@ -258,31 +267,32 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
 
             {/* Step 3: Ahorro semanal */}
             <div className={`transition-all duration-500 ease-out ${step === 3 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
-              <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6 text-center" style={{ color: textColor }}>
+              <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-6 text-center" style={{ color: textColor }}>
                 ¿Cuánto te gustaría ahorrar semanalmente?
               </h3>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                 {["25", "50", "75", "100", "150", "200"].map((amt) => (
                   <button
                     key={amt}
                     type="button"
                     onClick={() => updateField("ahorro_semanal", amt)}
                     className={`${amtBtnBase} ${form.ahorro_semanal === amt ? amtBtnActive : amtBtnIdle}`}
+                    style={{ backgroundColor: form.ahorro_semanal === amt ? "rgba(29,159,169,0.25)" : "rgba(29,159,169,0.1)", color: textColor }}
                   >
-                    <div className={`text-xl font-bold ${dark ? "text-white" : "text-[#0B1A1E]"}`} style={{ fontFamily: "'Playfair Display', serif" }}>${amt}</div>
-                    <div className={`text-[10px] mt-1 ${dark ? "text-white/60" : "text-[#0B1A1E]/50"}`}>/semana</div>
+                    <div className="text-lg sm:text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>${amt}</div>
+                    <div className="text-[10px] mt-0.5" style={{ color: mutedColor }}>/semana</div>
                   </button>
                 ))}
               </div>
-              <div className="flex gap-3 mt-5">
-                <button type="button" onClick={() => setStep(2)} className={`flex-1 py-3 rounded-xl border ${t.divider} ${t.textMid} font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]`}>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-5">
+                <button type="button" onClick={() => setStep(2)} className="sm:flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
                   ← Atrás
                 </button>
                 <button
                   type="button"
                   disabled={!form.ahorro_semanal}
                   onClick={() => setStep(4)}
-                  className="flex-1 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="sm:flex-1 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Siguiente →
                 </button>
@@ -292,7 +302,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
             {/* Step 4: Confirmación */}
             <div className={`transition-all duration-500 ease-out ${step === 4 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <div className="text-center">
-                <div className="text-4xl sm:text-5xl mb-4 sm:mb-5">🎯</div>
+                <div className="text-4xl sm:text-5xl mb-4">🎯</div>
                 <h3 className="text-base sm:text-xl font-bold mb-5 sm:mb-7" style={{ color: textColor }}>
                   Si calificas, ¿te gustaría ver tus números personalizados?
                 </h3>
@@ -300,7 +310,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                   <button type="button" onClick={() => setStep(5)} className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-4 rounded-xl font-bold text-base cursor-pointer hover:shadow-lg transition-all">
                     Sí, quiero ver mis números →
                   </button>
-                  <button type="button" onClick={() => setStep(3)} className={`w-full py-3 rounded-xl border ${t.divider} ${t.textMid} font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]`}>
+                  <button type="button" onClick={() => setStep(3)} className="w-full py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
                     ← Atrás
                   </button>
                 </div>
@@ -314,8 +324,8 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                   ¡Último paso! Tus datos de contacto
                 </h3>
 
-                <div className="mb-4">
-                  <label htmlFor={inline ? "nombre-hero" : "nombre"} className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
+                <div className="mb-3 sm:mb-4">
+                  <label htmlFor={inline ? "nombre-hero" : "nombre"} className="block text-[11px] mb-1.5 tracking-wide uppercase font-bold" style={{ color: midColor }}>
                     Nombre completo <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -327,19 +337,21 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                     autoComplete="name"
                     value={form.nombre}
                     onChange={(e) => updateField("nombre", e.target.value)}
-                    className={`w-full p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30`}
+                    className="w-full p-3 sm:p-3.5 border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30"
+                    style={{ backgroundColor: inputBg, borderColor: inputBorder, color: textColor }}
                   />
                 </div>
 
-                <div className="mb-4">
-                  <label htmlFor={inline ? "telefono-hero" : "telefono"} className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
+                <div className="mb-3 sm:mb-4">
+                  <label htmlFor={inline ? "telefono-hero" : "telefono"} className="block text-[11px] mb-1.5 tracking-wide uppercase font-bold" style={{ color: midColor }}>
                     Teléfono / WhatsApp <span className="text-red-400">*</span>
                   </label>
                   <div className="flex gap-2">
                     <select
                       value={countryCode}
                       onChange={(e) => { setCountryCode(e.target.value); setPhoneError(""); }}
-                      className={`w-[110px] shrink-0 p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30 appearance-none cursor-pointer`}
+                      className="w-[100px] sm:w-[110px] shrink-0 p-3 sm:p-3.5 border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30 appearance-none cursor-pointer"
+                      style={{ backgroundColor: inputBg, borderColor: inputBorder, color: textColor }}
                       aria-label="Código de país"
                     >
                       {COUNTRY_CODES.map((c) => (
@@ -363,14 +375,15 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                         updateField("telefono", display);
                         setPhoneError("");
                       }}
-                      className={`flex-1 p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30 ${phoneError ? "border-red-400" : ""}`}
+                      className={`flex-1 min-w-0 p-3 sm:p-3.5 border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30 ${phoneError ? "border-red-400" : ""}`}
+                      style={{ backgroundColor: inputBg, borderColor: phoneError ? undefined : inputBorder, color: textColor }}
                     />
                   </div>
                   {phoneError && <p className="text-xs text-red-400 mt-1.5">{phoneError}</p>}
                 </div>
 
-                <div className="mb-4">
-                  <label htmlFor={inline ? "email-hero" : "email"} className={`block text-[11px] ${t.textMid} mb-1.5 tracking-wide uppercase font-bold`}>
+                <div className="mb-3 sm:mb-4">
+                  <label htmlFor={inline ? "email-hero" : "email"} className="block text-[11px] mb-1.5 tracking-wide uppercase font-bold" style={{ color: midColor }}>
                     Email <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -382,7 +395,8 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                     autoComplete="email"
                     value={form.email}
                     onChange={(e) => updateField("email", e.target.value)}
-                    className={`w-full p-3.5 ${t.input} border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30`}
+                    className="w-full p-3 sm:p-3.5 border rounded-lg text-sm outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30"
+                    style={{ backgroundColor: inputBg, borderColor: inputBorder, color: textColor }}
                   />
                 </div>
 
@@ -394,31 +408,31 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 <button
                   type="submit"
                   disabled={formState === "loading"}
-                  className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-4 rounded-xl font-bold text-base tracking-wide cursor-pointer hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base tracking-wide cursor-pointer hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {formState === "loading" ? "Enviando..." : formState === "error" ? "Reintentar →" : "Ver mis números personalizados →"}
                 </button>
                 {formState === "error" && (
                   <p className="text-xs text-red-500 mt-2 text-center">Hubo un problema al enviar. Por favor intenta de nuevo.</p>
                 )}
-                <button type="button" onClick={() => setStep(4)} className={`w-full mt-3 py-3 rounded-xl border ${t.divider} ${t.textMid} font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]`}>
+                <button type="button" onClick={() => setStep(4)} className="w-full mt-2 sm:mt-3 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
                   ← Atrás
                 </button>
-                <p className={`text-[11px] ${t.textMuted} mt-3 text-center`}>Tu información es 100% confidencial. Sin spam.</p>
+                <p className="text-[11px] mt-2 sm:mt-3 text-center" style={{ color: mutedColor }}>Tu información es 100% confidencial. Sin spam.</p>
               </form>
             </div>
           </div>
         </>
       ) : (
-        <div className="text-center py-8 animate-[fadeUp_0.6s_ease]">
+        <div className="text-center py-6 sm:py-8 animate-[fadeUp_0.6s_ease]">
           <div className="text-5xl mb-5">✅</div>
-          <h3 className={`text-2xl font-semibold ${t.text} mb-3`} style={{ fontFamily: "'Playfair Display', serif" }}>
+          <h3 className="text-xl sm:text-2xl font-semibold mb-3" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
             ¡Gracias por completar el formulario!
           </h3>
-          <p className={`text-[15px] ${t.textMid} leading-relaxed mb-6`}>
+          <p className="text-sm sm:text-[15px] leading-relaxed mb-6" style={{ color: midColor }}>
             Estamos generando su cotización en PDF, atienda nuestra llamada para confirmar los datos telefónicamente.
           </p>
-          <p className={`text-sm ${t.textMuted} mb-5`}>
+          <p className="text-sm mb-5" style={{ color: mutedColor }}>
             O si desea recibir aún más rápido su presupuesto:
           </p>
           <a
@@ -442,7 +456,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   const defaultSidebar = (
     <Anim delay={0.1}>
       <div>
-        <h3 className={`text-2xl font-semibold ${t.text} mb-5`} style={{ fontFamily: "'Playfair Display', serif" }}>
+        <h3 className="text-xl sm:text-2xl font-semibold mb-5" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
           ¿Qué incluye tu consulta?
         </h3>
         {[
@@ -453,12 +467,12 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
         ].map((x, i) => (
           <div key={i} className="flex items-center gap-3 mb-3.5">
             <CheckIcon className="text-[#1d9fa9]" />
-            <span className={`text-sm ${t.text}`}>{x}</span>
+            <span className="text-sm" style={{ color: textColor }}>{x}</span>
           </div>
         ))}
-        <div className={`mt-7 p-5 ${t.brandBg} border border-[#1d9fa9]/15 rounded-xl`}>
+        <div className="mt-7 p-5 border border-[#1d9fa9]/15 rounded-xl" style={{ backgroundColor: "rgba(29,159,169,0.08)" }}>
           <div className="text-xs text-[#1d9fa9] font-bold mb-1.5 tracking-wide">DOCUMENTOS ACEPTADOS</div>
-          <p className={`text-sm ${t.textMid}`}>Social Security • ITIN • Pasaporte • Matrícula Consular</p>
+          <p className="text-sm" style={{ color: midColor }}>Social Security • ITIN • Pasaporte • Matrícula Consular</p>
         </div>
         <div className="mt-7 rounded-2xl overflow-hidden shadow-lg">
           <img src={familyHomeImg} alt="Familia latina en su nuevo hogar" className="w-full h-48 object-cover" width={512} height={192} loading="lazy" />
@@ -470,25 +484,25 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   const sidebar = sidebarContent ? <Anim delay={0.1}>{sidebarContent}</Anim> : defaultSidebar;
 
   return (
-    <section id="consulta" className={`${t.bg2} py-24 px-6`} aria-labelledby="form-heading">
+    <section id="consulta" className={`${t.bg2} py-16 lg:py-24 px-4 sm:px-6`} aria-labelledby="form-heading">
       <div className="max-w-6xl mx-auto">
         <Anim>
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 sm:mb-12">
             <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Sin compromiso</p>
             <h2
               id="form-heading"
-              className={`text-3xl sm:text-4xl font-normal ${t.text}`}
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+              className="text-2xl sm:text-3xl lg:text-4xl font-normal"
+              style={{ fontFamily: "'Playfair Display', Georgia, serif", color: textColor }}
             >
               Agenda tu{" "}
-              <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] to-[#177D85] bg-clip-text text-transparent">
+              <span className="font-bold italic" style={{ background: "linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 consulta gratuita
               </span>
             </h2>
           </div>
         </Anim>
 
-        <div className={`grid ${showSidebar ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1 max-w-xl mx-auto"} gap-8 items-start`}>
+        <div className={`grid ${showSidebar ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1 max-w-xl mx-auto"} gap-6 sm:gap-8 items-start`}>
           {showSidebar && sidebar}
           <Anim delay={0.15}>
             {formCard}

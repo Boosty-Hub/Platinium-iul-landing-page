@@ -85,495 +85,475 @@ export default function HomePage() {
 
   return (
     <Layout>
-      {({ t, dark }) => (
-        <>
-          <SEOHead title={SEO.title} description={SEO.description} keywords={SEO.keywords} canonical={DOMAIN} jsonLd={JSON_LD} />
+      {({ t, dark }) => {
+        const textColor = dark ? "#E4EEF0" : "#0B1A1E";
+        const mutedColor = dark ? "#6A8E98" : "#7A9BA3";
+        const midColor = dark ? "#94B3BB" : "#4A6B73";
 
-          {/* HERO */}
-          <section className="lg:min-h-screen flex flex-col justify-center relative overflow-hidden" aria-label="Inicio">
-            <div className="absolute top-[8%] right-[3%] w-80 h-80 rounded-full border border-[#1d9fa9]/[0.06] animate-[spin_80s_linear_infinite] pointer-events-none hidden lg:block" />
-            <div className="absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none hidden lg:block" />
+        return (
+          <>
+            <SEOHead title={SEO.title} description={SEO.description} keywords={SEO.keywords} canonical={DOMAIN} jsonLd={JSON_LD} />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 pt-20 sm:pt-24 lg:pt-[120px] pb-5">
-              {/* Mobile hero text */}
-              <div className="lg:hidden text-center mb-5">
-                <div className="inline-flex items-center gap-2 bg-[#1d9fa9]/10 border border-[#1d9fa9]/20 rounded-full px-4 py-1.5 mb-3">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#1d9fa9]" />
-                  <span className="text-[10px] font-bold tracking-[1px] uppercase" style={{ color: "#1d9fa9" }}>Asesoría para Latinos en EE.UU.</span>
-                </div>
-                <h1
-                  className="text-2xl sm:text-3xl font-normal leading-[1.15] mb-2"
-                  style={{ fontFamily: "'Playfair Display', Georgia, serif", color: dark ? "#E4EEF0" : "#0B1A1E" }}
-                >
-                  Protege a tu familia.{" "}
-                  <span className="font-bold italic" style={{ background: "linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                    Construye tu retiro.
-                  </span>
-                </h1>
-                <p className="text-sm mb-1" style={{ color: dark ? "#94B3BB" : "#4A6B73" }}>
-                  Con un <strong style={{ color: dark ? "#E4EEF0" : "#0B1A1E" }}>Indexed Universal Life (IUL)</strong>
-                </p>
-                <div className="flex flex-wrap justify-center gap-3 mt-3">
-                  {["ITIN ✓", "Piso 0%", "Gratis"].map((label, i) => (
-                    <span key={i} className="text-[11px] font-bold px-3 py-1 rounded-full" style={{ color: "#1d9fa9", backgroundColor: "rgba(29,159,169,0.1)" }}>{label}</span>
-                  ))}
-                </div>
-              </div>
+            {/* HERO — single unified responsive structure */}
+            <section className="flex flex-col justify-center relative overflow-hidden" aria-label="Inicio">
+              <div className="absolute top-[8%] right-[3%] w-80 h-80 rounded-full border border-[#1d9fa9]/[0.06] animate-[spin_80s_linear_infinite] pointer-events-none hidden lg:block" />
+              <div className="absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none hidden lg:block" />
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
-                {/* Hero text - desktop only */}
-                <div className="max-w-xl hidden lg:block">
-                  <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-5 py-2 mb-7 animate-[fadeUp_0.8s_ease]`}>
-                    <span className="w-2 h-2 rounded-full bg-[#1d9fa9] shadow-[0_0_8px_rgba(29,159,169,0.5)]" />
-                    <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">Asesoría Financiera para Latinos en Estados Unidos</span>
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 pt-20 lg:pt-[120px] pb-5">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
+                  {/* Hero text — always visible, responsive */}
+                  <div className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left">
+                    <div className="inline-flex items-center gap-2 bg-[#1d9fa9]/10 border border-[#1d9fa9]/20 rounded-full px-4 lg:px-5 py-1.5 lg:py-2 mb-4 lg:mb-7">
+                      <span className="w-1.5 lg:w-2 h-1.5 lg:h-2 rounded-full bg-[#1d9fa9] shadow-[0_0_8px_rgba(29,159,169,0.5)]" />
+                      <span className="text-[10px] lg:text-xs font-bold tracking-[1px] lg:tracking-[1.5px] uppercase" style={{ color: "#1d9fa9" }}>
+                        Asesoría Financiera para Latinos en EE.UU.
+                      </span>
+                    </div>
+
+                    <h1
+                      className="text-2xl sm:text-3xl lg:text-[56px] font-normal leading-[1.1] lg:leading-[1.08] mb-3 lg:mb-6"
+                      style={{ fontFamily: "'Playfair Display', Georgia, serif", color: textColor }}
+                    >
+                      Protege a tu familia.{" "}
+                      <span
+                        className="font-bold italic"
+                        style={{ background: "linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+                      >
+                        Construye tu retiro.
+                      </span>
+                      <br className="hidden lg:block" />
+                      <span className="block lg:inline text-[0.5em] lg:text-[0.55em] font-normal mt-1" style={{ color: mutedColor }}>
+                        Con un Indexed Universal Life (IUL).
+                      </span>
+                    </h1>
+
+                    {/* Extended copy — desktop only */}
+                    <p className="hidden lg:block text-lg leading-relaxed max-w-xl mb-5" style={{ color: midColor }}>
+                      Mientras tu dinero duerme en el banco ganando 0.05%, las familias con un{" "}
+                      <strong style={{ color: textColor }}>IUL ganan hasta 12% anual</strong> vinculado al S&P 500 —{" "}
+                      <strong style={{ color: textColor }}>sin riesgo de pérdida</strong> cuando el mercado cae.
+                    </p>
+                    <p className="hidden lg:block text-base leading-relaxed max-w-xl mb-9" style={{ color: midColor }}>
+                      Protección permanente + plan de retiro + acceso a tu dinero sin penalidades.{" "}
+                      <strong style={{ color: "#1d9fa9" }}>Todo en un solo instrumento.</strong>
+                    </p>
+
+                    {/* CTAs — desktop only */}
+                    <div className="hidden lg:flex flex-col sm:flex-row gap-3.5 mb-10">
+                      <Link to="/contacto" className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-9 py-4 rounded-lg font-bold text-base tracking-wide no-underline hover:shadow-xl hover:shadow-[#1d9fa9]/25 transition-all hover:-translate-y-0.5 text-center">
+                        Agenda tu Consulta Gratis →
+                      </Link>
+                      <Link to="/seguro-de-vida-iul" className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold text-[15px] no-underline hover:bg-[#1d9fa9]/10 transition-all text-center">
+                        ¿Cómo funciona el IUL?
+                      </Link>
+                    </div>
+
+                    {/* Guarantee badges — always visible */}
+                    <div className="flex flex-wrap justify-center lg:justify-start gap-3 lg:gap-6 mt-3 lg:mt-0" aria-label="Garantías">
+                      {[["Aplicable con ", "ITIN"], ["Piso garantizado ", "0%"], ["Consulta ", "100% gratis"]].map(([pre, bold], i) => (
+                        <div key={i} className="flex items-center gap-1.5 lg:gap-2">
+                          <CheckIcon className="text-[#1d9fa9]" />
+                          <span className="text-[11px] lg:text-sm" style={{ color: midColor }}>
+                            {pre}<strong style={{ color: textColor }}>{bold}</strong>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  <h1
-                    className={`text-4xl sm:text-5xl lg:text-[56px] font-normal leading-[1.08] mb-6 ${t.text}`}
-                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-                  >
-                    Protege a tu familia.{" "}
-                    <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
-                      Construye tu retiro.
-                    </span>
-                    <br />
-                    <span className={`${t.textMuted} text-[0.55em] font-normal`}>Con un Indexed Universal Life (IUL).</span>
-                  </h1>
-
-                  <p className={`text-lg leading-relaxed ${t.textMid} max-w-xl mb-5`}>
-                    Mientras tu dinero duerme en el banco ganando 0.05%, las familias con un <strong className={t.text}>IUL ganan hasta 12% anual</strong> vinculado al S&P 500 — <strong className={t.text}>sin riesgo de pérdida</strong> cuando el mercado cae.
-                  </p>
-                  <p className={`text-base leading-relaxed ${t.textMid} max-w-xl mb-9`}>
-                    Protección permanente + plan de retiro + acceso a tu dinero sin penalidades. <strong className="text-[#1d9fa9]">Todo en un solo instrumento.</strong>
-                  </p>
-
-                  <div className="flex flex-col sm:flex-row gap-3.5 mb-10">
-                    <Link to="/contacto" className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-9 py-4 rounded-lg font-bold text-base tracking-wide no-underline hover:shadow-xl hover:shadow-[#1d9fa9]/25 transition-all hover:-translate-y-0.5 text-center">
-                      Agenda tu Consulta Gratis →
-                    </Link>
-                    <Link to="/seguro-de-vida-iul" className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold text-[15px] no-underline hover:bg-[#1d9fa9]/10 transition-all text-center">
-                      ¿Cómo funciona el IUL?
-                    </Link>
+                  {/* Form */}
+                  <div className="mt-4 lg:mt-0">
+                    <LeadForm t={t} dark={dark} inline />
                   </div>
+                </div>
 
-                  <div className="flex flex-wrap gap-6" aria-label="Garantías">
-                    {[["Aplicable con ", "ITIN"], ["Piso garantizado ", "0%"], ["Consulta ", "100% gratis"]].map(([pre, bold], i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <CheckIcon className="text-[#1d9fa9]" />
-                        <span className={`text-sm ${t.textMid}`}>{pre}<strong className={t.text}>{bold}</strong></span>
+                {/* Contact bar — works on all sizes */}
+                <div className="mt-6 lg:mt-8">
+                  <ContactBar t={t} compact />
+                </div>
+
+                {/* Insurance logos marquee */}
+                <div className="mt-6 lg:mt-10 overflow-hidden rounded-xl">
+                  <div className="flex items-center" style={{ animation: "marquee 30s linear infinite", width: "max-content" }}>
+                    {[...INSURANCE_LOGOS, ...INSURANCE_LOGOS].map((logo, i) => (
+                      <div key={i} className={`flex items-center justify-center mx-4 sm:mx-8 shrink-0 h-10 sm:h-16 ${dark ? "opacity-70 hover:opacity-100" : "opacity-60 hover:opacity-100"} transition-opacity`}>
+                        <img src={logo.src} alt={logo.alt} className={`h-8 sm:h-12 w-auto max-w-[100px] sm:max-w-[140px] object-contain ${dark ? "brightness-0 invert" : ""}`} />
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Form */}
-                <div>
-                  <LeadForm t={t} dark={dark} inline />
+                {/* Offices & Hours */}
+                <div className={`mt-6 lg:mt-10 ${t.card} border rounded-2xl p-4 sm:p-8 backdrop-blur-xl max-w-6xl mx-auto`}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
+                    <div>
+                      <h4 className="text-[11px] tracking-[2px] uppercase mb-3 font-bold" style={{ color: "#1d9fa9" }}>📍 Oficinas</h4>
+                      <div className="space-y-3 text-sm leading-relaxed">
+                        {[
+                          { city: "Miami, FL (Central)", addr: "5775 Waterford District Dr #170, Miami, FL 33126" },
+                          { city: "Orlando, FL", addr: "13550 Village Park Dr, Orlando, FL 32837" },
+                          { city: "Houston, TX", addr: "16225 Park Ten Place, Of. 475, 4to Piso, Houston, TX 77084" },
+                        ].map((o, i) => (
+                          <div key={i}>
+                            <p className="font-semibold" style={{ color: "#1d9fa9" }}>{o.city}</p>
+                            <p style={{ color: mutedColor }}>{o.addr}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="text-[11px] tracking-[2px] uppercase mb-3 font-bold" style={{ color: "#1d9fa9" }}>🕒 Horarios de Atención</h4>
+                      <div className="text-sm leading-relaxed space-y-1" style={{ color: mutedColor }}>
+                        <p>Lunes a Viernes: 10:00 A.M. a 5:00 P.M.</p>
+                        <p>Sábado: Cerrado</p>
+                        <p>Domingo: Cerrado</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              {/* Mobile CTAs - call & whatsapp */}
-              <div className="lg:hidden mt-6">
-                <div className="flex gap-3">
-                  <a href="tel:+16893082809" className="flex-1 inline-flex items-center justify-center gap-2 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-4 py-3 rounded-xl font-bold text-sm no-underline">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+                {/* Discover more */}
+                <div className="flex items-center justify-center mt-6 lg:mt-14">
+                  <div className="flex flex-col items-center gap-2 animate-bounce">
+                    <span className="text-[10px] tracking-[2px] uppercase" style={{ color: mutedColor }}>Descubre más</span>
+                    <svg className="w-5 h-5 text-[#1d9fa9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
                     </svg>
-                    Llamar
-                  </a>
-                  <a href="https://wa.me/17866787863" target="_blank" rel="noopener noreferrer" className="flex-1 inline-flex items-center justify-center gap-2 border-2 border-[#25D366] text-[#25D366] px-4 py-3 rounded-xl font-bold text-sm no-underline">
-                    <WhatsAppIcon />
-                    WhatsApp
-                  </a>
-                </div>
-              </div>
-
-              {/* Desktop contact bar */}
-              <div className="hidden lg:block">
-                <ContactBar t={t} compact />
-              </div>
-
-              {/* Insurance logos marquee */}
-              <div className="mt-6 lg:mt-10 overflow-hidden rounded-xl">
-                <div className="flex items-center" style={{ animation: "marquee 30s linear infinite", width: "max-content" }}>
-                  {[...INSURANCE_LOGOS, ...INSURANCE_LOGOS].map((logo, i) => (
-                    <div key={i} className={`flex items-center justify-center mx-4 sm:mx-8 shrink-0 h-10 sm:h-16 ${dark ? "opacity-70 hover:opacity-100" : "opacity-60 hover:opacity-100"} transition-opacity`}>
-                      <img src={logo.src} alt={logo.alt} className={`h-8 sm:h-12 w-auto max-w-[100px] sm:max-w-[140px] object-contain ${dark ? "brightness-0 invert" : ""}`} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Offices & Hours */}
-              <div className={`mt-6 lg:mt-10 ${t.card} border rounded-2xl p-5 sm:p-8 backdrop-blur-xl max-w-6xl mx-auto`}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-                  <div>
-                    <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-3 font-bold">📍 Oficinas</h4>
-                    <div className={`text-sm ${t.textMuted} space-y-2.5 leading-relaxed`}>
-                      <div>
-                        <p className="font-semibold text-[#1d9fa9]">Miami, FL (Central)</p>
-                        <p>5775 Waterford District Dr #170, Miami, FL 33126</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-[#1d9fa9]">Orlando, FL</p>
-                        <p>13550 Village Park Dr, Orlando, FL 32837</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-[#1d9fa9]">Houston, TX</p>
-                        <p>16225 Park Ten Place, Of. 475, 4to Piso, Houston, TX 77084</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-3 font-bold">🕒 Horarios de Atención</h4>
-                    <div className={`text-sm ${t.textMuted} leading-relaxed space-y-1`}>
-                      <p>Lunes a Viernes: 10:00 A.M. a 5:00 P.M.</p>
-                      <p>Sábado: Cerrado</p>
-                      <p>Domingo: Cerrado</p>
-                    </div>
                   </div>
                 </div>
               </div>
+            </section>
 
-              {/* Discover more */}
-              <div className="flex items-center justify-center mt-8 lg:mt-14">
-                <div className="flex flex-col items-center gap-2 animate-bounce">
-                  <span className={`text-[10px] tracking-[2px] ${t.textMuted} uppercase`}>Descubre más</span>
-                  <svg className="w-5 h-5 text-[#1d9fa9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* STATS BAR */}
-          <section className={`${t.bg2} ${t.divider} border-y`} aria-label="Estadísticas del mercado">
-            <div className="max-w-7xl mx-auto px-6 py-11 flex flex-col sm:flex-row justify-around items-center gap-5 sm:gap-4 flex-wrap">
-              {[
-                { v: <CountUp end={3710} prefix="$" suffix="B" />, l: "Mercado de seguros EE.UU. para 2033" },
-                { v: <CountUp end={62} suffix="M" />, l: "Hispanos en Estados Unidos" },
-                { v: "0%", l: "Piso garantizado en caídas de mercado" },
-                { v: <CountUp end={12} suffix="%" />, l: "Cap de rendimiento anual potencial" },
-              ].map((s, i) => (
-                <Anim key={i} delay={i * 0.1}>
-                  <div className="text-center min-w-[170px]">
-                    <div className="text-4xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>{s.v}</div>
-                    <div className={`text-[11px] ${t.textMuted} mt-1.5 tracking-wide max-w-[170px]`}>{s.l}</div>
-                  </div>
-                </Anim>
-              ))}
-            </div>
-          </section>
-
-          {/* PAIN POINTS */}
-          <section className="py-24 px-6" aria-labelledby="pain-heading">
-            <div className="max-w-4xl mx-auto text-center">
-              <Anim>
-                <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">¿Te identificas?</p>
-                <h2 id="pain-heading" className={`text-3xl sm:text-4xl font-normal leading-tight ${t.text} mb-4`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                  Si trabajas duro pero <em className="text-[#1d9fa9]">no tienes un plan</em>,<br />tu esfuerzo se pierde cada día
-                </h2>
-                <p className={`text-base ${t.textMuted} max-w-xl mx-auto mb-2`}>
-                  La inflación se come tus ahorros. El banco te paga 0.05%. Y si mañana no puedes trabajar, ¿quién mantiene a tu familia?
-                </p>
-                <div className="w-16 h-[3px] bg-gradient-to-r from-transparent via-[#1d9fa9] to-transparent mx-auto mt-5 mb-10 rounded" />
-              </Anim>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+            {/* STATS BAR */}
+            <section className={`${t.bg2} ${t.divider} border-y`} aria-label="Estadísticas del mercado">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-11 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-4">
                 {[
-                  { icon: "😰", text: "Trabajas 50+ horas y tu cuenta de ahorros no crece" },
-                  { icon: "🏦", text: "Tu banco te paga 0.05% mientras la inflación sube 3-5%" },
-                  { icon: "❌", text: "Sin 401(k), sin pensión, sin plan de retiro formal" },
-                  { icon: "👨‍👩‍👧‍👦", text: "Si mañana no puedes trabajar, ¿quién mantiene a tu familia?" },
-                ].map((p, i) => (
-                  <Anim key={i} delay={i * 0.08}>
-                    <div className={`${t.card} border rounded-xl p-5 flex items-start gap-4 backdrop-blur-xl`}>
-                      <span className="text-2xl shrink-0">{p.icon}</span>
-                      <p className={`text-sm ${t.textMid} leading-relaxed`}>{p.text}</p>
+                  { v: <CountUp end={3710} prefix="$" suffix="B" />, l: "Mercado de seguros EE.UU. para 2033" },
+                  { v: <CountUp end={62} suffix="M" />, l: "Hispanos en Estados Unidos" },
+                  { v: "0%", l: "Piso garantizado en caídas de mercado" },
+                  { v: <CountUp end={12} suffix="%" />, l: "Cap de rendimiento anual potencial" },
+                ].map((s, i) => (
+                  <Anim key={i} delay={i * 0.1}>
+                    <div className="text-center">
+                      <div className="text-2xl sm:text-4xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>{s.v}</div>
+                      <div className="text-[10px] sm:text-[11px] mt-1.5 tracking-wide" style={{ color: mutedColor }}>{s.l}</div>
                     </div>
                   </Anim>
                 ))}
               </div>
-            </div>
-          </section>
+            </section>
 
-          {/* BENEFITS */}
-          <section id="beneficios" className={`${t.bg2} py-24 px-6`} aria-labelledby="benefits-heading">
-            <div className="max-w-7xl mx-auto">
-              <Anim>
-                <div className="text-center mb-14">
-                  <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Beneficios reales</p>
-                  <h2 id="benefits-heading" className={`text-3xl sm:text-4xl font-normal ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                    Un instrumento,{" "}
-                    <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] to-[#177D85] bg-clip-text text-transparent">múltiples beneficios</span>
+            {/* PAIN POINTS */}
+            <section className="py-16 lg:py-24 px-4 sm:px-6" aria-labelledby="pain-heading">
+              <div className="max-w-4xl mx-auto text-center">
+                <Anim>
+                  <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">¿Te identificas?</p>
+                  <h2 id="pain-heading" className="text-2xl sm:text-3xl lg:text-4xl font-normal leading-tight mb-4" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
+                    Si trabajas duro pero <em style={{ color: "#1d9fa9" }}>no tienes un plan</em>,<br className="hidden sm:block" />tu esfuerzo se pierde cada día
                   </h2>
-                </div>
-              </Anim>
+                  <p className="text-sm sm:text-base max-w-xl mx-auto mb-2" style={{ color: mutedColor }}>
+                    La inflación se come tus ahorros. El banco te paga 0.05%. Y si mañana no puedes trabajar, ¿quién mantiene a tu familia?
+                  </p>
+                  <div className="w-16 h-[3px] bg-gradient-to-r from-transparent via-[#1d9fa9] to-transparent mx-auto mt-5 mb-10 rounded" />
+                </Anim>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {BENEFITS.map((n, i) => (
-                  <Anim key={i} delay={i * 0.08}>
-                    <Link to={n.link} className="no-underline block h-full">
-                      <article className={`${t.card} border rounded-2xl p-8 h-full flex flex-col backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-lg hover:border-[#1d9fa9]/30`}>
-                        <span className="text-4xl mb-4" role="img" aria-hidden="true">{n.icon}</span>
-                        <h3 className={`text-xl font-semibold ${t.text} mb-3`} style={{ fontFamily: "'Playfair Display', serif" }}>{n.title}</h3>
-                        <p className={`text-sm ${t.textMuted} leading-relaxed flex-1`}>{n.desc}</p>
-                        <div className="mt-4 flex items-center gap-2 text-[#1d9fa9] text-sm font-semibold">
-                          Saber más →
-                        </div>
-                      </article>
-                    </Link>
-                  </Anim>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* HOW IT WORKS */}
-          <section id="como-funciona" className="py-24 px-6" aria-labelledby="steps-heading">
-            <div className="max-w-6xl mx-auto">
-              <Anim>
-                <div className="text-center mb-14">
-                  <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Proceso simple</p>
-                  <h2 id="steps-heading" className={`text-3xl sm:text-4xl font-normal ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                    Tu camino hacia la{" "}
-                    <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] to-[#177D85] bg-clip-text text-transparent">protección financiera</span>
-                  </h2>
-                </div>
-              </Anim>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div>
-                  {STEPS.map((s, i) => (
-                    <Anim key={i} delay={i * 0.12}>
-                      <div className="flex gap-7 mb-10 items-start">
-                        <div className="shrink-0 w-20 h-20 flex items-center justify-center border-2 border-[#1d9fa9] rounded-2xl relative">
-                          <span className="text-3xl font-light text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>{s.n}</span>
-                          {i < STEPS.length - 1 && <div className="absolute -bottom-11 left-1/2 w-[2px] h-10 bg-gradient-to-b from-[#1d9fa9]/40 to-transparent rounded" />}
-                        </div>
-                        <div className="pt-1.5">
-                          <h3 className={`text-2xl font-semibold ${t.text} mb-2`} style={{ fontFamily: "'Playfair Display', serif" }}>{s.t}</h3>
-                          <p className={`text-[15px] ${t.textMid} leading-relaxed max-w-lg`}>{s.d}</p>
-                        </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 text-left">
+                  {[
+                    { icon: "😰", text: "Trabajas 50+ horas y tu cuenta de ahorros no crece" },
+                    { icon: "🏦", text: "Tu banco te paga 0.05% mientras la inflación sube 3-5%" },
+                    { icon: "❌", text: "Sin 401(k), sin pensión, sin plan de retiro formal" },
+                    { icon: "👨‍👩‍👧‍👦", text: "Si mañana no puedes trabajar, ¿quién mantiene a tu familia?" },
+                  ].map((p, i) => (
+                    <Anim key={i} delay={i * 0.08}>
+                      <div className={`${t.card} border rounded-xl p-4 sm:p-5 flex items-start gap-3 sm:gap-4 backdrop-blur-xl`}>
+                        <span className="text-xl sm:text-2xl shrink-0">{p.icon}</span>
+                        <p className="text-sm leading-relaxed" style={{ color: midColor }}>{p.text}</p>
                       </div>
                     </Anim>
                   ))}
                 </div>
-                <Anim delay={0.3}>
-                  <div className="rounded-3xl overflow-hidden shadow-xl shadow-[#1d9fa9]/10 border border-[#1d9fa9]/10">
-                    <img src={consultationImg} alt="Asesor financiero en consulta con una familia latina" className="w-full h-auto object-cover" width={512} height={320} loading="lazy" />
+              </div>
+            </section>
+
+            {/* BENEFITS */}
+            <section id="beneficios" className={`${t.bg2} py-16 lg:py-24 px-4 sm:px-6`} aria-labelledby="benefits-heading">
+              <div className="max-w-7xl mx-auto">
+                <Anim>
+                  <div className="text-center mb-10 lg:mb-14">
+                    <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Beneficios reales</p>
+                    <h2 id="benefits-heading" className="text-2xl sm:text-3xl lg:text-4xl font-normal" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
+                      Un instrumento,{" "}
+                      <span className="font-bold italic" style={{ background: "linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>múltiples beneficios</span>
+                    </h2>
+                  </div>
+                </Anim>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                  {BENEFITS.map((n, i) => (
+                    <Anim key={i} delay={i * 0.08}>
+                      <Link to={n.link} className="no-underline block h-full">
+                        <article className={`${t.card} border rounded-2xl p-6 sm:p-8 h-full flex flex-col backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-lg hover:border-[#1d9fa9]/30`}>
+                          <span className="text-3xl sm:text-4xl mb-3 sm:mb-4" role="img" aria-hidden="true">{n.icon}</span>
+                          <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>{n.title}</h3>
+                          <p className="text-sm leading-relaxed flex-1" style={{ color: mutedColor }}>{n.desc}</p>
+                          <div className="mt-4 flex items-center gap-2 text-[#1d9fa9] text-sm font-semibold">
+                            Saber más →
+                          </div>
+                        </article>
+                      </Link>
+                    </Anim>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* HOW IT WORKS */}
+            <section id="como-funciona" className="py-16 lg:py-24 px-4 sm:px-6" aria-labelledby="steps-heading">
+              <div className="max-w-6xl mx-auto">
+                <Anim>
+                  <div className="text-center mb-10 lg:mb-14">
+                    <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Proceso simple</p>
+                    <h2 id="steps-heading" className="text-2xl sm:text-3xl lg:text-4xl font-normal" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
+                      Tu camino hacia la{" "}
+                      <span className="font-bold italic" style={{ background: "linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>protección financiera</span>
+                    </h2>
+                  </div>
+                </Anim>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                  <div>
+                    {STEPS.map((s, i) => (
+                      <Anim key={i} delay={i * 0.12}>
+                        <div className="flex gap-4 sm:gap-7 mb-8 sm:mb-10 items-start">
+                          <div className="shrink-0 w-14 h-14 sm:w-20 sm:h-20 flex items-center justify-center border-2 border-[#1d9fa9] rounded-2xl relative">
+                            <span className="text-xl sm:text-3xl font-light text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>{s.n}</span>
+                            {i < STEPS.length - 1 && <div className="absolute -bottom-9 sm:-bottom-11 left-1/2 w-[2px] h-8 sm:h-10 bg-gradient-to-b from-[#1d9fa9]/40 to-transparent rounded" />}
+                          </div>
+                          <div className="pt-0.5 sm:pt-1.5">
+                            <h3 className="text-lg sm:text-2xl font-semibold mb-1.5 sm:mb-2" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>{s.t}</h3>
+                            <p className="text-sm sm:text-[15px] leading-relaxed max-w-lg" style={{ color: midColor }}>{s.d}</p>
+                          </div>
+                        </div>
+                      </Anim>
+                    ))}
+                  </div>
+                  <Anim delay={0.3}>
+                    <div className="rounded-3xl overflow-hidden shadow-xl shadow-[#1d9fa9]/10 border border-[#1d9fa9]/10">
+                      <img src={consultationImg} alt="Asesor financiero en consulta con una familia latina" className="w-full h-auto object-cover" width={512} height={320} loading="lazy" />
+                    </div>
+                  </Anim>
+                </div>
+              </div>
+            </section>
+
+            {/* COMPARISON */}
+            <section id="comparativa" className={`${t.bg2} py-16 lg:py-24 px-4 sm:px-6`} aria-labelledby="comparison-heading">
+              <div className="max-w-4xl mx-auto">
+                <Anim>
+                  <div className="text-center mb-10 lg:mb-12">
+                    <p className="text-xs tracking-[3px] text-red-500 uppercase font-bold mb-4">La verdad en números</p>
+                    <h2 id="comparison-heading" className="text-2xl sm:text-3xl lg:text-4xl font-normal" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
+                      Tu cuenta de banco <em className="text-red-500">no es suficiente</em>
+                    </h2>
+                    <p className="text-sm sm:text-base max-w-xl mx-auto mt-4" style={{ color: mutedColor }}>Compara el rendimiento real de ahorrar en un banco vs un IUL con protección incluida.</p>
+                  </div>
+                </Anim>
+
+                <Anim delay={0.15}>
+                  <div className="overflow-x-auto mb-4">
+                    <table className={`w-full ${t.divider} border rounded-xl overflow-hidden`} role="table" aria-label="Banco vs IUL">
+                      <thead>
+                        <tr className={t.brandBg}>
+                          <th className="text-left p-3 sm:p-4 text-[10px] sm:text-[11px] tracking-[2px] uppercase font-bold" style={{ color: mutedColor }}>Característica</th>
+                          <th className="text-center p-3 sm:p-4 text-[10px] sm:text-[11px] tracking-[2px] uppercase font-bold" style={{ color: mutedColor }}>Banco</th>
+                          <th className="text-center p-3 sm:p-4 text-[10px] sm:text-[11px] tracking-[2px] text-[#1d9fa9] uppercase font-bold">IUL ✦</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {BANK_VS_IUL.map((r, i) => (
+                          <tr key={i} className={`${t.divider} border-t ${i % 2 !== 0 ? t.brandBg : ""}`}>
+                            <td className="p-3 sm:p-4 text-xs sm:text-sm font-medium" style={{ color: textColor }}>{r.f}</td>
+                            <td className="p-3 sm:p-4 text-xs sm:text-sm text-center" style={{ color: mutedColor }}>{r.b}</td>
+                            <td className="p-3 sm:p-4 text-xs sm:text-sm text-[#1d9fa9] text-center font-semibold">{r.i}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-[10px] sm:text-[11px] italic" style={{ color: mutedColor }}>*Retiros mediante préstamos de la póliza pueden ser libres de impuestos cuando se estructuran correctamente.</p>
+                </Anim>
+
+                <Anim delay={0.2}>
+                  <div className="text-center mt-8">
+                    <Link to="/iul-vs-401k" className="inline-block bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-8 py-3.5 rounded-lg font-bold no-underline hover:shadow-lg transition-all">
+                      Ver comparación completa IUL vs 401(k) →
+                    </Link>
                   </div>
                 </Anim>
               </div>
-            </div>
-          </section>
+            </section>
 
-          {/* COMPARISON */}
-          <section id="comparativa" className={`${t.bg2} py-24 px-6`} aria-labelledby="comparison-heading">
-            <div className="max-w-4xl mx-auto">
-              <Anim>
-                <div className="text-center mb-12">
-                  <p className="text-xs tracking-[3px] text-red-500 uppercase font-bold mb-4">La verdad en números</p>
-                  <h2 id="comparison-heading" className={`text-3xl sm:text-4xl font-normal ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                    Tu cuenta de banco <em className="text-red-500">no es suficiente</em>
-                  </h2>
-                  <p className={`text-base ${t.textMuted} max-w-xl mx-auto mt-4`}>Compara el rendimiento real de ahorrar en un banco vs un IUL con protección incluida.</p>
-                </div>
-              </Anim>
+            {/* NICHE TABS */}
+            <section className="py-16 lg:py-24 px-4 sm:px-6" aria-labelledby="niche-heading">
+              <div className="max-w-3xl mx-auto">
+                <Anim>
+                  <div className="text-center mb-10">
+                    <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Soluciones específicas</p>
+                    <h2 id="niche-heading" className="text-2xl sm:text-3xl lg:text-4xl font-normal" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
+                      ¿En qué situación{" "}
+                      <span className="font-bold italic" style={{ background: "linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>estás tú</span>?
+                    </h2>
+                  </div>
+                </Anim>
 
-              <Anim delay={0.15}>
-                <div className="overflow-x-auto mb-4">
-                  <table className={`w-full ${t.divider} border rounded-xl overflow-hidden`} role="table" aria-label="Banco vs IUL">
-                    <thead>
-                      <tr className={t.brandBg}>
-                        <th className={`text-left p-4 text-[11px] tracking-[2px] ${t.textMuted} uppercase font-bold`}>Característica</th>
-                        <th className={`text-center p-4 text-[11px] tracking-[2px] ${t.textMuted} uppercase font-bold`}>Banco</th>
-                        <th className="text-center p-4 text-[11px] tracking-[2px] text-[#1d9fa9] uppercase font-bold">IUL ✦</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {BANK_VS_IUL.map((r, i) => (
-                        <tr key={i} className={`${t.divider} border-t ${i % 2 !== 0 ? t.brandBg : ""}`}>
-                          <td className={`p-4 text-sm ${t.text} font-medium`}>{r.f}</td>
-                          <td className={`p-4 text-sm ${t.textMuted} text-center`}>{r.b}</td>
-                          <td className="p-4 text-sm text-[#1d9fa9] text-center font-semibold">{r.i}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <p className={`text-[11px] ${t.textMuted} italic`}>*Retiros mediante préstamos de la póliza pueden ser libres de impuestos cuando se estructuran correctamente.</p>
-              </Anim>
+                <Anim delay={0.1}>
+                  <div className="flex flex-wrap gap-2 justify-center mb-7" role="tablist">
+                    {TABS.map((item, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setTab(i)}
+                        role="tab"
+                        aria-selected={tab === i}
+                        className={`px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-lg cursor-pointer transition-all border ${
+                          tab === i ? "bg-[#1d9fa9]/10 border-[#1d9fa9] text-[#1d9fa9]" : `${t.divider} hover:border-[#1d9fa9]/30`
+                        }`}
+                        style={tab !== i ? { color: midColor } : undefined}
+                      >
+                        {item.t}
+                      </button>
+                    ))}
+                  </div>
 
-              <Anim delay={0.2}>
-                <div className="text-center mt-8">
-                  <Link to="/iul-vs-401k" className="inline-block bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-8 py-3.5 rounded-lg font-bold no-underline hover:shadow-lg transition-all">
-                    Ver comparación completa IUL vs 401(k) →
-                  </Link>
-                </div>
-              </Anim>
-            </div>
-          </section>
+                  <div role="tabpanel" className={`${t.card} border rounded-2xl p-6 sm:p-10 text-center backdrop-blur-xl`}>
+                    <h3 className="text-xl sm:text-2xl font-semibold text-[#1d9fa9] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>{TABS[tab].t}</h3>
+                    <p className="text-sm sm:text-[15px] leading-relaxed max-w-xl mx-auto" style={{ color: midColor }}>{TABS[tab].c}</p>
+                    <Link to="/contacto" className="inline-block mt-6 sm:mt-7 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-8 py-3.5 rounded-lg font-bold no-underline hover:shadow-lg transition-all">
+                      Quiero mi plan personalizado →
+                    </Link>
+                  </div>
+                </Anim>
+              </div>
+            </section>
 
-          {/* NICHE TABS */}
-          <section className="py-24 px-6" aria-labelledby="niche-heading">
-            <div className="max-w-3xl mx-auto">
-              <Anim>
-                <div className="text-center mb-10">
-                  <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Soluciones específicas</p>
-                  <h2 id="niche-heading" className={`text-3xl sm:text-4xl font-normal ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                    ¿En qué situación{" "}
-                    <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] to-[#177D85] bg-clip-text text-transparent">estás tú</span>?
-                  </h2>
-                </div>
-              </Anim>
+            {/* TESTIMONIALS */}
+            <section id="testimonios" className="py-16 lg:py-24 px-4 sm:px-6" aria-labelledby="testimonials-heading">
+              <div className="max-w-7xl mx-auto">
+                <Anim>
+                  <div className="text-center mb-10 lg:mb-12">
+                    <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Historias reales</p>
+                    <h2 id="testimonials-heading" className="text-2xl sm:text-3xl lg:text-4xl font-normal" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
+                      Familias que ya están{" "}
+                      <span className="font-bold italic" style={{ background: "linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>construyendo su futuro</span>
+                    </h2>
+                  </div>
+                </Anim>
 
-              <Anim delay={0.1}>
-                <div className="flex flex-wrap gap-2 justify-center mb-7" role="tablist">
-                  {TABS.map((item, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setTab(i)}
-                      role="tab"
-                      aria-selected={tab === i}
-                      className={`px-5 py-2.5 text-sm font-semibold rounded-lg cursor-pointer transition-all border ${
-                        tab === i ? "bg-[#1d9fa9]/10 border-[#1d9fa9] text-[#1d9fa9]" : `${t.divider} ${t.textMid} hover:border-[#1d9fa9]/30`
-                      }`}
-                    >
-                      {item.t}
-                    </button>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+                  {TESTIMONIALS.map((item, i) => (
+                    <Anim key={i} delay={i * 0.12}>
+                      <blockquote className={`${t.card} border rounded-2xl p-6 sm:p-8 h-full flex flex-col backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-lg`}>
+                        <span className="text-3xl text-[#1d9fa9] opacity-25 leading-none">"</span>
+                        <p className="text-sm leading-relaxed flex-1 italic my-3" style={{ color: midColor }}>"{item.text}"</p>
+                        <div className="flex gap-0.5 mb-3 text-[#1d9fa9]">
+                          {Array(item.stars).fill(0).map((_, j) => <StarIcon key={j} />)}
+                        </div>
+                        <cite className="not-italic flex items-center gap-3">
+                          <img src={item.img} alt={item.name} className="w-12 h-12 rounded-full object-cover border-2 border-[#1d9fa9]/20" width={48} height={48} loading="lazy" />
+                          <div>
+                            <div className="text-base font-semibold" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>{item.name}</div>
+                            <div className="text-xs mt-0.5" style={{ color: mutedColor }}>{item.role}</div>
+                          </div>
+                        </cite>
+                      </blockquote>
+                    </Anim>
                   ))}
                 </div>
+              </div>
+            </section>
 
-                <div role="tabpanel" className={`${t.card} border rounded-2xl p-10 text-center backdrop-blur-xl`}>
-                  <h3 className="text-2xl font-semibold text-[#1d9fa9] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>{TABS[tab].t}</h3>
-                  <p className={`text-[15px] ${t.textMid} leading-relaxed max-w-xl mx-auto`}>{TABS[tab].c}</p>
-                  <Link to="/contacto" className="inline-block mt-7 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-8 py-3.5 rounded-lg font-bold no-underline hover:shadow-lg transition-all">
-                    Quiero mi plan personalizado →
-                  </Link>
-                </div>
-              </Anim>
-            </div>
-          </section>
+            {/* FAQ */}
+            <section id="faq" className={`${t.bg2} py-16 lg:py-24 px-4 sm:px-6`} aria-labelledby="faq-heading">
+              <div className="max-w-3xl mx-auto">
+                <Anim>
+                  <div className="text-center mb-10 lg:mb-12">
+                    <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Preguntas frecuentes</p>
+                    <h2 id="faq-heading" className="text-2xl sm:text-3xl lg:text-4xl font-normal" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
+                      Respuestas claras,{" "}
+                      <span className="font-bold italic" style={{ background: "linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>sin letra pequeña</span>
+                    </h2>
+                  </div>
+                </Anim>
 
-          {/* TESTIMONIALS */}
-          <section id="testimonios" className="py-24 px-6" aria-labelledby="testimonials-heading">
-            <div className="max-w-7xl mx-auto">
-              <Anim>
-                <div className="text-center mb-12">
-                  <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Historias reales</p>
-                  <h2 id="testimonials-heading" className={`text-3xl sm:text-4xl font-normal ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                    Familias que ya están{" "}
-                    <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] to-[#177D85] bg-clip-text text-transparent">construyendo su futuro</span>
-                  </h2>
-                </div>
-              </Anim>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                {TESTIMONIALS.map((item, i) => (
-                  <Anim key={i} delay={i * 0.12}>
-                    <blockquote className={`${t.card} border rounded-2xl p-8 h-full flex flex-col backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-lg`}>
-                      <span className="text-3xl text-[#1d9fa9] opacity-25 leading-none">"</span>
-                      <p className={`text-sm ${t.textMid} leading-relaxed flex-1 italic my-3`}>"{item.text}"</p>
-                      <div className="flex gap-0.5 mb-3 text-[#1d9fa9]">
-                        {Array(item.stars).fill(0).map((_, j) => <StarIcon key={j} />)}
+                <div className="space-y-3">
+                  {FAQS.map((faq, i) => (
+                    <Anim key={i} delay={i * 0.05}>
+                      <div className={`${t.card} border rounded-xl overflow-hidden backdrop-blur-xl`}>
+                        <button
+                          onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+                          className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-4 cursor-pointer bg-transparent border-none"
+                          style={{ color: textColor }}
+                          aria-expanded={faqOpen === i}
+                        >
+                          <span className="text-sm sm:text-[15px] font-semibold pr-4">{faq.q}</span>
+                          <svg className={`w-5 h-5 text-[#1d9fa9] shrink-0 transition-transform ${faqOpen === i ? "rotate-45" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        </button>
+                        {faqOpen === i && (
+                          <div className="px-4 sm:px-5 pb-4 sm:pb-5 text-sm leading-relaxed animate-[fadeUp_0.3s_ease]" style={{ color: midColor }}>{faq.a}</div>
+                        )}
                       </div>
-                      <cite className="not-italic flex items-center gap-3">
-                        <img src={item.img} alt={item.name} className="w-12 h-12 rounded-full object-cover border-2 border-[#1d9fa9]/20" width={48} height={48} loading="lazy" />
-                        <div>
-                          <div className={`text-base font-semibold ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>{item.name}</div>
-                          <div className={`text-xs ${t.textMuted} mt-0.5`}>{item.role}</div>
-                        </div>
-                      </cite>
-                    </blockquote>
-                  </Anim>
-                ))}
+                    </Anim>
+                  ))}
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          {/* FAQ */}
-          <section id="faq" className={`${t.bg2} py-24 px-6`} aria-labelledby="faq-heading">
-            <div className="max-w-3xl mx-auto">
+            {/* LEAD FORM with hero image as sidebar */}
+            <LeadForm t={t} dark={dark} sidebarContent={
+              <div className="relative">
+                <div className="overflow-hidden rounded-2xl">
+                  <img alt="Familia latina protegida con un plan IUL" className="w-full h-auto object-contain" width={640} height={384} loading="lazy" src="/lovable-uploads/3658c176-85e0-4ba2-80c5-30909eeb0c4d.webp" />
+                </div>
+                <div className={`absolute ${t.card} border rounded-2xl p-5 backdrop-blur-xl shadow-xl`} style={{ bottom: "3rem", left: "0rem" }}>
+                  <div className="text-3xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>$200K+</div>
+                  <div className="text-xs mt-1" style={{ color: mutedColor }}>Valor potencial en 20 años<br />con solo $250/mes</div>
+                </div>
+              </div>
+            } />
+
+            {/* CONTACT BAR */}
+            <div className="px-4 sm:px-6 pb-10 lg:pb-12">
+              <ContactBar t={t} />
+            </div>
+
+            {/* FINAL CTA */}
+            <section className="py-14 lg:py-20 px-4 sm:px-6 text-center" aria-label="Llamado final">
               <Anim>
-                <div className="text-center mb-12">
-                  <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">Preguntas frecuentes</p>
-                  <h2 id="faq-heading" className={`text-3xl sm:text-4xl font-normal ${t.text}`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                    Respuestas claras,{" "}
-                    <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] to-[#177D85] bg-clip-text text-transparent">sin letra pequeña</span>
+                <div className="max-w-2xl mx-auto">
+                  <h2 className="text-2xl sm:text-3xl lg:text-[44px] font-normal leading-tight mb-5" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
+                    Tu familia merece{" "}
+                    <strong className="italic" style={{ background: "linear-gradient(to right, #28C4CF, #1d9fa9, #177D85)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                      un plan
+                    </strong>
                   </h2>
+                  <p className="text-sm sm:text-base leading-relaxed mb-8" style={{ color: midColor }}>
+                    No importa si tienes SSN o ITIN. No importa si eres W-2 o 1099. Lo que importa es que hoy puedes dar el primer paso para proteger lo que más quieres.
+                  </p>
+                  <div className="flex flex-col sm:flex-row justify-center gap-3.5">
+                    <Link to="/contacto" className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-9 py-4 rounded-lg font-bold no-underline hover:shadow-xl transition-all text-center">
+                      Agenda tu Consulta Gratis
+                    </Link>
+                    <a href="tel:+16893082809" className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold no-underline hover:bg-[#1d9fa9]/10 transition-all inline-flex items-center justify-center gap-2">
+                      Llámanos ahora
+                    </a>
+                  </div>
                 </div>
               </Anim>
-
-              <div className="space-y-3">
-                {FAQS.map((faq, i) => (
-                  <Anim key={i} delay={i * 0.05}>
-                    <div className={`${t.card} border rounded-xl overflow-hidden backdrop-blur-xl`}>
-                      <button
-                        onClick={() => setFaqOpen(faqOpen === i ? null : i)}
-                        className={`w-full text-left p-5 flex items-center justify-between gap-4 cursor-pointer bg-transparent border-none ${t.text}`}
-                        aria-expanded={faqOpen === i}
-                      >
-                        <span className="text-[15px] font-semibold pr-4">{faq.q}</span>
-                        <svg className={`w-5 h-5 text-[#1d9fa9] shrink-0 transition-transform ${faqOpen === i ? "rotate-45" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                          <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
-                      </button>
-                      {faqOpen === i && (
-                        <div className={`px-5 pb-5 text-sm ${t.textMid} leading-relaxed animate-[fadeUp_0.3s_ease]`}>{faq.a}</div>
-                      )}
-                    </div>
-                  </Anim>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* LEAD FORM with hero image as sidebar */}
-          <LeadForm t={t} dark={dark} sidebarContent={
-            <div className="relative">
-              <div className="overflow-hidden rounded-2xl">
-                <img alt="Familia latina protegida con un plan IUL" className="w-full h-auto object-contain" width={640} height={384} loading="lazy" src="/lovable-uploads/3658c176-85e0-4ba2-80c5-30909eeb0c4d.webp" />
-              </div>
-              <div className={`absolute ${t.card} border rounded-2xl p-5 backdrop-blur-xl shadow-xl`} style={{ bottom: "3rem", left: "0rem" }}>
-                <div className="text-3xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>$200K+</div>
-                <div className={`text-xs ${t.textMuted} mt-1`}>Valor potencial en 20 años<br />con solo $250/mes</div>
-              </div>
-            </div>
-          } />
-
-          {/* CONTACT BAR */}
-          <div className="px-6 pb-12">
-            <ContactBar t={t} />
-          </div>
-
-          {/* FINAL CTA */}
-          <section className="py-20 px-6 text-center" aria-label="Llamado final">
-            <Anim>
-              <div className="max-w-2xl mx-auto">
-                <h2 className={`text-3xl sm:text-[44px] font-normal ${t.text} leading-tight mb-5`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                  Tu familia merece{" "}
-                  <strong className="italic bg-gradient-to-r from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-[length:200%_auto] bg-clip-text text-transparent animate-[shimmer_4s_ease-in-out_infinite]">
-                    un plan
-                  </strong>
-                </h2>
-                <p className={`text-base ${t.textMid} leading-relaxed mb-8`}>
-                  No importa si tienes SSN o ITIN. No importa si eres W-2 o 1099. Lo que importa es que hoy puedes dar el primer paso para proteger lo que más quieres.
-                </p>
-                <div className="flex flex-col sm:flex-row justify-center gap-3.5">
-                  <Link to="/contacto" className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-9 py-4 rounded-lg font-bold no-underline hover:shadow-xl transition-all text-center">
-                    Agenda tu Consulta Gratis
-                  </Link>
-                  <a href="tel:+16893082809" className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold no-underline hover:bg-[#1d9fa9]/10 transition-all inline-flex items-center justify-center gap-2">
-                    Llámanos ahora
-                  </a>
-                </div>
-              </div>
-            </Anim>
-          </section>
-        </>
-      )}
+            </section>
+          </>
+        );
+      }}
     </Layout>
   );
 }
