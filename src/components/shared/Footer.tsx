@@ -74,7 +74,7 @@ export function Footer({ t }: FooterProps) {
                 <p>13550 Village Park Dr, Orlando, FL 32837</p>
               </div>
               <div>
-                <p className="font-semibold text-[#1d9fa9]">Houston, TX</p>
+                <p className="font-semibold text-white">Houston, TX</p>
                 <p>16225 Park Ten Place, Of. 475, 4to Piso, Houston, TX 77084</p>
               </div>
             </div>
