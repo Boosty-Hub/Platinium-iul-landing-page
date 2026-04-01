@@ -86,9 +86,9 @@ export default function HomePage() {
   return (
     <Layout>
       {({ t, dark }) => {
-        const textColor = dark ? "#E4EEF0" : "#0B1A1E";
-        const mutedColor = dark ? "#6A8E98" : "#7A9BA3";
-        const midColor = dark ? "#94B3BB" : "#4A6B73";
+        const textColor = dark ? "#FFFFFF" : "#0B1A1E";
+        const mutedColor = dark ? "#B2EBF2" : "#7A9BA3";
+        const midColor = dark ? "#E0F7FA" : "#4A6B73";
 
         return (
           <>

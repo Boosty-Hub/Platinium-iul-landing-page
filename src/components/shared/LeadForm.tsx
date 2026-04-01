@@ -164,12 +164,12 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   }, []);
 
   // Explicit color values for reliable rendering
-  const textColor = dark ? "#E4EEF0" : "#1A2E33";
-  const mutedColor = dark ? "#6A8E98" : "#7A9BA3";
-  const midColor = dark ? "#94B3BB" : "#4A6B73";
-  const inputBg = dark ? "#0B2A33" : "#E8F4F6";
-  const inputBorder = "rgba(29,159,169,0.3)";
-  const dividerBorder = dark ? "rgba(29,159,169,0.1)" : "rgba(29,159,169,0.1)";
+  const textColor = dark ? "#FFFFFF" : "#1A2E33";
+  const mutedColor = dark ? "#B2EBF2" : "#7A9BA3";
+  const midColor = dark ? "#E0F7FA" : "#4A6B73";
+  const inputBg = dark ? "#0D5F66" : "#E8F4F6";
+  const inputBorder = dark ? "rgba(255,255,255,0.2)" : "rgba(29,159,169,0.3)";
+  const dividerBorder = dark ? "rgba(255,255,255,0.1)" : "rgba(29,159,169,0.1)";
 
   // Selection button styles
   const selBtnBase = "w-full p-3 rounded-xl border text-left flex items-center gap-3 cursor-pointer transition-all duration-300";
