@@ -70,7 +70,7 @@ export function Footer({ t }: FooterProps) {
                 <p>5775 Waterford District Dr #170, Miami, FL 33126</p>
               </div>
               <div>
-                <p className="font-semibold text-[#1d9fa9]">Orlando, FL</p>
+                <p className="font-semibold text-white">Orlando, FL</p>
                 <p>13550 Village Park Dr, Orlando, FL 32837</p>
               </div>
               <div>
