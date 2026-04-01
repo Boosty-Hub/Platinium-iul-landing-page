@@ -86,6 +86,7 @@ async function submitLead(data: LeadFormData, formLoadedAt: number): Promise<{ o
         interes: data.interes || "",
         anio_nacimiento: data.anio_nacimiento || null,
         ahorro_semanal: data.ahorro_semanal || null,
+        genero: data.genero || null,
         notas: `Año nacimiento: ${data.anio_nacimiento || "N/A"} | Ahorro semanal: $${data.ahorro_semanal || "N/A"} | Género: ${data.genero || "N/A"}`,
         referrer: document.referrer || "direct",
         fuente: window.location.pathname,
