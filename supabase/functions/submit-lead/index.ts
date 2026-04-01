@@ -55,7 +55,8 @@ function validateLead(body: Record<string, unknown>): { valid: boolean; error?: 
     }
   }
 
-  const notas = body.notas ? String(body.notas).trim().slice(0, 2000) : `Año nacimiento: ${anio_nacimiento || 'N/A'} | Ahorro semanal: $${ahorro || 'N/A'}`;
+  const genero = body.genero ? String(body.genero).trim().slice(0, 50) : null;
+  const notas = body.notas ? String(body.notas).trim().slice(0, 2000) : `Año nacimiento: ${anio_nacimiento || 'N/A'} | Ahorro semanal: $${ahorro || 'N/A'} | Género: ${genero || 'N/A'}`;
 
   // UTM params
   const utmFields = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"] as const;
