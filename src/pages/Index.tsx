@@ -228,7 +228,7 @@ export default function HomePage() {
                 ].map((s, i) => (
                   <Anim key={i} delay={i * 0.1}>
                     <div className="text-center">
-                      <div className="text-2xl sm:text-4xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>{s.v}</div>
+                      <div className="text-2xl sm:text-4xl font-bold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>{s.v}</div>
                       <div className="text-[10px] sm:text-[11px] mt-1.5 tracking-wide" style={{ color: mutedColor }}>{s.l}</div>
                     </div>
                   </Anim>
