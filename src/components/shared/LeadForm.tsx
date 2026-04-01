@@ -196,11 +196,11 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
       {formState !== "success" ? (
         <>
           <div className="flex items-center gap-1.5 mb-3 sm:mb-6">
-            {[1, 2, 3, 4, 5].map((s) => (
+            {[1, 2, 3, 4, 5, 6].map((s) => (
               <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= s ? "bg-[#1d9fa9]" : ""}`} style={step < s ? { backgroundColor: dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" } : undefined} />
             ))}
           </div>
-          <p className="text-[11px] mb-3 sm:mb-5 text-center tracking-wide" style={{ color: mutedColor }}>Paso {step} de 5</p>
+          <p className="text-[11px] mb-3 sm:mb-5 text-center tracking-wide" style={{ color: mutedColor }}>Paso {step} de 6</p>
 
           <div className="relative overflow-hidden">
             {/* Step 1: Interés */}
