@@ -314,7 +314,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 </button>
                 <button
                   type="button"
-                  disabled={!form.genero}
+                  disabled={!form.genero || (form.genero.startsWith("Otro") && form.genero.replace(/^Otro:?\s*/, "").trim().length === 0)}
                   onClick={() => setStep(4)}
                   className="sm:flex-1 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
