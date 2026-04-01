@@ -36,8 +36,8 @@ export function Footer({ t }: FooterProps) {
           </nav>
 
           <div>
-            <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">🕒 Horarios de Atención</h4>
-            <div className={`text-sm ${t.textMuted} leading-relaxed space-y-1`}>
+            <h4 className="text-[11px] tracking-[2px] text-white uppercase mb-4 font-bold">🕒 Horarios de Atención</h4>
+            <div className="text-sm text-white/70 leading-relaxed space-y-1">
               <p>Lunes a Viernes: 10:00 A.M. a 5:00 P.M.</p>
               <p>Sábado: Cerrado</p>
               <p>Domingo: Cerrado</p>
