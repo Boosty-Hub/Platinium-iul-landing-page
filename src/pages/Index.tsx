@@ -100,32 +100,7 @@ export default function HomePage() {
               <div className="hidden lg:block absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" />
 
               <div className="max-w-7xl mx-auto px-4 sm:px-6" style={{ position: 'relative', zIndex: 10, paddingTop: '80px', paddingBottom: '20px' }}>
-                {/* Hero text — mobile: stacked above form */}
-                <div style={{ textAlign: 'center', marginBottom: '20px' }} className="lg:hidden">
-                  <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-3" style={{ backgroundColor: 'rgba(29,159,169,0.1)', border: '1px solid rgba(29,159,169,0.2)' }}>
-                    <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#1d9fa9', display: 'inline-block' }} />
-                    <span style={{ color: '#1d9fa9', fontSize: '10px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const }}>
-                      Asesoría Financiera para Latinos en EE.UU.
-                    </span>
-                  </div>
-                  <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", color: textColor, fontSize: '24px', lineHeight: 1.15, marginBottom: '8px', fontWeight: 400 }}>
-                    Protege a tu familia.{" "}
-                    <span style={{ background: 'linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 700, fontStyle: 'italic' }}>
-                      Construye tu retiro.
-                    </span>
-                  </h1>
-                  <p style={{ color: mutedColor, fontSize: '13px' }}>Con un Indexed Universal Life (IUL).</p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
-                    {[["Aplicable con ", "ITIN"], ["Piso garantizado ", "0%"], ["Consulta ", "100% gratis"]].map(([pre, bold], i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <CheckIcon className="text-[#1d9fa9]" />
-                        <span style={{ color: midColor, fontSize: '11px' }}>
-                          {pre}<strong style={{ color: textColor }}>{bold}</strong>
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                {/* Hero text hidden on mobile per design request */}
 
                 {/* Desktop: two columns */}
                 <div className="hidden lg:grid lg:grid-cols-2 gap-10 items-center">
