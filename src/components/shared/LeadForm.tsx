@@ -149,6 +149,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
         interes: form.interes.slice(0, 50),
         anio_nacimiento: form.anio_nacimiento,
         ahorro_semanal: form.ahorro_semanal,
+        genero: form.genero,
       };
       setFormState("loading");
       const result = await submitLead(sanitized, formLoadedAt.current);
