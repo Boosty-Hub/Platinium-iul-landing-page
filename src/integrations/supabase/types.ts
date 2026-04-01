@@ -21,6 +21,7 @@ export type Database = {
           created_at: string
           email: string
           fuente: string | null
+          genero: string | null
           id: string
           interes: string | null
           ip_address: string | null
@@ -43,6 +44,7 @@ export type Database = {
           created_at?: string
           email: string
           fuente?: string | null
+          genero?: string | null
           id?: string
           interes?: string | null
           ip_address?: string | null
@@ -65,6 +67,7 @@ export type Database = {
           created_at?: string
           email?: string
           fuente?: string | null
+          genero?: string | null
           id?: string
           interes?: string | null
           ip_address?: string | null

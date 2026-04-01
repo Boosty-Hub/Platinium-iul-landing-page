@@ -55,7 +55,8 @@ function validateLead(body: Record<string, unknown>): { valid: boolean; error?: 
     }
   }
 
-  const notas = body.notas ? String(body.notas).trim().slice(0, 2000) : `Año nacimiento: ${anio_nacimiento || 'N/A'} | Ahorro semanal: $${ahorro || 'N/A'}`;
+  const genero = body.genero ? String(body.genero).trim().slice(0, 50) : null;
+  const notas = body.notas ? String(body.notas).trim().slice(0, 2000) : `Año nacimiento: ${anio_nacimiento || 'N/A'} | Ahorro semanal: $${ahorro || 'N/A'} | Género: ${genero || 'N/A'}`;
 
   // UTM params
   const utmFields = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"] as const;
@@ -76,6 +77,7 @@ function validateLead(body: Record<string, unknown>): { valid: boolean; error?: 
       referrer: body.referrer ? String(body.referrer).slice(0, 1000) : "",
       anio_nacimiento,
       ahorro_semanal: ahorro,
+      genero,
       notas,
       ...utms,
     },
@@ -156,6 +158,7 @@ serve(async (req) => {
         interes: leadData.interes,
         anio_nacimiento: leadData.anio_nacimiento,
         ahorro_semanal: leadData.ahorro_semanal,
+        genero: leadData.genero,
         fuente: "landing-iul",
         referrer: leadData.referrer,
         utm_source: leadData.utm_source || null,
