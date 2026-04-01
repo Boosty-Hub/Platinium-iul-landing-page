@@ -420,7 +420,7 @@ export default function HomePage() {
                   <div role="tabpanel" className={`${t.card} border rounded-2xl p-6 sm:p-10 text-center backdrop-blur-xl`}>
                     <h3 className="text-xl sm:text-2xl font-semibold text-[#1d9fa9] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>{TABS[tab].t}</h3>
                     <p className="text-sm sm:text-[15px] leading-relaxed max-w-xl mx-auto" style={{ color: midColor }}>{TABS[tab].c}</p>
-                    <Link to="/contacto" className="inline-block mt-6 sm:mt-7 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-8 py-3.5 rounded-lg font-bold no-underline hover:shadow-lg transition-all">
+                    <Link to="/contacto" className="inline-block mt-6 sm:mt-7 bg-white text-[#1d9fa9] px-8 py-3.5 rounded-lg font-bold no-underline hover:shadow-lg transition-all">
                       Quiero mi plan personalizado →
                     </Link>
                   </div>
