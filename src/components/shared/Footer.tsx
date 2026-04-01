@@ -27,9 +27,9 @@ export function Footer({ t }: FooterProps) {
           </div>
 
           <nav aria-label="Servicios">
-            <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">Servicios</h4>
+            <h4 className="text-[11px] tracking-[2px] text-white uppercase mb-4 font-bold">Servicios</h4>
             {SERVICE_PAGES.map((l) => (
-              <Link key={l.href} to={l.href} className={`block text-sm ${t.textMuted} no-underline mb-2.5 hover:text-[#1d9fa9] transition-colors`}>
+              <Link key={l.href} to={l.href} className="block text-sm text-white/70 no-underline mb-2.5 hover:text-white transition-colors">
                 {l.label}
               </Link>
             ))}
