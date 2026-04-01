@@ -157,6 +157,7 @@ serve(async (req) => {
         interes: leadData.interes,
         anio_nacimiento: leadData.anio_nacimiento,
         ahorro_semanal: leadData.ahorro_semanal,
+        genero: leadData.genero,
         fuente: "landing-iul",
         referrer: leadData.referrer,
         utm_source: leadData.utm_source || null,
