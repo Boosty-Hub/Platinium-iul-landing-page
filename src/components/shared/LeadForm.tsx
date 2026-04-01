@@ -268,8 +268,45 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
               </div>
             </div>
 
-            {/* Step 3: Ahorro semanal */}
+            {/* Step 3: Género */}
             <div className={`transition-all duration-500 ease-out ${step === 3 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
+              <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-5 text-center" style={{ color: textColor }}>
+                ¿Cuál es tu género?
+              </h3>
+              <div className="grid grid-cols-1 gap-2.5">
+                {[
+                  { value: "Masculino", icon: "👨" },
+                  { value: "Femenino", icon: "👩" },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => updateField("genero", opt.value)}
+                    className={`${selBtnBase} ${form.genero === opt.value ? selBtnActive : selBtnIdle}`}
+                    style={{ backgroundColor: form.genero === opt.value ? "rgba(29,159,169,0.25)" : "rgba(29,159,169,0.1)", color: textColor }}
+                  >
+                    <span className="text-xl sm:text-2xl">{opt.icon}</span>
+                    <span className="text-sm font-medium">{opt.value}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-5">
+                <button type="button" onClick={() => setStep(2)} className="sm:flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
+                  ← Atrás
+                </button>
+                <button
+                  type="button"
+                  disabled={!form.genero}
+                  onClick={() => setStep(4)}
+                  className="sm:flex-1 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Siguiente →
+                </button>
+              </div>
+            </div>
+
+            {/* Step 4: Ahorro semanal */}
+            <div className={`transition-all duration-500 ease-out ${step === 4 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-6 text-center" style={{ color: textColor }}>
                 ¿Cuánto te gustaría ahorrar semanalmente?
               </h3>
@@ -288,13 +325,13 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 ))}
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-5">
-                <button type="button" onClick={() => setStep(2)} className="sm:flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
+                <button type="button" onClick={() => setStep(3)} className="sm:flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
                   ← Atrás
                 </button>
                 <button
                   type="button"
                   disabled={!form.ahorro_semanal}
-                  onClick={() => setStep(4)}
+                  onClick={() => setStep(5)}
                   className="sm:flex-1 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Siguiente →
@@ -302,26 +339,26 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
               </div>
             </div>
 
-            {/* Step 4: Confirmación */}
-            <div className={`transition-all duration-500 ease-out ${step === 4 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
+            {/* Step 5: Confirmación */}
+            <div className={`transition-all duration-500 ease-out ${step === 5 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <div className="text-center">
                 <div className="text-4xl sm:text-5xl mb-4">🎯</div>
                 <h3 className="text-base sm:text-xl font-bold mb-5 sm:mb-7" style={{ color: textColor }}>
                   Si calificas, ¿te gustaría ver tus números personalizados?
                 </h3>
                 <div className="flex flex-col gap-3">
-                  <button type="button" onClick={() => setStep(5)} className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-4 rounded-xl font-bold text-base cursor-pointer hover:shadow-lg transition-all">
+                  <button type="button" onClick={() => setStep(6)} className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-4 rounded-xl font-bold text-base cursor-pointer hover:shadow-lg transition-all">
                     Sí, quiero ver mis números →
                   </button>
-                  <button type="button" onClick={() => setStep(3)} className="w-full py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
+                  <button type="button" onClick={() => setStep(4)} className="w-full py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
                     ← Atrás
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Step 5: Datos de contacto */}
-            <div className={`transition-all duration-500 ease-out ${step === 5 ? "opacity-100 translate-x-0 max-h-[800px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
+            {/* Step 6: Datos de contacto */}
+            <div className={`transition-all duration-500 ease-out ${step === 6 ? "opacity-100 translate-x-0 max-h-[800px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <form onSubmit={handleSubmit} noValidate>
                 <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6 text-center" style={{ color: textColor }}>
                   ¡Último paso! Tus datos de contacto
