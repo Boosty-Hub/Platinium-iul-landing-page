@@ -534,10 +534,10 @@ export default function HomePage() {
                     No importa si tienes SSN o ITIN. No importa si eres W-2 o 1099. Lo que importa es que hoy puedes dar el primer paso para proteger lo que más quieres.
                   </p>
                   <div className="flex flex-col sm:flex-row justify-center gap-3.5">
-                    <Link to="/contacto" className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-9 py-4 rounded-lg font-bold no-underline hover:shadow-xl transition-all text-center">
+                    <Link to="/contacto" className="bg-white text-[#1d9fa9] px-9 py-4 rounded-lg font-bold no-underline hover:shadow-xl transition-all text-center">
                       Agenda tu Consulta Gratis
                     </Link>
-                    <a href="tel:+16893082809" className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold no-underline hover:bg-[#1d9fa9]/10 transition-all inline-flex items-center justify-center gap-2">
+                    <a href="tel:+16893082809" className="border-2 border-white text-white px-8 py-3.5 rounded-lg font-semibold no-underline hover:bg-white/10 transition-all inline-flex items-center justify-center gap-2">
                       Llámanos ahora
                     </a>
                   </div>
