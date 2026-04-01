@@ -277,19 +277,37 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 {[
                   { value: "Masculino", icon: "👨" },
                   { value: "Femenino", icon: "👩" },
+                  { value: "Otro", icon: "🧑" },
                 ].map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
-                    onClick={() => updateField("genero", opt.value)}
-                    className={`${selBtnBase} ${form.genero === opt.value ? selBtnActive : selBtnIdle}`}
-                    style={{ backgroundColor: form.genero === opt.value ? "rgba(29,159,169,0.25)" : "rgba(29,159,169,0.1)", color: textColor }}
+                    onClick={() => {
+                      if (opt.value === "Otro") {
+                        updateField("genero", "Otro:");
+                      } else {
+                        updateField("genero", opt.value);
+                      }
+                    }}
+                    className={`${selBtnBase} ${(opt.value === "Otro" ? form.genero.startsWith("Otro") : form.genero === opt.value) ? selBtnActive : selBtnIdle}`}
+                    style={{ backgroundColor: (opt.value === "Otro" ? form.genero.startsWith("Otro") : form.genero === opt.value) ? "rgba(29,159,169,0.25)" : "rgba(29,159,169,0.1)", color: textColor }}
                   >
                     <span className="text-xl sm:text-2xl">{opt.icon}</span>
                     <span className="text-sm font-medium">{opt.value}</span>
                   </button>
                 ))}
               </div>
+              {form.genero.startsWith("Otro") && (
+                <input
+                  type="text"
+                  maxLength={100}
+                  placeholder="Indica tu género"
+                  value={form.genero.replace(/^Otro:?\s*/, "")}
+                  onChange={(e) => updateField("genero", `Otro: ${e.target.value}`)}
+                  className="mt-2.5 w-full rounded-xl border px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d9fa9]"
+                  style={{ backgroundColor: "rgba(29,159,169,0.08)", borderColor: "rgba(29,159,169,0.3)", color: textColor }}
+                />
+              )}
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-5">
                 <button type="button" onClick={() => setStep(2)} className="sm:flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
                   ← Atrás
