@@ -12,6 +12,7 @@ interface LeadFormData {
   interes: string;
   anio_nacimiento: string;
   ahorro_semanal: string;
+  genero: string;
 }
 
 const COUNTRY_CODES = [
@@ -85,7 +86,7 @@ async function submitLead(data: LeadFormData, formLoadedAt: number): Promise<{ o
         interes: data.interes || "",
         anio_nacimiento: data.anio_nacimiento || null,
         ahorro_semanal: data.ahorro_semanal || null,
-        notas: `Año nacimiento: ${data.anio_nacimiento || "N/A"} | Ahorro semanal: $${data.ahorro_semanal || "N/A"}`,
+        notas: `Año nacimiento: ${data.anio_nacimiento || "N/A"} | Ahorro semanal: $${data.ahorro_semanal || "N/A"} | Género: ${data.genero || "N/A"}`,
         referrer: document.referrer || "direct",
         fuente: window.location.pathname,
         form_loaded_at: formLoadedAt,
@@ -121,6 +122,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
     interes: defaultInteres,
     anio_nacimiento: "",
     ahorro_semanal: "",
+    genero: "",
   });
   const [countryCode, setCountryCode] = useState("+1");
   const [phoneError, setPhoneError] = useState("");
@@ -147,6 +149,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
         interes: form.interes.slice(0, 50),
         anio_nacimiento: form.anio_nacimiento,
         ahorro_semanal: form.ahorro_semanal,
+        genero: form.genero,
       };
       setFormState("loading");
       const result = await submitLead(sanitized, formLoadedAt.current);
@@ -182,7 +185,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   };
 
   const formCard = (
-    <div className={`${t.card} border rounded-2xl p-4 sm:p-9 backdrop-blur-xl shadow-sm`}>
+    <div className={`${t.card} border rounded-2xl p-4 sm:p-9 backdrop-blur-xl`} style={{ boxShadow: '0 0 60px rgba(29,159,169,0.25), 0 0 120px rgba(29,159,169,0.1)' }}>
       <div className="text-center mb-3 sm:mb-6">
         <h3 className="text-lg sm:text-2xl font-bold" style={{ color: textColor }}>
           ¡Cotiza tu IUL <span style={{ color: "#1d9fa9" }}>Gratis</span> ahora!
@@ -193,11 +196,11 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
       {formState !== "success" ? (
         <>
           <div className="flex items-center gap-1.5 mb-3 sm:mb-6">
-            {[1, 2, 3, 4, 5].map((s) => (
+            {[1, 2, 3, 4, 5, 6].map((s) => (
               <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= s ? "bg-[#1d9fa9]" : ""}`} style={step < s ? { backgroundColor: dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" } : undefined} />
             ))}
           </div>
-          <p className="text-[11px] mb-3 sm:mb-5 text-center tracking-wide" style={{ color: mutedColor }}>Paso {step} de 5</p>
+          <p className="text-[11px] mb-3 sm:mb-5 text-center tracking-wide" style={{ color: mutedColor }}>Paso {step} de 6</p>
 
           <div className="relative overflow-hidden">
             {/* Step 1: Interés */}
@@ -265,8 +268,45 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
               </div>
             </div>
 
-            {/* Step 3: Ahorro semanal */}
+            {/* Step 3: Género */}
             <div className={`transition-all duration-500 ease-out ${step === 3 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
+              <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-5 text-center" style={{ color: textColor }}>
+                ¿Cuál es tu género?
+              </h3>
+              <div className="grid grid-cols-1 gap-2.5">
+                {[
+                  { value: "Masculino", icon: "👨" },
+                  { value: "Femenino", icon: "👩" },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => updateField("genero", opt.value)}
+                    className={`${selBtnBase} ${form.genero === opt.value ? selBtnActive : selBtnIdle}`}
+                    style={{ backgroundColor: form.genero === opt.value ? "rgba(29,159,169,0.25)" : "rgba(29,159,169,0.1)", color: textColor }}
+                  >
+                    <span className="text-xl sm:text-2xl">{opt.icon}</span>
+                    <span className="text-sm font-medium">{opt.value}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-5">
+                <button type="button" onClick={() => setStep(2)} className="sm:flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
+                  ← Atrás
+                </button>
+                <button
+                  type="button"
+                  disabled={!form.genero}
+                  onClick={() => setStep(4)}
+                  className="sm:flex-1 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Siguiente →
+                </button>
+              </div>
+            </div>
+
+            {/* Step 4: Ahorro semanal */}
+            <div className={`transition-all duration-500 ease-out ${step === 4 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-6 text-center" style={{ color: textColor }}>
                 ¿Cuánto te gustaría ahorrar semanalmente?
               </h3>
@@ -285,13 +325,13 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 ))}
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-5">
-                <button type="button" onClick={() => setStep(2)} className="sm:flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
+                <button type="button" onClick={() => setStep(3)} className="sm:flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
                   ← Atrás
                 </button>
                 <button
                   type="button"
                   disabled={!form.ahorro_semanal}
-                  onClick={() => setStep(4)}
+                  onClick={() => setStep(5)}
                   className="sm:flex-1 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Siguiente →
@@ -299,26 +339,26 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
               </div>
             </div>
 
-            {/* Step 4: Confirmación */}
-            <div className={`transition-all duration-500 ease-out ${step === 4 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
+            {/* Step 5: Confirmación */}
+            <div className={`transition-all duration-500 ease-out ${step === 5 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <div className="text-center">
                 <div className="text-4xl sm:text-5xl mb-4">🎯</div>
                 <h3 className="text-base sm:text-xl font-bold mb-5 sm:mb-7" style={{ color: textColor }}>
                   Si calificas, ¿te gustaría ver tus números personalizados?
                 </h3>
                 <div className="flex flex-col gap-3">
-                  <button type="button" onClick={() => setStep(5)} className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-4 rounded-xl font-bold text-base cursor-pointer hover:shadow-lg transition-all">
+                  <button type="button" onClick={() => setStep(6)} className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-4 rounded-xl font-bold text-base cursor-pointer hover:shadow-lg transition-all">
                     Sí, quiero ver mis números →
                   </button>
-                  <button type="button" onClick={() => setStep(3)} className="w-full py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
+                  <button type="button" onClick={() => setStep(4)} className="w-full py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
                     ← Atrás
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Step 5: Datos de contacto */}
-            <div className={`transition-all duration-500 ease-out ${step === 5 ? "opacity-100 translate-x-0 max-h-[800px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
+            {/* Step 6: Datos de contacto */}
+            <div className={`transition-all duration-500 ease-out ${step === 6 ? "opacity-100 translate-x-0 max-h-[800px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <form onSubmit={handleSubmit} noValidate>
                 <h3 className="text-base sm:text-xl font-bold mb-4 sm:mb-6 text-center" style={{ color: textColor }}>
                   ¡Último paso! Tus datos de contacto
@@ -415,7 +455,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 {formState === "error" && (
                   <p className="text-xs text-red-500 mt-2 text-center">Hubo un problema al enviar. Por favor intenta de nuevo.</p>
                 )}
-                <button type="button" onClick={() => setStep(4)} className="w-full mt-2 sm:mt-3 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
+                <button type="button" onClick={() => setStep(5)} className="w-full mt-2 sm:mt-3 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
                   ← Atrás
                 </button>
                 <p className="text-[11px] mt-2 sm:mt-3 text-center" style={{ color: mutedColor }}>Tu información es 100% confidencial. Sin spam.</p>
