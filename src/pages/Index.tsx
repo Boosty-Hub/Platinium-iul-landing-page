@@ -131,10 +131,10 @@ export default function HomePage() {
                       <strong style={{ color: "#1d9fa9" }}>Todo en un solo instrumento.</strong>
                     </p>
                     <div className="flex gap-3.5 mb-10">
-                      <Link to="/contacto" className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-9 py-4 rounded-lg font-bold text-base tracking-wide no-underline hover:shadow-xl hover:shadow-[#1d9fa9]/25 transition-all hover:-translate-y-0.5 text-center">
+                      <Link to="/contacto" className="bg-white text-[#1d9fa9] px-9 py-4 rounded-lg font-bold text-base tracking-wide no-underline hover:shadow-xl transition-all hover:-translate-y-0.5 text-center">
                         Agenda tu Consulta Gratis →
                       </Link>
-                      <Link to="/seguro-de-vida-iul" className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold text-[15px] no-underline hover:bg-[#1d9fa9]/10 transition-all text-center">
+                      <Link to="/seguro-de-vida-iul" className="border-2 border-white text-white px-8 py-3.5 rounded-lg font-semibold text-[15px] no-underline hover:bg-white/10 transition-all text-center">
                         ¿Cómo funciona el IUL?
                       </Link>
                     </div>
