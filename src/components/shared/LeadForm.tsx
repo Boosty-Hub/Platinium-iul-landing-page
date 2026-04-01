@@ -12,6 +12,7 @@ interface LeadFormData {
   interes: string;
   anio_nacimiento: string;
   ahorro_semanal: string;
+  genero: string;
 }
 
 const COUNTRY_CODES = [
