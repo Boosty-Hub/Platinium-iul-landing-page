@@ -378,7 +378,7 @@ export default function HomePage() {
 
                 <Anim delay={0.2}>
                   <div className="text-center mt-8">
-                    <Link to="/iul-vs-401k" className="inline-block bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-8 py-3.5 rounded-lg font-bold no-underline hover:shadow-lg transition-all">
+                    <Link to="/iul-vs-401k" className="inline-block bg-white text-[#1d9fa9] px-8 py-3.5 rounded-lg font-bold no-underline hover:shadow-lg transition-all">
                       Ver comparación completa IUL vs 401(k) →
                     </Link>
                   </div>
