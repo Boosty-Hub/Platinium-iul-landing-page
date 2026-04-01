@@ -122,6 +122,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
     interes: defaultInteres,
     anio_nacimiento: "",
     ahorro_semanal: "",
+    genero: "",
   });
   const [countryCode, setCountryCode] = useState("+1");
   const [phoneError, setPhoneError] = useState("");
