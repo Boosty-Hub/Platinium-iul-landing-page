@@ -311,7 +311,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 ¿Cuánto te gustaría ahorrar semanalmente?
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                {["25", "50", "75", "100", "150", "200"].map((amt) => (
+                {["12.5", "25", "37.5", "50"].map((amt) => (
                   <button
                     key={amt}
                     type="button"
