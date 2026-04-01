@@ -455,7 +455,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 {formState === "error" && (
                   <p className="text-xs text-red-500 mt-2 text-center">Hubo un problema al enviar. Por favor intenta de nuevo.</p>
                 )}
-                <button type="button" onClick={() => setStep(4)} className="w-full mt-2 sm:mt-3 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
+                <button type="button" onClick={() => setStep(5)} className="w-full mt-2 sm:mt-3 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
                   ← Atrás
                 </button>
                 <p className="text-[11px] mt-2 sm:mt-3 text-center" style={{ color: mutedColor }}>Tu información es 100% confidencial. Sin spam.</p>
