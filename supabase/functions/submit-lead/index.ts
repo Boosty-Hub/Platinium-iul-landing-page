@@ -77,6 +77,7 @@ function validateLead(body: Record<string, unknown>): { valid: boolean; error?: 
       referrer: body.referrer ? String(body.referrer).slice(0, 1000) : "",
       anio_nacimiento,
       ahorro_semanal: ahorro,
+      genero,
       notas,
       ...utms,
     },
