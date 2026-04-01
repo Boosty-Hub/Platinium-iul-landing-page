@@ -63,10 +63,10 @@ export function Footer({ t }: FooterProps) {
           </div>
 
           <div>
-            <h4 className="text-[11px] tracking-[2px] text-[#1d9fa9] uppercase mb-4 font-bold">📍 Oficinas</h4>
-            <div className={`text-sm ${t.textMuted} space-y-3 leading-relaxed`}>
+            <h4 className="text-[11px] tracking-[2px] text-white uppercase mb-4 font-bold">📍 Oficinas</h4>
+            <div className="text-sm text-white/70 space-y-3 leading-relaxed">
               <div>
-                <p className="font-semibold text-[#1d9fa9]">Miami, FL (Central)</p>
+                <p className="font-semibold text-white">Miami, FL (Central)</p>
                 <p>5775 Waterford District Dr #170, Miami, FL 33126</p>
               </div>
               <div>
