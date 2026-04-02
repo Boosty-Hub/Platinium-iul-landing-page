@@ -503,7 +503,7 @@ export default function HomePage() {
             </section>
 
             {/* LEAD FORM with hero image as sidebar */}
-            <LeadForm t={t} dark={dark} sidebarContent={
+            <LeadForm t={t} dark={dark} defaultInteres="Ahorro a largo plazo / retiro" sidebarContent={
               <div className="relative">
                 <div className="overflow-hidden rounded-2xl">
                   <img alt="Familia latina protegida con un plan IUL" className="w-full h-auto object-contain" width={640} height={384} loading="lazy" src="/lovable-uploads/3658c176-85e0-4ba2-80c5-30909eeb0c4d.webp" />
