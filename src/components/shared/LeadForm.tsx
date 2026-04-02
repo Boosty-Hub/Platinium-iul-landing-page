@@ -16,23 +16,7 @@ interface LeadFormData {
 }
 
 const COUNTRY_CODES = [
-  { code: "+1", flag: "🇺🇸", label: "US/CA" },
-  { code: "+52", flag: "🇲🇽", label: "MX" },
-  { code: "+57", flag: "🇨🇴", label: "CO" },
-  { code: "+58", flag: "🇻🇪", label: "VE" },
-  { code: "+54", flag: "🇦🇷", label: "AR" },
-  { code: "+56", flag: "🇨🇱", label: "CL" },
-  { code: "+51", flag: "🇵🇪", label: "PE" },
-  { code: "+593", flag: "🇪🇨", label: "EC" },
-  { code: "+502", flag: "🇬🇹", label: "GT" },
-  { code: "+503", flag: "🇸🇻", label: "SV" },
-  { code: "+504", flag: "🇭🇳", label: "HN" },
-  { code: "+505", flag: "🇳🇮", label: "NI" },
-  { code: "+506", flag: "🇨🇷", label: "CR" },
-  { code: "+507", flag: "🇵🇦", label: "PA" },
-  { code: "+53", flag: "🇨🇺", label: "CU" },
-  { code: "+1809", flag: "🇩🇴", label: "DO" },
-  { code: "+55", flag: "🇧🇷", label: "BR" },
+  { code: "+1", flag: "🇺🇸", label: "US" },
 ];
 
 const MIN_LOCAL_DIGITS: Record<string, number> = {
@@ -312,18 +296,22 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 ¿Cuánto te gustaría ahorrar semanalmente?
               </h3>
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                {["12.5", "25", "37.5", "50"].map((amt) => (
-                  <button
-                    key={amt}
-                    type="button"
-                    onClick={() => updateField("ahorro_semanal", amt)}
-                    className={`${amtBtnBase} ${form.ahorro_semanal === amt ? amtBtnActive : amtBtnIdle}`}
-                    style={{ backgroundColor: form.ahorro_semanal === amt ? "rgba(29,159,169,0.25)" : "rgba(29,159,169,0.1)", color: textColor }}
-                  >
-                    <div className="text-lg sm:text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>${amt}</div>
-                    <div className="text-[10px] mt-0.5" style={{ color: mutedColor }}>/semana</div>
-                  </button>
-                ))}
+                {["12.5", "25", "37.5", "50"].map((amt) => {
+                  const monthly = (parseFloat(amt) * 4.33).toFixed(0);
+                  return (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => updateField("ahorro_semanal", amt)}
+                      className={`${amtBtnBase} ${form.ahorro_semanal === amt ? amtBtnActive : amtBtnIdle}`}
+                      style={{ backgroundColor: form.ahorro_semanal === amt ? "rgba(29,159,169,0.25)" : "rgba(29,159,169,0.1)", color: textColor }}
+                    >
+                      <div className="text-lg sm:text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>${amt}</div>
+                      <div className="text-[10px] mt-0.5" style={{ color: mutedColor }}>a la semana</div>
+                      <div className="text-[10px] mt-0.5" style={{ color: mutedColor }}>≈ ${monthly}/mes</div>
+                    </button>
+                  );
+                })}
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-5">
                 <button type="button" onClick={() => setStep(3)} className="sm:flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
