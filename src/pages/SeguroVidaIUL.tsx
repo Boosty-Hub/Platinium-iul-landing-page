@@ -233,7 +233,7 @@ export default function SeguroVidaIUL() {
             </div>
           </section>
 
-          <LeadForm t={t} dark={dark} />
+          <LeadForm t={t} dark={dark} defaultInteres="Ahorro a largo plazo / retiro" />
           <div className="px-6 pb-12"><ContactBar t={t} /></div>
         </>
       )}
