@@ -1,27 +1,35 @@
 import { useState, useEffect } from "react";
 
+type GeoStatus = "checking" | "allowed" | "blocked";
+
 export function GeoGate({ children }: { children: React.ReactNode }) {
-  const [blocked, setBlocked] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
+  const [status, setStatus] = useState<GeoStatus>("checking");
 
   useEffect(() => {
-    const already = sessionStorage.getItem("geo_checked");
-    if (already) return;
-
     fetch("https://ipapi.co/json/")
       .then((r) => r.json())
       .then((data) => {
-        sessionStorage.setItem("geo_checked", "1");
         if (data.country_code && data.country_code !== "US") {
-          setBlocked(true);
+          setStatus("blocked");
+        } else {
+          setStatus("allowed");
         }
       })
       .catch(() => {
         // If geo service fails, allow access
+        setStatus("allowed");
       });
   }, []);
 
-  if (blocked && !dismissed) {
+  if (status === "checking") {
+    return (
+      <div className="fixed inset-0 z-[9999] bg-[#0B1A1E] flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#1d9fa9]/30 border-t-[#1d9fa9] rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (status === "blocked") {
     return (
       <div className="fixed inset-0 z-[9999] bg-[#0B1A1E]/95 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl p-10 max-w-lg text-center shadow-2xl">
@@ -30,17 +38,19 @@ export function GeoGate({ children }: { children: React.ReactNode }) {
             Servicio exclusivo para residentes de Estados Unidos
           </h2>
           <p className="text-gray-600 mb-3 leading-relaxed">
-            Nuestros servicios de seguros de vida IUL están disponibles exclusivamente para residentes de Estados Unidos.
+            Nuestros servicios de seguros de vida IUL están disponibles exclusivamente para personas que residen en Estados Unidos.
           </p>
-          <p className="text-gray-500 text-sm mb-7">
-            Si resides en EE.UU. y estás usando VPN o te encuentras viajando, puedes continuar haciendo clic en el botón de abajo.
+          <p className="text-gray-500 text-sm mb-4">
+            El acceso a este sitio está restringido según tu ubicación.
           </p>
-          <button
-            onClick={() => setDismissed(true)}
-            className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-8 py-3.5 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all"
-          >
-            Soy residente de EE.UU., continuar →
-          </button>
+          <div className="border-t border-gray-200 pt-5 mt-5">
+            <p className="text-gray-500 text-xs leading-relaxed">
+              Si crees que esto es un error, contáctanos:<br />
+              <a href="tel:+17862000000" className="text-[#1d9fa9] font-semibold">📞 (786) 200-0000</a>
+              {" · "}
+              <a href="mailto:info@platiniuminsurance.com" className="text-[#1d9fa9] font-semibold">✉️ info@platiniuminsurance.com</a>
+            </p>
+          </div>
         </div>
       </div>
     );
