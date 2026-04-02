@@ -35,9 +35,9 @@ export function Navbar({ t, dark, setDark }: NavbarProps) {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-xl transition-all duration-300 ${
-        scrollY > 50 ? `${t.nav} ${t.divider} border-b shadow-sm` : ""
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-xl transition-all ${
+        navVisible ? "translate-y-0 duration-500 ease-out" : "-translate-y-full duration-300 ease-in"
+      } ${scrollY > 50 ? `${t.nav} ${t.divider} border-b shadow-sm` : ""}`}
       role="navigation"
       aria-label="Navegación principal"
     >
