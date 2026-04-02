@@ -150,7 +150,7 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div>
-                    <LeadForm t={t} dark={dark} inline />
+                    <LeadForm t={t} dark={dark} inline defaultInteres="Ahorro a largo plazo / retiro" />
                   </div>
                 </div>
 
