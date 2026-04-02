@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useScrollY } from "@/hooks/useScrollY";
+import { useScrollY, useScrollDirection } from "@/hooks/useScrollY";
 import type { ThemeClasses } from "./theme";
 import { SERVICE_PAGES } from "./data";
 
