@@ -1,18 +1,18 @@
 export function getThemeClasses(dark: boolean) {
   return dark
     ? {
-        bg: "bg-[#1d9fa9]",
-        bg2: "bg-[#178A93]",
-        card: "bg-[#0E6B73]/60 border-white/15",
-        text: "text-white",
-        textMid: "text-[#E0F7FA]",
-        textMuted: "text-[#B2EBF2]",
-        nav: "bg-[#1d9fa9]/92",
-        divider: "border-white/10",
-        input: "bg-[#0D5F66] border-white/20 text-white",
-        brandBg: "bg-white/[0.08]",
-        dangerBg: "bg-red-500/[0.08]",
-        successBg: "bg-white/[0.05]",
+        bg: "bg-[#0B1A1E]",
+        bg2: "bg-[#0F2229]",
+        card: "bg-[#0F2229]/80 border-[#1d9fa9]/15",
+        text: "text-[#E4EEF0]",
+        textMid: "text-[#94B3BB]",
+        textMuted: "text-[#6A8E98]",
+        nav: "bg-[#0B1A1E]/92",
+        divider: "border-[#1d9fa9]/10",
+        input: "bg-[#0B2A33] border-[#1d9fa9]/30 text-[#E4EEF0]",
+        brandBg: "bg-[#1d9fa9]/[0.08]",
+        dangerBg: "bg-red-500/[0.05]",
+        successBg: "bg-[#1d9fa9]/[0.05]",
       }
     : {
         bg: "bg-[#FAFCFC]",

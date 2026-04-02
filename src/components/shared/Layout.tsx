@@ -8,7 +8,7 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
-  const [dark, setDark] = useState(true);
+  const [dark, setDark] = useState(false);
   const t = getThemeClasses(dark);
 
   return (

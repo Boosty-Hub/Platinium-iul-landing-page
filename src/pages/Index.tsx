@@ -86,9 +86,9 @@ export default function HomePage() {
   return (
     <Layout>
       {({ t, dark }) => {
-        const textColor = dark ? "#FFFFFF" : "#0B1A1E";
-        const mutedColor = dark ? "#B2EBF2" : "#7A9BA3";
-        const midColor = dark ? "#E0F7FA" : "#4A6B73";
+        const textColor = dark ? "#E4EEF0" : "#0B1A1E";
+        const mutedColor = dark ? "#6A8E98" : "#7A9BA3";
+        const midColor = dark ? "#94B3BB" : "#4A6B73";
 
         return (
           <>
@@ -131,10 +131,10 @@ export default function HomePage() {
                       <strong style={{ color: "#1d9fa9" }}>Todo en un solo instrumento.</strong>
                     </p>
                     <div className="flex gap-3.5 mb-10">
-                      <Link to="/contacto" className="bg-white text-[#1d9fa9] px-9 py-4 rounded-lg font-bold text-base tracking-wide no-underline hover:shadow-xl transition-all hover:-translate-y-0.5 text-center">
+                      <Link to="/contacto" className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-9 py-4 rounded-lg font-bold text-base tracking-wide no-underline hover:shadow-xl hover:shadow-[#1d9fa9]/25 transition-all hover:-translate-y-0.5 text-center">
                         Agenda tu Consulta Gratis →
                       </Link>
-                      <Link to="/seguro-de-vida-iul" className="border-2 border-white text-white px-8 py-3.5 rounded-lg font-semibold text-[15px] no-underline hover:bg-white/10 transition-all text-center">
+                      <Link to="/seguro-de-vida-iul" className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold text-[15px] no-underline hover:bg-[#1d9fa9]/10 transition-all text-center">
                         ¿Cómo funciona el IUL?
                       </Link>
                     </div>
@@ -228,7 +228,7 @@ export default function HomePage() {
                 ].map((s, i) => (
                   <Anim key={i} delay={i * 0.1}>
                     <div className="text-center">
-                      <div className="text-2xl sm:text-4xl font-bold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>{s.v}</div>
+                      <div className="text-2xl sm:text-4xl font-bold text-[#1d9fa9]" style={{ fontFamily: "'Playfair Display', serif" }}>{s.v}</div>
                       <div className="text-[10px] sm:text-[11px] mt-1.5 tracking-wide" style={{ color: mutedColor }}>{s.l}</div>
                     </div>
                   </Anim>
@@ -378,7 +378,7 @@ export default function HomePage() {
 
                 <Anim delay={0.2}>
                   <div className="text-center mt-8">
-                    <Link to="/iul-vs-401k" className="inline-block bg-white text-[#1d9fa9] px-8 py-3.5 rounded-lg font-bold no-underline hover:shadow-lg transition-all">
+                    <Link to="/iul-vs-401k" className="inline-block bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-8 py-3.5 rounded-lg font-bold no-underline hover:shadow-lg transition-all">
                       Ver comparación completa IUL vs 401(k) →
                     </Link>
                   </div>
@@ -420,7 +420,7 @@ export default function HomePage() {
                   <div role="tabpanel" className={`${t.card} border rounded-2xl p-6 sm:p-10 text-center backdrop-blur-xl`}>
                     <h3 className="text-xl sm:text-2xl font-semibold text-[#1d9fa9] mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>{TABS[tab].t}</h3>
                     <p className="text-sm sm:text-[15px] leading-relaxed max-w-xl mx-auto" style={{ color: midColor }}>{TABS[tab].c}</p>
-                    <Link to="/contacto" className="inline-block mt-6 sm:mt-7 bg-white text-[#1d9fa9] px-8 py-3.5 rounded-lg font-bold no-underline hover:shadow-lg transition-all">
+                    <Link to="/contacto" className="inline-block mt-6 sm:mt-7 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-8 py-3.5 rounded-lg font-bold no-underline hover:shadow-lg transition-all">
                       Quiero mi plan personalizado →
                     </Link>
                   </div>
@@ -534,10 +534,10 @@ export default function HomePage() {
                     No importa si tienes SSN o ITIN. No importa si eres W-2 o 1099. Lo que importa es que hoy puedes dar el primer paso para proteger lo que más quieres.
                   </p>
                   <div className="flex flex-col sm:flex-row justify-center gap-3.5">
-                    <Link to="/contacto" className="bg-white text-[#1d9fa9] px-9 py-4 rounded-lg font-bold no-underline hover:shadow-xl transition-all text-center">
+                    <Link to="/contacto" className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-9 py-4 rounded-lg font-bold no-underline hover:shadow-xl transition-all text-center">
                       Agenda tu Consulta Gratis
                     </Link>
-                    <a href="tel:+16893082809" className="border-2 border-white text-white px-8 py-3.5 rounded-lg font-semibold no-underline hover:bg-white/10 transition-all inline-flex items-center justify-center gap-2">
+                    <a href="tel:+16893082809" className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold no-underline hover:bg-[#1d9fa9]/10 transition-all inline-flex items-center justify-center gap-2">
                       Llámanos ahora
                     </a>
                   </div>
