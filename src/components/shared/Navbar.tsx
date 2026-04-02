@@ -18,6 +18,7 @@ const NAV_LINKS = [
 
 export function Navbar({ t, dark, setDark }: NavbarProps) {
   const scrollY = useScrollY();
+  const navVisible = useScrollDirection();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
