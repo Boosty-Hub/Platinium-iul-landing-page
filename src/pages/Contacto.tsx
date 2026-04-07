@@ -47,9 +47,6 @@ export default function Contacto() {
 
           <LeadForm t={t} dark={dark} defaultInteres="Ahorro a largo plazo / retiro" />
 
-          <div className="px-6 pb-12">
-            <ContactBar t={t} />
-          </div>
 
           {/* MAP & OFFICES */}
           <section className={`${t.bg2} py-16 px-6`}>

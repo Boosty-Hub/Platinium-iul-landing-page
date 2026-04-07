@@ -178,7 +178,7 @@ export default function IULEmprendedores() {
           </section>
 
           <LeadForm t={t} dark={dark} defaultInteres="Proteger mi negocio" />
-          <div className="px-6 pb-12"><ContactBar t={t} /></div>
+          
         </>
       )}
     </Layout>
