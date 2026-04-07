@@ -160,10 +160,6 @@ export default function HomePage() {
                   <LeadForm t={t} dark={dark} inline defaultInteres="Ahorro a largo plazo / retiro" />
                 </div>
 
-                {/* Contact bar — works on all sizes */}
-                <div className="mt-6 lg:mt-8">
-                  <ContactBar t={t} compact />
-                </div>
 
                 {/* Insurance logos marquee */}
                 <div className="mt-6 lg:mt-10 overflow-hidden rounded-xl">
@@ -515,10 +511,6 @@ export default function HomePage() {
               </div>
             } />
 
-            {/* CONTACT BAR */}
-            <div className="px-4 sm:px-6 pb-10 lg:pb-12">
-              <ContactBar t={t} />
-            </div>
 
             {/* FINAL CTA */}
             <section className="py-14 lg:py-20 px-4 sm:px-6 text-center" aria-label="Llamado final">

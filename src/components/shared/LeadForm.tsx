@@ -216,7 +216,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 type="button"
                 disabled={!form.interes}
                 onClick={() => setStep(2)}
-                className="w-full mt-4 sm:mt-5 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3.5 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full mt-4 sm:mt-5 bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white py-3.5 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Continuar →
               </button>
@@ -246,7 +246,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                   type="button"
                   disabled={!form.anio_nacimiento || parseInt(form.anio_nacimiento) < 1940 || parseInt(form.anio_nacimiento) > 2007}
                   onClick={() => setStep(3)}
-                  className="sm:flex-1 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="sm:flex-1 bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Siguiente →
                 </button>
@@ -283,7 +283,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                   type="button"
                   disabled={!form.genero}
                   onClick={() => setStep(4)}
-                  className="sm:flex-1 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="sm:flex-1 bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Siguiente →
                 </button>
@@ -321,7 +321,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                   type="button"
                   disabled={!form.ahorro_semanal}
                   onClick={() => setStep(5)}
-                  className="sm:flex-1 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="sm:flex-1 bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Siguiente →
                 </button>
@@ -336,7 +336,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                   Si calificas, ¿te gustaría ver tus números personalizados?
                 </h3>
                 <div className="flex flex-col gap-3">
-                  <button type="button" onClick={() => setStep(6)} className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-4 rounded-xl font-bold text-base cursor-pointer hover:shadow-lg transition-all">
+                  <button type="button" onClick={() => setStep(6)} className="w-full bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white py-4 rounded-xl font-bold text-base cursor-pointer hover:shadow-lg transition-all">
                     Sí, quiero ver mis números →
                   </button>
                   <button type="button" onClick={() => setStep(4)} className="w-full py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
@@ -437,7 +437,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 <button
                   type="submit"
                   disabled={formState === "loading"}
-                  className="w-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base tracking-wide cursor-pointer hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base tracking-wide cursor-pointer hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {formState === "loading" ? "Enviando..." : formState === "error" ? "Reintentar →" : "Ver mis números personalizados →"}
                 </button>
@@ -464,15 +464,26 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
           <p className="text-sm mb-5" style={{ color: mutedColor }}>
             O si desea recibir aún más rápido su presupuesto:
           </p>
-          <a
-            href="tel:+16893082809"
-            className="inline-flex items-center justify-center gap-2 bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-8 py-4 rounded-xl font-bold text-base no-underline hover:shadow-lg transition-all"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
-            </svg>
-            Llamar Ahora
-          </a>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a
+              href="tel:+16893082809"
+              className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white px-8 py-4 rounded-xl font-bold text-base no-underline hover:shadow-lg transition-all"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+              </svg>
+              Llamar Ahora
+            </a>
+            <a
+              href="https://wa.me/17866787863"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 border-2 border-[#25D366] text-[#25D366] px-8 py-4 rounded-xl font-bold text-base no-underline hover:bg-[#25D366]/10 transition-all"
+            >
+              <WhatsAppIcon />
+              WhatsApp
+            </a>
+          </div>
         </div>
       )}
     </div>

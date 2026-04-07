@@ -194,7 +194,7 @@ export default function SeguroSinExamen() {
           </section>
 
           <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" />
-          <div className="px-6 pb-12"><ContactBar t={t} /></div>
+          
         </>
       )}
     </Layout>
