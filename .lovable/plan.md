@@ -1,21 +1,26 @@
 
 
-## Bloqueo geográfico estricto — Solo EE.UU.
+## Cambios en el formulario — Botón de llamada y color naranja
 
-Actualmente el componente `GeoGate` muestra un overlay para visitantes fuera de EE.UU. pero permite continuar con un botón "Soy residente de EE.UU., continuar →". El usuario quiere eliminar esa posibilidad y bloquear completamente el acceso.
+### 1. Ocultar ContactBar antes del formulario completado
 
-### Cambios en `src/components/shared/GeoGate.tsx`
+Actualmente el `<ContactBar>` aparece justo debajo del `<LeadForm>` en todas las páginas, visible siempre. El cambio es **mover el botón de llamada al interior del formulario**, mostrándolo solo en el estado `success`.
 
-1. **Eliminar el estado `dismissed`** y el botón que lo activa — ya no habrá forma de cerrar el overlay.
-2. **Eliminar `sessionStorage`** — cada visita verificará la ubicación (evita que alguien guarde el bypass en caché).
-3. **Si el país NO es US, mostrar pantalla de bloqueo permanente** sin botón de continuar. Solo texto informativo.
-4. **Mientras se verifica la ubicación**, mostrar una pantalla de carga mínima (spinner o blank) para evitar flash de contenido antes de confirmar que es US.
-5. **Si el servicio de geo falla**, permitir acceso (fallback permisivo para no bloquear usuarios legítimos por error del API).
+**En todas las páginas** (Index, Contacto, ProteccionFamiliar, SeguroVidaIUL, BeneficiosEnVida, IULParaJubilacion, IULParaIndocumentados, IULEmprendedores, SeguroSinExamen, IULvs401k):
+- Eliminar `<div className="px-6 pb-12"><ContactBar t={t} /></div>` que aparece debajo del `<LeadForm>`.
 
-### Pantalla de bloqueo (sin escape)
+**En `LeadForm.tsx`** (estado success, líneas 456-477):
+- Mantener el botón "Llamar Ahora" que ya existe en el estado success — este se queda.
+- Agregar también el botón de WhatsApp del ContactBar en el estado success para no perder esa opción.
 
-- Mismo estilo visual actual (overlay oscuro, card blanca centrada)
-- Emoji 🇺🇸, título, texto explicativo
-- **Sin botón** — el usuario simplemente no puede continuar
-- Texto adicional: "Si crees que esto es un error, contáctanos a [email/teléfono]" para dar una salida humana
+### 2. Botones "Continuar" y "Llamar" en color naranja
+
+**En `LeadForm.tsx`**:
+- Cambiar todos los botones de acción (Continuar, Siguiente, "Sí quiero ver mis números", submit, y "Llamar Ahora" en success) del gradiente teal actual (`from-[#1d9fa9] to-[#177D85]`) a un gradiente naranja: `from-[#F97316] to-[#EA580C]`.
+- Esto afecta los botones en los pasos 1-6 y el botón de llamar post-envío.
+- Los botones "Atrás" mantienen su estilo actual (outline gris).
+
+### Archivos a modificar
+- `src/components/shared/LeadForm.tsx` — gradiente naranja + WhatsApp en success
+- 10 páginas — eliminar `<ContactBar>` debajo del form
 
