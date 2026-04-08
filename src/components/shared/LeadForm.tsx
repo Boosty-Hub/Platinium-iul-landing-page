@@ -333,11 +333,11 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
               <div className="text-center">
                 <div className="text-4xl sm:text-5xl mb-4">🎯</div>
                 <h3 className="text-base sm:text-xl font-bold mb-5 sm:mb-7" style={{ color: textColor }}>
-                  Si calificas, ¿te gustaría ver tus números personalizados?
+                  Si calificas, ¿te gustaría ver tu presupuesto personalizado?
                 </h3>
                 <div className="flex flex-col gap-3">
                   <button type="button" onClick={() => setStep(6)} className="w-full bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white py-4 rounded-xl font-bold text-base cursor-pointer hover:shadow-lg transition-all">
-                    Sí, quiero ver mis números →
+                    Sí, quiero ver mi presupuesto →
                   </button>
                   <button type="button" onClick={() => setStep(4)} className="w-full py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
                     ← Atrás
