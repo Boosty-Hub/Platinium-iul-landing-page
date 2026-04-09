@@ -156,7 +156,7 @@ export default function HomePage() {
 
                 {/* Mobile: form below hero text */}
                 <div className="lg:hidden">
-                  <h1 className="sr-only">Seguro de Vida IUL — Protege a Tu Familia y Construye Riqueza</h1>
+                  <span className="sr-only">Seguro de Vida IUL — Protege a Tu Familia y Construye Riqueza</span>
                   <LeadForm t={t} dark={dark} inline defaultInteres="Ahorro a largo plazo / retiro" />
                 </div>
 
