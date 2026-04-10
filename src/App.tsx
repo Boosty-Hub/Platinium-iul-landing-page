@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { lazy, Suspense } from "react";
 import { GeoGate } from "@/components/shared/GeoGate";
+import { CookieBanner } from "@/components/shared/CookieBanner";
 
 const Index = lazy(() => import("./pages/Index.tsx"));
 const SeguroVidaIUL = lazy(() => import("./pages/SeguroVidaIUL.tsx"));
