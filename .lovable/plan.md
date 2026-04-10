@@ -1,26 +1,52 @@
 
 
-## Cambios en el formulario — Botón de llamada y color naranja
+## Banner de cookies + Página de Política de Privacidad
 
-### 1. Ocultar ContactBar antes del formulario completado
+### 1. Crear página `/politica-de-privacidad`
 
-Actualmente el `<ContactBar>` aparece justo debajo del `<LeadForm>` en todas las páginas, visible siempre. El cambio es **mover el botón de llamada al interior del formulario**, mostrándolo solo en el estado `success`.
+Nueva página `src/pages/PoliticaPrivacidad.tsx` con contenido legal completo en español, adaptado a:
+- **Marca**: Platinium Insurance Group, agencia de seguros de vida IUL
+- **Ubicación**: Miami FL, con oficinas en Orlando y Houston
+- **Leyes aplicables**: Ley federal de EE.UU. (no hay ley federal única de privacidad, pero se cubren estándares de la industria), CCPA/CPRA (California), y buenas prácticas generales
+- **Contacto**: info@platiniuminsuranceusa.com, (689) 308-2809
 
-**En todas las páginas** (Index, Contacto, ProteccionFamiliar, SeguroVidaIUL, BeneficiosEnVida, IULParaJubilacion, IULParaIndocumentados, IULEmprendedores, SeguroSinExamen, IULvs401k):
-- Eliminar `<div className="px-6 pb-12"><ContactBar t={t} /></div>` que aparece debajo del `<LeadForm>`.
+Secciones del contenido:
+- Información que recopilamos (nombre, teléfono, edad, datos del formulario de cotización)
+- Cómo usamos la información (contactar al usuario, cotizaciones, CRM/Kommo)
+- Cookies y tecnologías de rastreo (Google Tag Manager, analytics)
+- Compartición con terceros (aseguradoras, CRM)
+- Derechos del usuario (acceso, eliminación, opt-out)
+- Seguridad de datos
+- Menores de edad
+- Cambios a la política
+- Contacto
 
-**En `LeadForm.tsx`** (estado success, líneas 456-477):
-- Mantener el botón "Llamar Ahora" que ya existe en el estado success — este se queda.
-- Agregar también el botón de WhatsApp del ContactBar en el estado success para no perder esa opción.
+Usará `Layout` y `SEOHead` como las demás páginas. Estilo visual consistente con el resto del sitio.
 
-### 2. Botones "Continuar" y "Llamar" en color naranja
+### 2. Crear banner de cookies `src/components/shared/CookieBanner.tsx`
 
-**En `LeadForm.tsx`**:
-- Cambiar todos los botones de acción (Continuar, Siguiente, "Sí quiero ver mis números", submit, y "Llamar Ahora" en success) del gradiente teal actual (`from-[#1d9fa9] to-[#177D85]`) a un gradiente naranja: `from-[#F97316] to-[#EA580C]`.
-- Esto afecta los botones en los pasos 1-6 y el botón de llamar post-envío.
-- Los botones "Atrás" mantienen su estilo actual (outline gris).
+- Banner fijo en la parte inferior de la pantalla (similar al de la imagen de referencia)
+- Texto: "Usamos cookies para mejorar tu experiencia y mantener tus datos seguros."
+- Link a "Política de Privacidad" (`/politica-de-privacidad`)
+- Botón "Aceptar" (estilo primario)
+- Botón secundario "Gestionar preferencias" (texto link)
+- Se guarda la preferencia en `localStorage` para no volver a mostrar
+- Glassmorphism card style consistente con el design system
 
-### Archivos a modificar
-- `src/components/shared/LeadForm.tsx` — gradiente naranja + WhatsApp en success
-- 10 páginas — eliminar `<ContactBar>` debajo del form
+### 3. Integrar en App.tsx
+
+- Agregar ruta `/politica-de-privacidad` 
+- Renderizar `<CookieBanner />` a nivel global (dentro del BrowserRouter pero fuera de Routes)
+
+### 4. Agregar link en Footer
+
+- Añadir enlace "Política de Privacidad" en la sección inferior del footer, junto al copyright
+
+### 5. Actualizar sitemap y llms.txt
+
+- Agregar `/politica-de-privacidad` al sitemap.xml y al llms.txt
+
+### Archivos a crear/modificar
+- **Crear**: `src/pages/PoliticaPrivacidad.tsx`, `src/components/shared/CookieBanner.tsx`
+- **Modificar**: `src/App.tsx` (ruta + banner), `src/components/shared/Footer.tsx` (link), `public/sitemap.xml`, `public/llms.txt`
 
