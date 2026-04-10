@@ -81,8 +81,11 @@ export function Footer({ t }: FooterProps) {
           </div>
         </div>
 
-        <div className={`${t.divider} border-t pt-5 mt-10 flex flex-col sm:flex-row justify-between gap-3`}>
-          <p className={`text-[11px] ${t.textMuted} opacity-60`}>© {new Date().getFullYear()} Platinium Insurance Group. Todos los derechos reservados.</p>
+        <div className={`${t.divider} border-t pt-5 mt-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3`}>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <p className={`text-[11px] ${t.textMuted} opacity-60`}>© {new Date().getFullYear()} Platinium Insurance Group. Todos los derechos reservados.</p>
+            <Link to="/politica-de-privacidad" className={`text-[11px] ${t.textMuted} opacity-60 hover:text-[#1d9fa9] transition-colors no-underline`}>Política de Privacidad</Link>
+          </div>
           <p className={`text-[10px] ${t.textMuted} opacity-50 max-w-lg`}>
             Descargo: Este sitio es informativo y no constituye asesoría financiera, legal o fiscal. El IUL es un producto de seguro, no una inversión regulada por la SEC. Consulte con un asesor licenciado.
           </p>
