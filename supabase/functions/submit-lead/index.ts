@@ -170,6 +170,7 @@ serve(async (req) => {
         utm_content: leadData.utm_content || null,
         utm_term: leadData.utm_term || null,
         notas: leadData.notas,
+        gclid: leadData.gclid || null,
         created_at,
       };
 
