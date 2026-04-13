@@ -213,6 +213,42 @@ export default function HomePage() {
               </div>
             </section>
 
+            {/* VIDEO SECTION */}
+            <section className={`${t.bg2} py-16 sm:py-24`}>
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+                <Anim>
+                  <h2 className="text-2xl sm:text-4xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
+                    Ahorra para ti y tu familia, no para el gobierno
+                  </h2>
+                  <p className="text-sm sm:text-base mb-8 max-w-2xl mx-auto" style={{ color: mutedColor, fontFamily: "'DM Sans', sans-serif" }}>
+                    Descubre cómo una planificación financiera con la estructura correcta puede proteger tu patrimonio y el futuro de los tuyos.
+                  </p>
+                </Anim>
+                <Anim delay={0.15}>
+                  <div className="max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-xl">
+                    <video
+                      controls
+                      preload="metadata"
+                      className="w-full"
+                      playsInline
+                    >
+                      <source src="/videos/ahorro-planificacion.mp4" type="video/mp4" />
+                      Tu navegador no soporta el elemento de video.
+                    </video>
+                  </div>
+                </Anim>
+                <Anim delay={0.3}>
+                  <a
+                    href="#lead-form"
+                    className="inline-flex items-center justify-center mt-8 px-8 py-3.5 rounded-full text-white font-semibold text-base shadow-lg bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:shadow-xl hover:scale-105 transition-all duration-200"
+                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    Quiero mi presupuesto personalizado
+                  </a>
+                </Anim>
+              </div>
+            </section>
+
             {/* STATS BAR */}
             <section className={`${t.bg2} ${t.divider} border-y`} aria-label="Estadísticas del mercado">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-11 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-4">
