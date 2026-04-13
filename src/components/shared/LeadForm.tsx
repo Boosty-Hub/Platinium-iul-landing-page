@@ -50,11 +50,11 @@ function validatePhone(rawPhone: string, countryCode: string): { valid: boolean;
 
 function getUTMParams(): Record<string, string> {
   const params = new URLSearchParams(window.location.search);
-  const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+  const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid"];
   const result: Record<string, string> = {};
   utmKeys.forEach((key) => {
     const val = params.get(key);
-    if (val) result[key] = val.slice(0, 100);
+    if (val) result[key] = val.slice(0, 200);
   });
   return result;
 }
