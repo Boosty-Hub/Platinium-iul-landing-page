@@ -215,36 +215,54 @@ export default function HomePage() {
 
             {/* VIDEO SECTION */}
             <section className={`${t.bg2} py-16 sm:py-24`}>
-              <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-                <Anim>
-                  <h2 className="text-2xl sm:text-4xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col lg:flex-row items-center gap-10 lg:gap-14">
+                {/* Left column - content */}
+                <Anim className="lg:w-[35%] text-center lg:text-left">
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
                     Ahorra para ti y tu familia, no para el gobierno
                   </h2>
-                  <p className="text-sm sm:text-base mb-8 max-w-2xl mx-auto" style={{ color: mutedColor, fontFamily: "'DM Sans', sans-serif" }}>
-                    Descubre cómo una planificación financiera con la estructura correcta puede proteger tu patrimonio y el futuro de los tuyos.
+                  <p className="text-sm sm:text-base mb-4" style={{ color: mutedColor, fontFamily: "'DM Sans', sans-serif" }}>
+                    ¿Sabías que la mayoría de las personas pagan más impuestos de los necesarios por no tener la estructura correcta?
                   </p>
+                  <p className="text-sm sm:text-base mb-4" style={{ color: mutedColor, fontFamily: "'DM Sans', sans-serif" }}>
+                    Con una planificación financiera adecuada puedes hacer crecer tu dinero con ventajas fiscales, proteger a tu familia y construir un retiro libre de impuestos.
+                  </p>
+                  <ul className="space-y-2.5 mb-6 text-left" style={{ color: mutedColor, fontFamily: "'DM Sans', sans-serif" }}>
+                    {[
+                      "Crecimiento libre de impuestos",
+                      "Piso garantizado del 0% en caídas de mercado",
+                      "Acceso a tu dinero sin penalidades",
+                      "Beneficio en vida para tu familia",
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm sm:text-base">
+                        <span className="text-[#1d9fa9] mt-0.5 shrink-0">✓</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href="#lead-form"
+                    className="inline-flex items-center justify-center px-8 py-3.5 rounded-full text-white font-semibold text-base shadow-lg bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:shadow-xl hover:scale-105 transition-all duration-200"
+                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    Quiero mi presupuesto
+                  </a>
                 </Anim>
-                <Anim delay={0.15}>
-                  <div className="max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-xl">
+
+                {/* Right column - video */}
+                <Anim delay={0.15} className="lg:w-[65%] w-full">
+                  <div className="rounded-2xl overflow-hidden shadow-xl" style={{ maxHeight: 550 }}>
                     <video
                       controls
                       preload="metadata"
-                      className="w-full"
+                      className="w-full h-full object-cover"
+                      style={{ maxHeight: 550 }}
                       playsInline
                     >
                       <source src="/videos/ahorro-planificacion.mp4" type="video/mp4" />
                       Tu navegador no soporta el elemento de video.
                     </video>
                   </div>
-                </Anim>
-                <Anim delay={0.3}>
-                  <a
-                    href="#lead-form"
-                    className="inline-flex items-center justify-center mt-8 px-8 py-3.5 rounded-full text-white font-semibold text-base shadow-lg bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:shadow-xl hover:scale-105 transition-all duration-200"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
-                  >
-                    Quiero mi presupuesto personalizado
-                  </a>
                 </Anim>
               </div>
             </section>
