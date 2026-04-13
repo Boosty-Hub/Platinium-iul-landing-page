@@ -1,52 +1,29 @@
 
 
-## Banner de cookies + Página de Política de Privacidad
+## Nueva sección de video debajo de "Descubre más"
 
-### 1. Crear página `/politica-de-privacidad`
+### Resumen
 
-Nueva página `src/pages/PoliticaPrivacidad.tsx` con contenido legal completo en español, adaptado a:
-- **Marca**: Platinium Insurance Group, agencia de seguros de vida IUL
-- **Ubicación**: Miami FL, con oficinas en Orlando y Houston
-- **Leyes aplicables**: Ley federal de EE.UU. (no hay ley federal única de privacidad, pero se cubren estándares de la industria), CCPA/CPRA (California), y buenas prácticas generales
-- **Contacto**: info@platiniuminsuranceusa.com, (689) 308-2809
+Agregar una sección con el video subido por el usuario entre el bloque "Descubre más" (línea ~214) y la sección "STATS BAR" (línea ~216) en `Index.tsx`. La sección incluirá el video con un título contextual, descripción breve y un CTA que scrollea al formulario.
 
-Secciones del contenido:
-- Información que recopilamos (nombre, teléfono, edad, datos del formulario de cotización)
-- Cómo usamos la información (contactar al usuario, cotizaciones, CRM/Kommo)
-- Cookies y tecnologías de rastreo (Google Tag Manager, analytics)
-- Compartición con terceros (aseguradoras, CRM)
-- Derechos del usuario (acceso, eliminación, opt-out)
-- Seguridad de datos
-- Menores de edad
-- Cambios a la política
-- Contacto
+### Cambios
 
-Usará `Layout` y `SEOHead` como las demás páginas. Estilo visual consistente con el resto del sitio.
+**1. Copiar el video al proyecto**
+- Copiar `user-uploads://document_5103092790338783902_1.mp4` a `public/videos/ahorro-planificacion.mp4`
 
-### 2. Crear banner de cookies `src/components/shared/CookieBanner.tsx`
+**2. Modificar `src/pages/Index.tsx`**
 
-- Banner fijo en la parte inferior de la pantalla (similar al de la imagen de referencia)
-- Texto: "Usamos cookies para mejorar tu experiencia y mantener tus datos seguros."
-- Link a "Política de Privacidad" (`/politica-de-privacidad`)
-- Botón "Aceptar" (estilo primario)
-- Botón secundario "Gestionar preferencias" (texto link)
-- Se guarda la preferencia en `localStorage` para no volver a mostrar
-- Glassmorphism card style consistente con el design system
+Insertar una nueva sección después de la línea 214 (cierre de la sección hero/descubre más) y antes de la sección STATS BAR:
 
-### 3. Integrar en App.tsx
+- Fondo alternado (`t.bg2`) para separar visualmente del hero
+- Título: "Ahorra para ti y tu familia, no para el gobierno"
+- Subtítulo breve sobre planificación financiera con estructura correcta
+- Video con `<video>` nativo (controls, poster frame auto, rounded corners, max-width)
+- Botón CTA naranja (mismo gradiente `from-[#F97316] to-[#EA580C]`) con anchor link `#lead-form` que scrollea al formulario
+- Todo envuelto en `<Anim>` para consistencia visual
 
-- Agregar ruta `/politica-de-privacidad` 
-- Renderizar `<CookieBanner />` a nivel global (dentro del BrowserRouter pero fuera de Routes)
-
-### 4. Agregar link en Footer
-
-- Añadir enlace "Política de Privacidad" en la sección inferior del footer, junto al copyright
-
-### 5. Actualizar sitemap y llms.txt
-
-- Agregar `/politica-de-privacidad` al sitemap.xml y al llms.txt
-
-### Archivos a crear/modificar
-- **Crear**: `src/pages/PoliticaPrivacidad.tsx`, `src/components/shared/CookieBanner.tsx`
-- **Modificar**: `src/App.tsx` (ruta + banner), `src/components/shared/Footer.tsx` (link), `public/sitemap.xml`, `public/llms.txt`
+### Estilo visual
+- Consistente con el design system existente (Playfair Display para títulos, DM Sans para cuerpo, gradiente naranja para CTA)
+- Video centrado con `max-w-3xl`, bordes redondeados y sombra sutil
+- Responsive: video ocupa 100% en mobile
 
