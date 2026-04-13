@@ -218,8 +218,8 @@ export default function HomePage() {
               <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col lg:flex-row items-center gap-10 lg:gap-14">
                 {/* Left column - content */}
                 <Anim className="lg:w-[35%] text-center lg:text-left">
-                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
-                    Ahorra para ti y tu familia, no para el gobierno
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-normal leading-tight mb-4" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
+                    Ahorra para ti y tu familia, <em style={{ color: "#1d9fa9" }}>no para el gobierno</em>
                   </h2>
                   <p className="text-sm sm:text-base mb-4" style={{ color: mutedColor, fontFamily: "'DM Sans', sans-serif" }}>
                     ¿Sabías que la mayoría de las personas pagan más impuestos de los necesarios por no tener la estructura correcta?
