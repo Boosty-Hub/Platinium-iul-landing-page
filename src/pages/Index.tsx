@@ -161,8 +161,67 @@ export default function HomePage() {
                 </div>
 
 
-                {/* Insurance logos marquee */}
-                <div className="mt-6 lg:mt-10 overflow-hidden rounded-xl">
+              </div>
+            </section>
+
+            {/* VIDEO SECTION */}
+            <section className={`${t.bg2} py-16 sm:py-24`}>
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col lg:flex-row items-center gap-10 lg:gap-14">
+                {/* Left column - content */}
+                <Anim className="lg:w-[35%] text-center lg:text-left">
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-normal leading-tight mb-4" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
+                    Ahorra para ti y tu familia, <em style={{ color: "#1d9fa9" }}>no para el gobierno</em>
+                  </h2>
+                  <p className="text-sm sm:text-base mb-4" style={{ color: mutedColor, fontFamily: "'DM Sans', sans-serif" }}>
+                    ¿Sabías que la mayoría de las personas pagan más impuestos de los necesarios por no tener la estructura correcta?
+                  </p>
+                  <p className="text-sm sm:text-base mb-4" style={{ color: mutedColor, fontFamily: "'DM Sans', sans-serif" }}>
+                    Con una planificación financiera adecuada puedes hacer crecer tu dinero con ventajas fiscales, proteger a tu familia y construir un retiro libre de impuestos.
+                  </p>
+                  <ul className="space-y-2.5 mb-6 text-left" style={{ color: mutedColor, fontFamily: "'DM Sans', sans-serif" }}>
+                    {[
+                      "Crecimiento libre de impuestos",
+                      "Piso garantizado del 0% en caídas de mercado",
+                      "Acceso a tu dinero sin penalidades",
+                      "Beneficio en vida para tu familia",
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm sm:text-base">
+                        <span className="text-[#1d9fa9] mt-0.5 shrink-0">✓</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href="#lead-form"
+                    className="inline-flex items-center justify-center px-8 py-3.5 rounded-full text-white font-semibold text-base shadow-lg bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:shadow-xl hover:scale-105 transition-all duration-200"
+                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    Quiero mi presupuesto
+                  </a>
+                </Anim>
+
+                {/* Right column - video */}
+                <Anim delay={0.15} className="lg:w-[65%] w-full">
+                  <div className="rounded-2xl overflow-hidden shadow-xl flex justify-center">
+                    <video
+                      controls
+                      preload="metadata"
+                      className="w-full rounded-2xl"
+                      style={{ maxHeight: 700 }}
+                      playsInline
+                    >
+                      <source src="/videos/ahorro-planificacion.mp4" type="video/mp4" />
+                      Tu navegador no soporta el elemento de video.
+                    </video>
+                  </div>
+                </Anim>
+              </div>
+            </section>
+
+            {/* Insurance logos marquee */}
+            <section aria-label="Aseguradoras aliadas">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+                <div className="overflow-hidden rounded-xl">
                   <div className="flex items-center" style={{ animation: "marquee 30s linear infinite", width: "max-content" }}>
                     {[...INSURANCE_LOGOS, ...INSURANCE_LOGOS].map((logo, i) => (
                       <div key={i} className={`flex items-center justify-center mx-4 sm:mx-8 shrink-0 h-10 sm:h-16 ${dark ? "opacity-70 hover:opacity-100" : "opacity-60 hover:opacity-100"} transition-opacity`}>
@@ -170,9 +229,14 @@ export default function HomePage() {
                       </div>
                     ))}
                   </div>
+                  </div>
                 </div>
+              </div>
+            </section>
 
-                {/* Offices & Hours */}
+            {/* Offices & Hours */}
+            <section className="px-4 sm:px-6 pb-8">
+              <div className="max-w-7xl mx-auto">
                 <div className={`mt-6 lg:mt-10 ${t.card} border rounded-2xl p-4 sm:p-8 backdrop-blur-xl max-w-6xl mx-auto`}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
                     <div>
