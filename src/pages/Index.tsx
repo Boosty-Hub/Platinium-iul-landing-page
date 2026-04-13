@@ -251,11 +251,12 @@ export default function HomePage() {
 
                 {/* Right column - video */}
                 <Anim delay={0.15} className="lg:w-[65%] w-full">
-                  <div className="rounded-2xl overflow-hidden shadow-xl">
+                  <div className="rounded-2xl overflow-hidden shadow-xl flex justify-center">
                     <video
                       controls
                       preload="metadata"
                       className="w-full rounded-2xl"
+                      style={{ maxHeight: 700 }}
                       playsInline
                     >
                       <source src="/videos/ahorro-planificacion.mp4" type="video/mp4" />
