@@ -66,6 +66,8 @@ function validateLead(body: Record<string, unknown>): { valid: boolean; error?: 
     utms[key] = val ? String(val).trim().slice(0, 200) : null;
   }
 
+  const gclid = body.gclid ? String(body.gclid).trim().slice(0, 500) : null;
+
   return {
     valid: true,
     data: {
@@ -79,6 +81,7 @@ function validateLead(body: Record<string, unknown>): { valid: boolean; error?: 
       ahorro_semanal: ahorro,
       genero,
       notas,
+      gclid,
       ...utms,
     },
   };
@@ -167,6 +170,7 @@ serve(async (req) => {
         utm_content: leadData.utm_content || null,
         utm_term: leadData.utm_term || null,
         notas: leadData.notas,
+        gclid: leadData.gclid || null,
         created_at,
       };
 

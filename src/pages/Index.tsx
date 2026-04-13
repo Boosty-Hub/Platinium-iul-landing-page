@@ -161,55 +161,6 @@ export default function HomePage() {
                 </div>
 
 
-                {/* Insurance logos marquee */}
-                <div className="mt-6 lg:mt-10 overflow-hidden rounded-xl">
-                  <div className="flex items-center" style={{ animation: "marquee 30s linear infinite", width: "max-content" }}>
-                    {[...INSURANCE_LOGOS, ...INSURANCE_LOGOS].map((logo, i) => (
-                      <div key={i} className={`flex items-center justify-center mx-4 sm:mx-8 shrink-0 h-10 sm:h-16 ${dark ? "opacity-70 hover:opacity-100" : "opacity-60 hover:opacity-100"} transition-opacity`}>
-                        <img src={logo.src} alt={logo.alt} className={`h-8 sm:h-12 w-auto max-w-[100px] sm:max-w-[140px] object-contain ${dark ? "brightness-0 invert" : ""}`} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Offices & Hours */}
-                <div className={`mt-6 lg:mt-10 ${t.card} border rounded-2xl p-4 sm:p-8 backdrop-blur-xl max-w-6xl mx-auto`}>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
-                    <div>
-                      <h4 className="text-[11px] tracking-[2px] uppercase mb-3 font-bold" style={{ color: "#1d9fa9" }}>📍 Oficinas</h4>
-                      <div className="space-y-3 text-sm leading-relaxed">
-                        {[
-                          { city: "Miami, FL (Central)", addr: "5775 Waterford District Dr #170, Miami, FL 33126" },
-                          { city: "Orlando, FL", addr: "13550 Village Park Dr, Orlando, FL 32837" },
-                          { city: "Houston, TX", addr: "16225 Park Ten Place, Of. 475, 4to Piso, Houston, TX 77084" },
-                        ].map((o, i) => (
-                          <div key={i}>
-                            <p className="font-semibold" style={{ color: "#1d9fa9" }}>{o.city}</p>
-                            <p style={{ color: mutedColor }}>{o.addr}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="text-[11px] tracking-[2px] uppercase mb-3 font-bold" style={{ color: "#1d9fa9" }}>🕒 Horarios de Atención</h4>
-                      <div className="text-sm leading-relaxed space-y-1" style={{ color: mutedColor }}>
-                        <p>Lunes a Viernes: 10:00 A.M. a 5:00 P.M.</p>
-                        <p>Sábado: Cerrado</p>
-                        <p>Domingo: Cerrado</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Discover more */}
-                <div className="flex items-center justify-center mt-6 lg:mt-14">
-                  <div className="flex flex-col items-center gap-2 animate-bounce">
-                    <span className="text-[10px] tracking-[2px] uppercase" style={{ color: mutedColor }}>Descubre más</span>
-                    <svg className="w-5 h-5 text-[#1d9fa9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
-                    </svg>
-                  </div>
-                </div>
               </div>
             </section>
 
@@ -264,6 +215,64 @@ export default function HomePage() {
                     </video>
                   </div>
                 </Anim>
+              </div>
+            </section>
+
+            {/* Insurance logos marquee */}
+            <section aria-label="Aseguradoras aliadas">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+                <div className="overflow-hidden rounded-xl">
+                  <div className="flex items-center" style={{ animation: "marquee 30s linear infinite", width: "max-content" }}>
+                    {[...INSURANCE_LOGOS, ...INSURANCE_LOGOS].map((logo, i) => (
+                      <div key={i} className={`flex items-center justify-center mx-4 sm:mx-8 shrink-0 h-10 sm:h-16 ${dark ? "opacity-70 hover:opacity-100" : "opacity-60 hover:opacity-100"} transition-opacity`}>
+                        <img src={logo.src} alt={logo.alt} className={`h-8 sm:h-12 w-auto max-w-[100px] sm:max-w-[140px] object-contain ${dark ? "brightness-0 invert" : ""}`} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Offices & Hours */}
+            <section className="px-4 sm:px-6 pb-8">
+              <div className="max-w-6xl mx-auto">
+                <div className={`${t.card} border rounded-2xl p-4 sm:p-8 backdrop-blur-xl`}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
+                    <div>
+                      <h4 className="text-[11px] tracking-[2px] uppercase mb-3 font-bold" style={{ color: "#1d9fa9" }}>📍 Oficinas</h4>
+                      <div className="space-y-3 text-sm leading-relaxed">
+                        {[
+                          { city: "Miami, FL (Central)", addr: "5775 Waterford District Dr #170, Miami, FL 33126" },
+                          { city: "Orlando, FL", addr: "13550 Village Park Dr, Orlando, FL 32837" },
+                          { city: "Houston, TX", addr: "16225 Park Ten Place, Of. 475, 4to Piso, Houston, TX 77084" },
+                        ].map((o, i) => (
+                          <div key={i}>
+                            <p className="font-semibold" style={{ color: "#1d9fa9" }}>{o.city}</p>
+                            <p style={{ color: mutedColor }}>{o.addr}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="text-[11px] tracking-[2px] uppercase mb-3 font-bold" style={{ color: "#1d9fa9" }}>🕒 Horarios de Atención</h4>
+                      <div className="text-sm leading-relaxed space-y-1" style={{ color: mutedColor }}>
+                        <p>Lunes a Viernes: 10:00 A.M. a 5:00 P.M.</p>
+                        <p>Sábado: Cerrado</p>
+                        <p>Domingo: Cerrado</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Discover more */}
+                <div className="flex items-center justify-center mt-6 lg:mt-14">
+                  <div className="flex flex-col items-center gap-2 animate-bounce">
+                    <span className="text-[10px] tracking-[2px] uppercase" style={{ color: mutedColor }}>Descubre más</span>
+                    <svg className="w-5 h-5 text-[#1d9fa9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
+                    </svg>
+                  </div>
+                </div>
               </div>
             </section>
 
