@@ -1,29 +1,31 @@
 
 
-## Nueva sección de video debajo de "Descubre más"
+## Landing "Link in Bio" para Platinium Insurance
 
 ### Resumen
+Crear una página standalone en `/links` estilo Linktree, sin navbar ni footer, con la marca Platinium Insurance adaptada al design system existente (teal + naranja). Optimizada para mobile-first pero con vista desktop contenida (max-width ~480px centrado).
 
-Agregar una sección con el video subido por el usuario entre el bloque "Descubre más" (línea ~214) y la sección "STATS BAR" (línea ~216) en `Index.tsx`. La sección incluirá el video con un título contextual, descripción breve y un CTA que scrollea al formulario.
+### Página: `src/pages/Links.tsx`
 
-### Cambios
+**Estructura visual (inspirada en la referencia):**
+- Fondo con gradiente oscuro (teal oscuro → negro) fullscreen
+- Logo circular de la marca (`/logo.png`) centrado arriba
+- Nombre: "Platinium Insurance Group"
+- Subtítulo: "Seguros de Vida IUL · Asesoría en Español"
+- Iconos de redes sociales (Instagram, WhatsApp, teléfono)
+- 4 botones apilados con bordes redondeados y estilo semi-transparente:
+  1. **💬 Chatear con un Asesor** → WhatsApp link (`https://wa.me/17866787863`)
+  2. **📞 Llamar AHORA!** → `tel:+16893082809`
+  3. **📊 Cotizar tu Proyección** → `/contacto` (o `#lead-form` en index)
+  4. **📍 Oficinas** → `/contacto` con scroll a oficinas
 
-**1. Copiar el video al proyecto**
-- Copiar `user-uploads://document_5103092790338783902_1.mp4` a `public/videos/ahorro-planificacion.mp4`
+**Diseño desktop:** Contenedor centrado con `max-w-md` (448px) para que los botones no se estiren. Fondo cubre toda la pantalla.
 
-**2. Modificar `src/pages/Index.tsx`**
+### Ruta: `src/App.tsx`
+- Agregar ruta `/links` con lazy import
+- No aparece en navbar ni footer (accesible solo por URL directa)
 
-Insertar una nueva sección después de la línea 214 (cierre de la sección hero/descubre más) y antes de la sección STATS BAR:
-
-- Fondo alternado (`t.bg2`) para separar visualmente del hero
-- Título: "Ahorra para ti y tu familia, no para el gobierno"
-- Subtítulo breve sobre planificación financiera con estructura correcta
-- Video con `<video>` nativo (controls, poster frame auto, rounded corners, max-width)
-- Botón CTA naranja (mismo gradiente `from-[#F97316] to-[#EA580C]`) con anchor link `#lead-form` que scrollea al formulario
-- Todo envuelto en `<Anim>` para consistencia visual
-
-### Estilo visual
-- Consistente con el design system existente (Playfair Display para títulos, DM Sans para cuerpo, gradiente naranja para CTA)
-- Video centrado con `max-w-3xl`, bordes redondeados y sombra sutil
-- Responsive: video ocupa 100% en mobile
+### Archivos
+- **Crear**: `src/pages/Links.tsx`
+- **Modificar**: `src/App.tsx` (agregar ruta)
 
