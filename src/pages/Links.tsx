@@ -38,10 +38,8 @@ export default function Links() {
     >
       <div className="w-full max-w-md flex flex-col items-center gap-6">
         {/* Avatar / Logo */}
-        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#1d9fa9] to-[#177D85] flex items-center justify-center shadow-lg shadow-[#1d9fa9]/20 ring-2 ring-[#1d9fa9]/30">
-          <span className="text-3xl font-bold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
-            P
-          </span>
+        <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg shadow-[#1d9fa9]/20 ring-2 ring-[#1d9fa9]/30">
+          <img src="/logo.png" alt="Platinium Insurance Group" className="w-full h-full object-cover" />
         </div>
 
         {/* Name & subtitle */}
