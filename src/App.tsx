@@ -43,6 +43,7 @@ const App = () => (
               <Route path="/seguro-vida-sin-examen-medico" element={<SeguroSinExamen />} />
               <Route path="/beneficios-en-vida" element={<BeneficiosEnVida />} />
               <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
+              <Route path="/links" element={<Links />} />
               {/* Redirects from old URLs */}
               <Route path="/iul-para-jubilacion" element={<Navigate to="/jubilacion-sin-401k" replace />} />
               <Route path="/iul-para-indocumentados" element={<Navigate to="/seguro-vida-itin" replace />} />
