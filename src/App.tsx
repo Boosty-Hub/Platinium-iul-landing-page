@@ -18,6 +18,7 @@ const IULEmprendedores = lazy(() => import("./pages/IULEmprendedores.tsx"));
 const SeguroSinExamen = lazy(() => import("./pages/SeguroSinExamen.tsx"));
 const BeneficiosEnVida = lazy(() => import("./pages/BeneficiosEnVida.tsx"));
 const PoliticaPrivacidad = lazy(() => import("./pages/PoliticaPrivacidad.tsx"));
+const Links = lazy(() => import("./pages/Links.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient();
