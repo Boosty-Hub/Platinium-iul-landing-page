@@ -18,6 +18,7 @@ const IULEmprendedores = lazy(() => import("./pages/IULEmprendedores.tsx"));
 const SeguroSinExamen = lazy(() => import("./pages/SeguroSinExamen.tsx"));
 const BeneficiosEnVida = lazy(() => import("./pages/BeneficiosEnVida.tsx"));
 const PoliticaPrivacidad = lazy(() => import("./pages/PoliticaPrivacidad.tsx"));
+const Links = lazy(() => import("./pages/Links.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/seguro-vida-sin-examen-medico" element={<SeguroSinExamen />} />
               <Route path="/beneficios-en-vida" element={<BeneficiosEnVida />} />
               <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
+              <Route path="/links" element={<Links />} />
               {/* Redirects from old URLs */}
               <Route path="/iul-para-jubilacion" element={<Navigate to="/jubilacion-sin-401k" replace />} />
               <Route path="/iul-para-indocumentados" element={<Navigate to="/seguro-vida-itin" replace />} />
