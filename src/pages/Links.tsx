@@ -39,7 +39,7 @@ export default function Links() {
       <div className="w-full max-w-md flex flex-col items-center gap-6">
         {/* Avatar / Logo */}
         <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg shadow-[#1d9fa9]/20 ring-2 ring-[#1d9fa9]/30">
-          <img src="/logo.png" alt="Platinium Insurance Group" className="w-full h-full object-cover" />
+          <img src="/logo.png" alt="Platinium Insurance Group" className="w-full h-full object-cover border-0 border-none rounded-none shadow-none" />
         </div>
 
         {/* Name & subtitle */}
