@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,41 +24,49 @@ const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient();
 
+// Routes that bypass GeoGate (accessible from anywhere)
+const BYPASS_GEO = ["/form-panel"];
+
+const AppRoutes = () => {
+  const location = useLocation();
+  const bypass = BYPASS_GEO.some((p) => location.pathname.startsWith(p));
+
+  const routes = (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/seguro-de-vida-iul" element={<SeguroVidaIUL />} />
+        <Route path="/jubilacion-sin-401k" element={<IULParaJubilacion />} />
+        <Route path="/seguro-vida-itin" element={<IULParaIndocumentados />} />
+        <Route path="/iul-vs-401k" element={<IULvs401k />} />
+        <Route path="/contacto" element={<Contacto />} />
+        <Route path="/proteccion-familiar" element={<ProteccionFamiliar />} />
+        <Route path="/iul-emprendedores" element={<IULEmprendedores />} />
+        <Route path="/seguro-vida-sin-examen-medico" element={<SeguroSinExamen />} />
+        <Route path="/beneficios-en-vida" element={<BeneficiosEnVida />} />
+        <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
+        <Route path="/links" element={<Links />} />
+        <Route path="/form-panel" element={<FormPanel />} />
+        {/* Redirects from old URLs */}
+        <Route path="/iul-para-jubilacion" element={<Navigate to="/jubilacion-sin-401k" replace />} />
+        <Route path="/iul-para-indocumentados" element={<Navigate to="/seguro-vida-itin" replace />} />
+        <Route path="/iul-proteccion-familiar" element={<Navigate to="/proteccion-familiar" replace />} />
+        <Route path="/iul-para-emprendedores" element={<Navigate to="/iul-emprendedores" replace />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
+  );
+
+  return bypass ? routes : <GeoGate>{routes}</GeoGate>;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Suspense fallback={<div className="min-h-screen" />}>
-          <Routes>
-            <Route path="/form-panel" element={<FormPanel />} />
-          </Routes>
-        </Suspense>
-        <GeoGate>
-          <Suspense fallback={<div className="min-h-screen" />}>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/seguro-de-vida-iul" element={<SeguroVidaIUL />} />
-              <Route path="/jubilacion-sin-401k" element={<IULParaJubilacion />} />
-              <Route path="/seguro-vida-itin" element={<IULParaIndocumentados />} />
-              <Route path="/iul-vs-401k" element={<IULvs401k />} />
-              <Route path="/contacto" element={<Contacto />} />
-              <Route path="/proteccion-familiar" element={<ProteccionFamiliar />} />
-              <Route path="/iul-emprendedores" element={<IULEmprendedores />} />
-              <Route path="/seguro-vida-sin-examen-medico" element={<SeguroSinExamen />} />
-              <Route path="/beneficios-en-vida" element={<BeneficiosEnVida />} />
-              <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
-              <Route path="/links" element={<Links />} />
-              {/* Redirects from old URLs */}
-              <Route path="/iul-para-jubilacion" element={<Navigate to="/jubilacion-sin-401k" replace />} />
-              <Route path="/iul-para-indocumentados" element={<Navigate to="/seguro-vida-itin" replace />} />
-              <Route path="/iul-proteccion-familiar" element={<Navigate to="/proteccion-familiar" replace />} />
-              <Route path="/iul-para-emprendedores" element={<Navigate to="/iul-emprendedores" replace />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </GeoGate>
+        <AppRoutes />
         <CookieBanner />
       </BrowserRouter>
     </TooltipProvider>
@@ -66,3 +74,4 @@ const App = () => (
 );
 
 export default App;
+
