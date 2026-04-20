@@ -46,7 +46,7 @@ export function GeoGate({ children }: { children: React.ReactNode }) {
           <div className="border-t border-gray-200 pt-5 mt-5">
             <p className="text-gray-500 text-xs leading-relaxed">
               Si crees que esto es un error, contáctanos:<br />
-              <a href="tel:+17862000000" className="text-[#1d9fa9] font-semibold">📞 (786) 200-0000</a>
+              <a href="https://wa.me/16893082809" target="_blank" rel="noopener noreferrer" className="text-[#1d9fa9] font-semibold">💬 WhatsApp +1 (689) 308-2809</a>
               {" · "}
               <a href="mailto:info@platiniuminsurance.com" className="text-[#1d9fa9] font-semibold">✉️ info@platiniuminsurance.com</a>
             </p>
