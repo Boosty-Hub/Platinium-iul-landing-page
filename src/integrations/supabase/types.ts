@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           ahorro_semanal: string | null
           anio_nacimiento: number | null
+          city: string | null
           created_at: string
           email: string
           fuente: string | null
@@ -31,6 +32,7 @@ export type Database = {
           nombre: string
           notas: string | null
           referrer: string | null
+          region: string | null
           telefono: string
           user_agent: string | null
           utm_campaign: string | null
@@ -42,6 +44,7 @@ export type Database = {
         Insert: {
           ahorro_semanal?: string | null
           anio_nacimiento?: number | null
+          city?: string | null
           created_at?: string
           email: string
           fuente?: string | null
@@ -55,6 +58,7 @@ export type Database = {
           nombre: string
           notas?: string | null
           referrer?: string | null
+          region?: string | null
           telefono: string
           user_agent?: string | null
           utm_campaign?: string | null
@@ -66,6 +70,7 @@ export type Database = {
         Update: {
           ahorro_semanal?: string | null
           anio_nacimiento?: number | null
+          city?: string | null
           created_at?: string
           email?: string
           fuente?: string | null
@@ -79,6 +84,7 @@ export type Database = {
           nombre?: string
           notas?: string | null
           referrer?: string | null
+          region?: string | null
           telefono?: string
           user_agent?: string | null
           utm_campaign?: string | null
