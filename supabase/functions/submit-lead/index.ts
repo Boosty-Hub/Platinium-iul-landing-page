@@ -129,6 +129,25 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Resolve city/region from IP (best-effort, 2s timeout)
+    let city: string | null = null;
+    let region: string | null = null;
+    if (clientIp && clientIp !== "unknown") {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        const geoRes = await fetch(`https://ipapi.co/${clientIp}/json/`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (geoRes.ok) {
+          const geo = await geoRes.json();
+          city = geo.city ? String(geo.city).slice(0, 100) : null;
+          region = geo.region ? String(geo.region).slice(0, 100) : null;
+        }
+      } catch (e) {
+        console.warn("Geo lookup failed:", e);
+      }
+    }
+
     // Insert lead with service role (bypasses RLS)
     const leadId = crypto.randomUUID();
     const { error: insertError } = await supabase
@@ -138,6 +157,8 @@ serve(async (req) => {
         ...leadData,
         ip_address: clientIp,
         user_agent: req.headers.get("user-agent")?.slice(0, 500) || null,
+        city,
+        region,
       });
 
     if (insertError) {

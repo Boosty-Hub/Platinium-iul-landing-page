@@ -19,6 +19,7 @@ const SeguroSinExamen = lazy(() => import("./pages/SeguroSinExamen.tsx"));
 const BeneficiosEnVida = lazy(() => import("./pages/BeneficiosEnVida.tsx"));
 const PoliticaPrivacidad = lazy(() => import("./pages/PoliticaPrivacidad.tsx"));
 const Links = lazy(() => import("./pages/Links.tsx"));
+const FormPanel = lazy(() => import("./pages/FormPanel.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient();
@@ -29,6 +30,11 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <Suspense fallback={<div className="min-h-screen" />}>
+          <Routes>
+            <Route path="/form-panel" element={<FormPanel />} />
+          </Routes>
+        </Suspense>
         <GeoGate>
           <Suspense fallback={<div className="min-h-screen" />}>
             <Routes>
