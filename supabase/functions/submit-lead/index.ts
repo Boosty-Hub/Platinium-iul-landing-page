@@ -129,22 +129,30 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Resolve city/region from IP (best-effort, 2s timeout)
+    // Resolve city/region from IP (best-effort). Try multiple providers.
     let city: string | null = null;
     let region: string | null = null;
     if (clientIp && clientIp !== "unknown") {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2000);
-        const geoRes = await fetch(`https://ipapi.co/${clientIp}/json/`, { signal: controller.signal });
-        clearTimeout(timeoutId);
-        if (geoRes.ok) {
+      const providers = [
+        { url: `https://ipwho.is/${clientIp}`, city: "city", region: "region" },
+        { url: `http://ip-api.com/json/${clientIp}?fields=status,city,regionName`, city: "city", region: "regionName" },
+        { url: `https://ipapi.co/${clientIp}/json/`, city: "city", region: "region" },
+      ];
+      for (const p of providers) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 2500);
+          const geoRes = await fetch(p.url, { signal: controller.signal, headers: { "User-Agent": "Mozilla/5.0" } });
+          clearTimeout(timeoutId);
+          if (!geoRes.ok) { console.warn(`Geo ${p.url} status ${geoRes.status}`); continue; }
           const geo = await geoRes.json();
-          city = geo.city ? String(geo.city).slice(0, 100) : null;
-          region = geo.region ? String(geo.region).slice(0, 100) : null;
+          if (geo.success === false || geo.error || geo.status === "fail") { console.warn(`Geo ${p.url} returned error:`, geo.message || geo.reason); continue; }
+          city = geo[p.city] ? String(geo[p.city]).slice(0, 100) : null;
+          region = geo[p.region] ? String(geo[p.region]).slice(0, 100) : null;
+          if (city) { console.log(`Geo resolved via ${p.url}: ${city}, ${region}`); break; }
+        } catch (e) {
+          console.warn(`Geo lookup ${p.url} failed:`, e instanceof Error ? e.message : e);
         }
-      } catch (e) {
-        console.warn("Geo lookup failed:", e);
       }
     }
 
