@@ -1,107 +1,43 @@
+## Arreglos del panel `/form-panel`
 
+### Problemas detectados
 
-## Panel de monitoreo de leads en tiempo real
+1. **Se desconecta después de un rato.** El canal Realtime de Supabase se cae por inactividad o cambio de red (o cuando la pestaña queda en segundo plano y el WebSocket cierra). Hoy no hay reconexión: cuando el status cambia a `CHANNEL_ERROR`, `TIMED_OUT` o `CLOSED`, el indicador se pone rojo y no vuelve solo.
 
-### Resumen
-Crear una ruta pública `/form-panel` que escuche en tiempo real los nuevos leads de la tabla `leads` y dispare una alerta visual + sonora invasiva. Adicionalmente, enriquecer el flujo de captura existente para resolver la **ciudad** desde la IP automáticamente.
-
----
-
-### 1. Backend: Captura de ciudad desde IP
-
-**Modificar `supabase/functions/submit-lead/index.ts`:**
-- Después de obtener `clientIp`, hacer fetch a `https://ipapi.co/{ip}/json/` para resolver `city`, `region`, `country`.
-- Guardar `city` en una nueva columna de la tabla `leads`.
-- Fire-and-forget con timeout de 2s: si falla la geolocalización, el lead se guarda igual con `city = null`.
-
-**Migración SQL:**
-```sql
-ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS city text;
-ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS region text;
-```
-
-**Realtime habilitado:**
-```sql
-ALTER PUBLICATION supabase_realtime ADD TABLE public.leads;
-ALTER TABLE public.leads REPLICA IDENTITY FULL;
-```
-
-**RLS para SELECT público (temporal, según pedido del usuario):**
-```sql
-CREATE POLICY "public_read_leads_panel" ON public.leads
-  FOR SELECT TO anon, authenticated USING (true);
-```
-> Nota de seguridad: esto expone PII (nombre, email, teléfono) a cualquiera con la URL. El usuario lo aceptó como temporal. Lo señalo en la entrega para reforzar que se debe proteger pronto con auth.
+2. **Si entra otro lead inmediato, no se actualiza.** Cuando llega un lead, se abre el modal y se setea `alertLead`. Si llega un segundo lead mientras el modal aún está abierto, `setAlertLead(newLead2)` reemplaza el estado, pero como el modal ya está montado con el lead anterior y el `useEffect` del audio depende de `lead`, en algunos navegadores el cambio se pisa y el modal puede quedar mostrando el lead viejo o saltar el segundo. Además, no hay cola: si llegan 3 leads seguidos, el operador solo ve el último.
 
 ---
 
-### 2. Página `/form-panel`
+### Solución
 
-**Crear `src/pages/FormPanel.tsx`:**
+#### 1. Auto-reconexión del Realtime (`src/pages/FormPanel.tsx`)
 
-**Layout:**
-- Header oscuro con título "Panel de Leads en Vivo" + indicador verde pulsante ("● Conectado").
-- Botón inicial **"🔔 Activar Alertas"** que el operador debe presionar una vez para desbloquear el autoplay de audio (requisito de navegadores).
-- Tabla con columnas: **Hora · Nombre · Teléfono · Email · Ciudad · IP · Interés**.
-- Filas ordenadas DESC por `created_at`. Resaltar las nuevas con animación fadeUp + fondo teal por 5s.
-- Carga inicial: últimos 100 leads vía `supabase.from('leads').select(...).order('created_at', { ascending: false }).limit(100)`.
+- Envolver la suscripción en una función `connect()` que se reinvoque al detectar `CHANNEL_ERROR`, `TIMED_OUT` o `CLOSED`, con backoff (1s → 2s → 5s, máx 5s).
+- **Heartbeat de seguridad:** cada 30s, si `connected` es `false`, forzar reconexión.
+- **Resync al reconectar:** después de cada reconexión exitosa, hacer un `select` de los leads creados después del `created_at` más reciente que ya tenemos y prependerlos. Esto cubre cualquier `INSERT` que se haya perdido durante la caída.
+- **Reconexión al volver a la pestaña:** listener de `visibilitychange` → si la pestaña vuelve a ser visible y `connected === false`, reconectar + resync inmediato.
+- **Polling de respaldo:** cada 20s, hacer un `select` ligero del último lead. Si su `id` no está en el state, lo agregamos (esto garantiza que aunque Realtime falle silenciosamente, ningún lead se pierda).
 
-**Realtime:**
-```ts
-supabase.channel('leads-panel')
-  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'leads' },
-      (payload) => { setLeads(prev => [payload.new, ...prev]); triggerAlert(payload.new); })
-  .subscribe();
-```
+#### 2. Cola de alertas (no perder leads simultáneos)
 
-**Sin Navbar/Footer/GeoGate:** la ruta se monta fuera de `<GeoGate>` o lo bypassea, igual que `/links`.
+- Reemplazar `alertLead: Lead | null` por `alertQueue: Lead[]`.
+- Cuando llega un lead nuevo (por Realtime o por el polling de respaldo), se hace `setAlertQueue(q => [...q, newLead])` siempre que su `id` no esté ya en la cola ni haya sido mostrado (set de `id`s vistos en un `useRef`).
+- El `LeadAlertModal` muestra `alertQueue[0]`. El botón "Cerrar" o "Ver en Kommo" hace `shift()` de la cola → el modal se vuelve a montar con el siguiente lead y la alarma vuelve a sonar.
+- Badge en el modal: **"Lead 1 de N"** cuando hay más de uno encolado, para que el operador sepa que vienen más.
+- Botón extra **"Cerrar todos"** cuando `alertQueue.length > 1`.
 
----
+#### 3. Detalles UX
 
-### 3. Alerta pop-up invasiva con sonido
-
-**Componente `LeadAlertModal`:**
-- Overlay negro al 90% que bloquea interacción.
-- Modal grande centrado con animación zoom-in + pulso teal.
-- Texto: **"¡Acaba de llegar un lead! Atenderlo ahora."**
-- Muestra resumen del lead recién llegado (nombre + teléfono + ciudad).
-- Botón principal naranja gigante: **"Ver en Kommo"** → `window.open('https://agentplatiniuminsurancecom.kommo.com/leads/pipeline/', '_blank')`.
-- Botón secundario: "Cerrar".
-
-**Audio:**
-- Archivo `/public/alarm.mp3` (el usuario debe subirlo, o usaré un placeholder web-safe).
-- `<audio>` con `loop` activado mientras el modal esté abierto.
-- Se detiene al hacer clic en cualquier botón.
-- Volumen al 100%.
-
-**Desbloqueo de autoplay:**
-- Estado `audioEnabled` (default `false`). Mientras esté `false`, mostrar un overlay con botón "🔔 Activar Alertas" que llama a `audio.play().then(() => audio.pause())` para registrar el gesto del usuario.
+- Indicador del header: agregar **"Reconectando…"** (amarillo pulsante) entre `Conectado` y `Desconectado`.
+- Toast discreto cuando se recupera la conexión: "Conexión restaurada".
 
 ---
 
-### 4. Routing
+### Archivos a modificar
 
-**Modificar `src/App.tsx`:**
-- Agregar lazy import: `const FormPanel = lazy(() => import("./pages/FormPanel.tsx"));`
-- Agregar `<Route path="/form-panel" element={<FormPanel />} />` **fuera** del `<GeoGate>` para que sea accesible desde cualquier país (el equipo comercial podría estar fuera de US).
+- `src/pages/FormPanel.tsx` — reconexión, polling de respaldo, cola de leads, estados de conexión.
+- `src/components/panel/LeadAlertModal.tsx` — soporte para cola (badge "1 de N", botón "Cerrar todos"), reset de audio al cambiar de lead encolado.
 
----
+### Sin cambios en backend
 
-### 5. Pregunta sobre el archivo de audio
-
-Necesito saber cómo proveer el sonido de alarma:
-
-**Opción A (recomendada):** Tú subes un archivo `alarm.mp3` a `public/` y yo lo referencio.
-**Opción B:** Genero un beep sintético con Web Audio API (sin archivo, sin dependencias, repetitivo y fuerte).
-**Opción C:** Uso una URL pública de un sonido libre de derechos.
-
-Si no respondes esta duda en el siguiente mensaje, implementaré la **Opción B** (Web Audio API) para no bloquear el desarrollo, y dejaré preparado el `<audio src="/alarm.mp3">` como fallback para que solo subas el archivo después.
-
----
-
-### Archivos
-- **Crear**: `src/pages/FormPanel.tsx`, `src/components/panel/LeadAlertModal.tsx`
-- **Modificar**: `src/App.tsx`, `supabase/functions/submit-lead/index.ts`
-- **Migración SQL**: agregar `city`/`region`, habilitar realtime, RLS pública SELECT
-- **Opcional**: `public/alarm.mp3` (subido por el usuario)
-
+La tabla `leads` ya tiene Realtime habilitado y RLS pública de SELECT. No hace falta migración ni tocar la edge function.

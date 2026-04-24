@@ -12,7 +12,9 @@ interface Lead {
 
 interface LeadAlertModalProps {
   lead: Lead | null;
+  queueSize: number;
   onClose: () => void;
+  onDismissAll: () => void;
   audioRef: React.RefObject<HTMLAudioElement>;
   audioEnabled: boolean;
 }
@@ -44,7 +46,7 @@ function playSiren(): () => void {
   };
 }
 
-export function LeadAlertModal({ lead, onClose, audioRef, audioEnabled }: LeadAlertModalProps) {
+export function LeadAlertModal({ lead, queueSize, onClose, onDismissAll, audioRef, audioEnabled }: LeadAlertModalProps) {
   useEffect(() => {
     if (!lead || !audioEnabled) return;
     let stopSiren: (() => void) | null = null;
@@ -55,7 +57,6 @@ export function LeadAlertModal({ lead, onClose, audioRef, audioEnabled }: LeadAl
       audio.volume = 1;
       audio.loop = true;
       audio.play().catch(() => {
-        // Fallback to Web Audio siren
         stopSiren = playSiren();
       });
     } else {
@@ -66,7 +67,7 @@ export function LeadAlertModal({ lead, onClose, audioRef, audioEnabled }: LeadAl
       if (audio) { audio.pause(); audio.currentTime = 0; }
       if (stopSiren) stopSiren();
     };
-  }, [lead, audioEnabled, audioRef]);
+  }, [lead?.id, audioEnabled, audioRef]);
 
   if (!lead) return null;
 
@@ -76,16 +77,27 @@ export function LeadAlertModal({ lead, onClose, audioRef, audioEnabled }: LeadAl
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm animate-in fade-in duration-200">
+    <div
+      key={lead.id}
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm animate-in fade-in duration-200"
+    >
       <div className="relative w-full max-w-lg mx-4 rounded-2xl bg-gradient-to-br from-[#0F2229] to-[#0B1A1E] border-2 border-[#1d9fa9] shadow-[0_0_60px_rgba(29,159,169,0.6)] p-8 animate-in zoom-in-95 duration-300">
         <div className="absolute -inset-1 rounded-2xl border-2 border-[#1d9fa9] animate-pulse pointer-events-none" />
+
+        {queueSize > 1 && (
+          <div className="absolute -top-3 -right-3 z-10 px-3 py-1 rounded-full bg-[#F97316] text-white text-sm font-bold shadow-lg animate-pulse">
+            +{queueSize - 1} en cola
+          </div>
+        )}
 
         <div className="text-center space-y-6 relative">
           <div className="text-6xl animate-bounce">🚨</div>
           <h2 className="text-3xl font-bold text-white leading-tight">
             ¡Acaba de llegar un lead!
           </h2>
-          <p className="text-[#94B3BB] text-lg">Atenderlo ahora.</p>
+          <p className="text-[#94B3BB] text-lg">
+            {queueSize > 1 ? `Lead 1 de ${queueSize} — atenderlo ahora.` : "Atenderlo ahora."}
+          </p>
 
           <div className="bg-black/40 rounded-xl p-4 text-left space-y-2 border border-[#1d9fa9]/30">
             <div className="text-white"><span className="text-[#94B3BB] text-sm">Nombre:</span> <strong>{lead.nombre}</strong></div>
@@ -105,12 +117,22 @@ export function LeadAlertModal({ lead, onClose, audioRef, audioEnabled }: LeadAl
           >
             Ver en Kommo →
           </button>
-          <button
-            onClick={onClose}
-            className="w-full py-2 text-[#94B3BB] hover:text-white text-sm transition-colors"
-          >
-            Cerrar
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              className="flex-1 py-2 text-[#94B3BB] hover:text-white text-sm transition-colors"
+            >
+              {queueSize > 1 ? "Siguiente lead →" : "Cerrar"}
+            </button>
+            {queueSize > 1 && (
+              <button
+                onClick={onDismissAll}
+                className="flex-1 py-2 text-[#94B3BB] hover:text-white text-sm transition-colors"
+              >
+                Cerrar todos
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

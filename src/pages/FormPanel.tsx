@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LeadAlertModal } from "@/components/panel/LeadAlertModal";
+import { toast } from "@/hooks/use-toast";
 
 interface Lead {
   id: string;
@@ -14,13 +15,92 @@ interface Lead {
   interes?: string | null;
 }
 
+type ConnState = "connected" | "reconnecting" | "disconnected";
+
+const SELECT_COLS = "id, created_at, nombre, telefono, email, city, region, ip_address, interes";
+
 export default function FormPanel() {
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [alertLead, setAlertLead] = useState<Lead | null>(null);
+  const [alertQueue, setAlertQueue] = useState<Lead[]>([]);
   const [audioEnabled, setAudioEnabled] = useState(false);
-  const [connected, setConnected] = useState(false);
+  const [connState, setConnState] = useState<ConnState>("reconnecting");
   const [highlightId, setHighlightId] = useState<string | null>(null);
+
   const audioRef = useRef<HTMLAudioElement>(null);
+  const seenIdsRef = useRef<Set<string>>(new Set());
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const reconnectAttemptsRef = useRef(0);
+  const reconnectTimerRef = useRef<number | null>(null);
+  const wasConnectedRef = useRef(false);
+
+  // Add a lead to state (dedup) and to alert queue if new
+  const ingestLead = useCallback((lead: Lead, fromInitial = false) => {
+    if (seenIdsRef.current.has(lead.id)) return;
+    seenIdsRef.current.add(lead.id);
+    setLeads((prev) => {
+      if (prev.some((l) => l.id === lead.id)) return prev;
+      return [lead, ...prev].slice(0, 200);
+    });
+    if (!fromInitial) {
+      setAlertQueue((q) => (q.some((l) => l.id === lead.id) ? q : [...q, lead]));
+      setHighlightId(lead.id);
+      setTimeout(() => setHighlightId((h) => (h === lead.id ? null : h)), 5000);
+    }
+  }, []);
+
+  // Resync: fetch any leads newer than what we have
+  const resync = useCallback(async (silent = false) => {
+    const latestIso = leads[0]?.created_at;
+    let q = supabase.from("leads").select(SELECT_COLS).order("created_at", { ascending: false }).limit(50);
+    if (latestIso) q = q.gt("created_at", latestIso);
+    const { data, error } = await q;
+    if (error || !data) return;
+    // Reverse so older-of-the-new come first → newest ends up on top
+    [...data].reverse().forEach((l) => ingestLead(l as Lead, silent));
+  }, [leads, ingestLead]);
+
+  const connect = useCallback(() => {
+    if (channelRef.current) {
+      try { supabase.removeChannel(channelRef.current); } catch {}
+      channelRef.current = null;
+    }
+    setConnState((s) => (s === "connected" ? "reconnecting" : s));
+
+    const channel = supabase
+      .channel(`leads-panel-${Date.now()}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "leads" },
+        (payload) => ingestLead(payload.new as Lead)
+      )
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          setConnState("connected");
+          reconnectAttemptsRef.current = 0;
+          if (wasConnectedRef.current) {
+            toast({ title: "Conexión restaurada", description: "Recibiendo leads en vivo otra vez." });
+          }
+          wasConnectedRef.current = true;
+          // Catch up on anything we missed
+          resync(true);
+        } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+          setConnState("reconnecting");
+          scheduleReconnect();
+        }
+      });
+
+    channelRef.current = channel;
+  }, [ingestLead, resync]);
+
+  const scheduleReconnect = useCallback(() => {
+    if (reconnectTimerRef.current) return;
+    const attempt = reconnectAttemptsRef.current++;
+    const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+    reconnectTimerRef.current = window.setTimeout(() => {
+      reconnectTimerRef.current = null;
+      connect();
+    }, delay);
+  }, [connect]);
 
   useEffect(() => {
     document.title = "Panel de Leads en Vivo · Platinium";
@@ -28,28 +108,49 @@ export default function FormPanel() {
     // Initial load
     supabase
       .from("leads")
-      .select("id, created_at, nombre, telefono, email, city, region, ip_address, interes")
+      .select(SELECT_COLS)
       .order("created_at", { ascending: false })
       .limit(100)
-      .then(({ data }) => { if (data) setLeads(data as Lead[]); });
-
-    // Realtime subscription
-    const channel = supabase
-      .channel("leads-panel")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "leads" },
-        (payload) => {
-          const newLead = payload.new as Lead;
-          setLeads((prev) => [newLead, ...prev].slice(0, 200));
-          setAlertLead(newLead);
-          setHighlightId(newLead.id);
-          setTimeout(() => setHighlightId((h) => (h === newLead.id ? null : h)), 5000);
+      .then(({ data }) => {
+        if (data) {
+          (data as Lead[]).forEach((l) => seenIdsRef.current.add(l.id));
+          setLeads(data as Lead[]);
         }
-      )
-      .subscribe((status) => setConnected(status === "SUBSCRIBED"));
+      });
 
-    return () => { supabase.removeChannel(channel); };
+    connect();
+
+    // Heartbeat: every 30s, if not connected, force reconnect
+    const heartbeat = window.setInterval(() => {
+      setConnState((s) => {
+        if (s !== "connected") connect();
+        return s;
+      });
+    }, 30000);
+
+    // Backup polling: every 20s, fetch latest lead and ingest if new
+    const polling = window.setInterval(() => { resync(false); }, 20000);
+
+    // Reconnect on tab focus
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        connect();
+        resync(false);
+      }
+    };
+    const onOnline = () => connect();
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("online", onOnline);
+
+    return () => {
+      window.clearInterval(heartbeat);
+      window.clearInterval(polling);
+      if (reconnectTimerRef.current) window.clearTimeout(reconnectTimerRef.current);
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("online", onOnline);
+      if (channelRef.current) { try { supabase.removeChannel(channelRef.current); } catch {} }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const enableAudio = async () => {
@@ -63,7 +164,6 @@ export default function FormPanel() {
         audio.volume = 1;
       } catch {}
     }
-    // Also unlock Web Audio API
     try {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
       await ctx.resume();
@@ -77,6 +177,20 @@ export default function FormPanel() {
     return d.toLocaleTimeString("es-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) +
       " · " + d.toLocaleDateString("es-US", { day: "2-digit", month: "2-digit" });
   };
+
+  const dismissCurrent = () => setAlertQueue((q) => q.slice(1));
+  const dismissAll = () => setAlertQueue([]);
+
+  const currentAlert = alertQueue[0] ?? null;
+
+  const dotClass =
+    connState === "connected" ? "bg-green-400 animate-pulse"
+    : connState === "reconnecting" ? "bg-yellow-400 animate-pulse"
+    : "bg-red-500";
+  const stateLabel =
+    connState === "connected" ? "Conectado"
+    : connState === "reconnecting" ? "Reconectando…"
+    : "Desconectado";
 
   return (
     <div className="min-h-screen bg-[#0B1A1E] text-white">
@@ -108,8 +222,8 @@ export default function FormPanel() {
             <div>
               <h1 className="text-xl font-bold">Panel de Leads en Vivo</h1>
               <div className="flex items-center gap-2 text-sm text-[#94B3BB]">
-                <span className={`inline-block w-2 h-2 rounded-full ${connected ? "bg-green-400 animate-pulse" : "bg-red-500"}`} />
-                {connected ? "Conectado" : "Desconectado"}
+                <span className={`inline-block w-2 h-2 rounded-full ${dotClass}`} />
+                {stateLabel}
               </div>
             </div>
           </div>
@@ -162,8 +276,10 @@ export default function FormPanel() {
       </main>
 
       <LeadAlertModal
-        lead={alertLead}
-        onClose={() => setAlertLead(null)}
+        lead={currentAlert}
+        queueSize={alertQueue.length}
+        onClose={dismissCurrent}
+        onDismissAll={dismissAll}
         audioRef={audioRef}
         audioEnabled={audioEnabled}
       />
