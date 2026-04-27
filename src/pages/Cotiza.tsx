@@ -74,7 +74,7 @@ export default function Cotiza() {
 
           <Anim delay={0.1}>
             <div id="form">
-              <LeadForm t={t} dark={false} defaultInteres="Ahorro a largo plazo / retiro" />
+              <LeadForm t={t} dark={false} defaultInteres="Ahorro a largo plazo / retiro" inline />
             </div>
           </Anim>
         </div>
