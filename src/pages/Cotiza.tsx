@@ -50,15 +50,14 @@ export default function Cotiza() {
 
       {/* HERO + FORM */}
       <section className="relative px-4 sm:px-6 py-6 sm:py-10 bg-gradient-to-b from-[#1d9fa9]/5 to-white">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          {/* Texto Hero */}
+        <div className="max-w-2xl mx-auto">
           <Anim>
-            <div className="text-center lg:text-left">
+            <div className="text-center mb-6 sm:mb-8">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1d9fa9]/10 text-[#1d9fa9] text-xs font-semibold mb-4">
                 ⭐ +1,000 familias protegidas
               </div>
               <h1
-                className="text-3xl sm:text-4xl lg:text-5xl font-normal leading-[1.1] mb-4"
+                className="text-2xl sm:text-4xl font-normal leading-[1.15] mb-3"
                 style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
               >
                 Cotiza tu{" "}
@@ -67,34 +66,12 @@ export default function Cotiza() {
                 </span>{" "}
                 con Platinum Insurance
               </h1>
-              <p className="text-base sm:text-lg text-gray-600 mb-5 max-w-md mx-auto lg:mx-0">
+              <p className="text-sm sm:text-base text-gray-600 max-w-xl mx-auto">
                 Protege a tu familia y haz crecer tu dinero con un Seguro de Vida Indexado. Sin compromisos, sin letras pequeñas.
               </p>
-
-              <ul className="space-y-2 text-left max-w-md mx-auto lg:mx-0 mb-5">
-                {[
-                  "Protección familiar real y permanente",
-                  "Ahorro con interés (sin perder por caídas del mercado)",
-                  "Sin examen médico · Aceptamos ITIN",
-                ].map((b) => (
-                  <li key={b} className="flex items-start gap-2 text-sm sm:text-base text-gray-700">
-                    <span className="mt-1 text-[#1d9fa9]">✓</span>
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-gray-500">
-                <div className="flex items-center gap-1">
-                  <span className="text-yellow-400">★★★★★</span>
-                  <span>5.0 de calificación</span>
-                </div>
-                <div>⏱️ Respuesta en 24 hrs</div>
-              </div>
             </div>
           </Anim>
 
-          {/* Formulario */}
           <Anim delay={0.1}>
             <div id="form">
               <LeadForm t={t} dark={false} defaultInteres="Ahorro a largo plazo / retiro" />
