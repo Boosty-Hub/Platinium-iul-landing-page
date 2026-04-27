@@ -1,43 +1,57 @@
-## Arreglos del panel `/form-panel`
+## Landing dedicada para campaña Meta: `/cotiza`
 
-### Problemas detectados
-
-1. **Se desconecta después de un rato.** El canal Realtime de Supabase se cae por inactividad o cambio de red (o cuando la pestaña queda en segundo plano y el WebSocket cierra). Hoy no hay reconexión: cuando el status cambia a `CHANNEL_ERROR`, `TIMED_OUT` o `CLOSED`, el indicador se pone rojo y no vuelve solo.
-
-2. **Si entra otro lead inmediato, no se actualiza.** Cuando llega un lead, se abre el modal y se setea `alertLead`. Si llega un segundo lead mientras el modal aún está abierto, `setAlertLead(newLead2)` reemplaza el estado, pero como el modal ya está montado con el lead anterior y el `useEffect` del audio depende de `lead`, en algunos navegadores el cambio se pisa y el modal puede quedar mostrando el lead viejo o saltar el segundo. Además, no hay cola: si llegan 3 leads seguidos, el operador solo ve el último.
+### Objetivo
+Crear una página independiente, ultra enfocada en conversión, sin navbar ni footer ni distracciones, para usar como destino del tráfico pagado de Meta Ads. Solo logo + formulario + prueba social mínima.
 
 ---
 
-### Solución
+### Ruta
+- Nueva ruta: **`/cotiza`** (corta, fácil de recordar y de poner en anuncios)
+- Se mantiene el `GeoGate` (US-only) y el `CookieBanner` por compliance
+- **NO** se incluye Navbar ni Footer ni links a otras páginas (evita fugas de tráfico pagado)
 
-#### 1. Auto-reconexión del Realtime (`src/pages/FormPanel.tsx`)
+### Estructura de la página (mobile-first)
+1. **Top bar mínima**
+   - Logo de Platinum Insurance (centrado en mobile, izquierda en desktop)
+   - Badge de confianza: "Licenciados en USA · Atención en Español"
+   - Sin links de navegación
+2. **Hero compacto** (encima del formulario en mobile, al lado en desktop)
+   - Título grande: "Cotiza tu IUL Gratis con Platinum Insurance"
+   - Subtítulo: beneficios en 3 bullets cortos (protección familiar, ahorro con interés, sin examen médico)
+   - Iconos de confianza (5 estrellas, "+1,000 familias protegidas", "Respuesta en 24 hrs")
+3. **Formulario de leads (protagonista absoluto)**
+   - Reutiliza el componente actual `LeadForm` (mismo wizard de 6 pasos, misma validación, misma Edge Function `submit-lead`)
+   - Captura automática de UTMs / `gclid` / `fbclid` (ya está implementado, solo se asegura `fbclid`)
+4. **Mini prueba social debajo del form**
+   - 1 testimonio corto con foto
+   - Logos de aseguradoras partners (marquee actual reducido)
+5. **Footer minimal**
+   - Solo: copyright + WhatsApp + link a Política de Privacidad (requerido por Meta Ads)
 
-- Envolver la suscripción en una función `connect()` que se reinvoque al detectar `CHANNEL_ERROR`, `TIMED_OUT` o `CLOSED`, con backoff (1s → 2s → 5s, máx 5s).
-- **Heartbeat de seguridad:** cada 30s, si `connected` es `false`, forzar reconexión.
-- **Resync al reconectar:** después de cada reconexión exitosa, hacer un `select` de los leads creados después del `created_at` más reciente que ya tenemos y prependerlos. Esto cubre cualquier `INSERT` que se haya perdido durante la caída.
-- **Reconexión al volver a la pestaña:** listener de `visibilitychange` → si la pestaña vuelve a ser visible y `connected === false`, reconectar + resync inmediato.
-- **Polling de respaldo:** cada 20s, hacer un `select` ligero del último lead. Si su `id` no está en el state, lo agregamos (esto garantiza que aunque Realtime falle silenciosamente, ningún lead se pierda).
+### Atribución de campaña Meta
+- Capturar y enviar al backend: `fbclid`, `utm_source=facebook`, `utm_medium=cta`, `utm_campaign=...`
+- Ajuste menor en `getUTMParams()` (en `LeadForm.tsx`) para incluir `fbclid` en la lista de claves capturadas
+- Estos datos viajan al webhook de n8n → Kommo (ya configurado), permitiendo identificar leads por campaña
 
-#### 2. Cola de alertas (no perder leads simultáneos)
+### SEO / Indexación
+- `noindex, nofollow` en esta página (es landing pagada, no debe aparecer en Google orgánico ni competir con SEO)
+- Título y descripción optimizados para Meta Ads scraper (preview bonito al pegar el link)
+- OG Image dedicada (usa la actual del sitio)
 
-- Reemplazar `alertLead: Lead | null` por `alertQueue: Lead[]`.
-- Cuando llega un lead nuevo (por Realtime o por el polling de respaldo), se hace `setAlertQueue(q => [...q, newLead])` siempre que su `id` no esté ya en la cola ni haya sido mostrado (set de `id`s vistos en un `useRef`).
-- El `LeadAlertModal` muestra `alertQueue[0]`. El botón "Cerrar" o "Ver en Kommo" hace `shift()` de la cola → el modal se vuelve a montar con el siguiente lead y la alarma vuelve a sonar.
-- Badge en el modal: **"Lead 1 de N"** cuando hay más de uno encolado, para que el operador sepa que vienen más.
-- Botón extra **"Cerrar todos"** cuando `alertQueue.length > 1`.
+### Detalles técnicos
+- **Crear**: `src/pages/Cotiza.tsx` (no usa `Layout` para evitar Navbar/Footer)
+- **Modificar**: 
+  - `src/App.tsx` → registrar la ruta `/cotiza` (lazy import)
+  - `src/components/shared/LeadForm.tsx` → agregar `fbclid` a `getUTMParams()`
+- **No** se modifica el formulario actual de las otras páginas (queda igual)
+- **No** requiere migración de DB (los UTMs/fbclid se guardan en el campo existente)
 
-#### 3. Detalles UX
+### Resultado esperado
+Una URL `platiniuminsuranceusa.com/cotiza` lista para pegar en los anuncios de Meta:
+- 0 distracciones → mayor tasa de conversión
+- Tracking automático de qué campaña/anuncio generó cada lead
+- Mismo flujo de notificación en `/form-panel` (alarma sonora + sync a Kommo)
 
-- Indicador del header: agregar **"Reconectando…"** (amarillo pulsante) entre `Conectado` y `Desconectado`.
-- Toast discreto cuando se recupera la conexión: "Conexión restaurada".
-
----
-
-### Archivos a modificar
-
-- `src/pages/FormPanel.tsx` — reconexión, polling de respaldo, cola de leads, estados de conexión.
-- `src/components/panel/LeadAlertModal.tsx` — soporte para cola (badge "1 de N", botón "Cerrar todos"), reset de audio al cambiar de lead encolado.
-
-### Sin cambios en backend
-
-La tabla `leads` ya tiene Realtime habilitado y RLS pública de SELECT. No hace falta migración ni tocar la edge function.
+### Archivos
+- **Crear**: `src/pages/Cotiza.tsx`
+- **Modificar**: `src/App.tsx`, `src/components/shared/LeadForm.tsx`
