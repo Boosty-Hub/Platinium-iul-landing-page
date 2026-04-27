@@ -48,6 +48,7 @@ const AppRoutes = () => {
         <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
         <Route path="/links" element={<Links />} />
         <Route path="/form-panel" element={<FormPanel />} />
+        <Route path="/cotiza" element={<Cotiza />} />
         {/* Redirects from old URLs */}
         <Route path="/iul-para-jubilacion" element={<Navigate to="/jubilacion-sin-401k" replace />} />
         <Route path="/iul-para-indocumentados" element={<Navigate to="/seguro-vida-itin" replace />} />
