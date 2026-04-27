@@ -20,6 +20,7 @@ const BeneficiosEnVida = lazy(() => import("./pages/BeneficiosEnVida.tsx"));
 const PoliticaPrivacidad = lazy(() => import("./pages/PoliticaPrivacidad.tsx"));
 const Links = lazy(() => import("./pages/Links.tsx"));
 const FormPanel = lazy(() => import("./pages/FormPanel.tsx"));
+const Cotiza = lazy(() => import("./pages/Cotiza.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient();
