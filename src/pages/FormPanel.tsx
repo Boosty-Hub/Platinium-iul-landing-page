@@ -28,13 +28,19 @@ export default function FormPanel() {
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
+  const latestCreatedAtRef = useRef<string | null>(null);
+  const lastSyncAtRef = useRef(Date.now());
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const reconnectTimerRef = useRef<number | null>(null);
   const wasConnectedRef = useRef(false);
+  const connectRef = useRef<() => void>(() => {});
 
   // Add a lead to state (dedup) and to alert queue if new
   const ingestLead = useCallback((lead: Lead, fromInitial = false) => {
+    if (!latestCreatedAtRef.current || lead.created_at > latestCreatedAtRef.current) {
+      latestCreatedAtRef.current = lead.created_at;
+    }
     if (seenIdsRef.current.has(lead.id)) return;
     seenIdsRef.current.add(lead.id);
     setLeads((prev) => {
@@ -50,14 +56,27 @@ export default function FormPanel() {
 
   // Resync: fetch any leads newer than what we have
   const resync = useCallback(async (silent = false) => {
-    const latestIso = leads[0]?.created_at;
-    let q = supabase.from("leads").select(SELECT_COLS).order("created_at", { ascending: false }).limit(50);
-    if (latestIso) q = q.gt("created_at", latestIso);
+    const latestIso = latestCreatedAtRef.current;
+    let q = supabase.from("leads").select(SELECT_COLS).limit(200);
+    q = latestIso
+      ? q.gt("created_at", latestIso).order("created_at", { ascending: true })
+      : q.order("created_at", { ascending: false }).limit(50);
     const { data, error } = await q;
     if (error || !data) return;
-    // Reverse so older-of-the-new come first → newest ends up on top
-    [...data].reverse().forEach((l) => ingestLead(l as Lead, silent));
-  }, [leads, ingestLead]);
+    lastSyncAtRef.current = Date.now();
+    const rows = latestIso ? data : [...data].reverse();
+    rows.forEach((l) => ingestLead(l as Lead, silent));
+  }, [ingestLead]);
+
+  const scheduleReconnect = useCallback(() => {
+    if (reconnectTimerRef.current) return;
+    const attempt = reconnectAttemptsRef.current++;
+    const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+    reconnectTimerRef.current = window.setTimeout(() => {
+      reconnectTimerRef.current = null;
+      connectRef.current();
+    }, delay);
+  }, []);
 
   const connect = useCallback(() => {
     if (channelRef.current) {
@@ -90,16 +109,10 @@ export default function FormPanel() {
       });
 
     channelRef.current = channel;
-  }, [ingestLead, resync]);
+  }, [ingestLead, resync, scheduleReconnect]);
 
-  const scheduleReconnect = useCallback(() => {
-    if (reconnectTimerRef.current) return;
-    const attempt = reconnectAttemptsRef.current++;
-    const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
-    reconnectTimerRef.current = window.setTimeout(() => {
-      reconnectTimerRef.current = null;
-      connect();
-    }, delay);
+  useEffect(() => {
+    connectRef.current = connect;
   }, [connect]);
 
   useEffect(() => {
@@ -114,6 +127,8 @@ export default function FormPanel() {
       .then(({ data }) => {
         if (data) {
           (data as Lead[]).forEach((l) => seenIdsRef.current.add(l.id));
+          latestCreatedAtRef.current = (data as Lead[])[0]?.created_at ?? null;
+          lastSyncAtRef.current = Date.now();
           setLeads(data as Lead[]);
         }
       });
@@ -126,10 +141,14 @@ export default function FormPanel() {
         if (s !== "connected") connect();
         return s;
       });
-    }, 30000);
+      if (Date.now() - lastSyncAtRef.current > 45000) {
+        resync(false);
+        connect();
+      }
+    }, 15000);
 
-    // Backup polling: every 20s, fetch latest lead and ingest if new
-    const polling = window.setInterval(() => { resync(false); }, 20000);
+    // Backup polling: fetch missed leads even if realtime silently drops
+    const polling = window.setInterval(() => { resync(false); }, 10000);
 
     // Reconnect on tab focus
     const onVisibility = () => {
