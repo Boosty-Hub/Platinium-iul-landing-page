@@ -127,6 +127,8 @@ export default function FormPanel() {
       .then(({ data }) => {
         if (data) {
           (data as Lead[]).forEach((l) => seenIdsRef.current.add(l.id));
+          latestCreatedAtRef.current = (data as Lead[])[0]?.created_at ?? null;
+          lastSyncAtRef.current = Date.now();
           setLeads(data as Lead[]);
         }
       });
@@ -139,10 +141,14 @@ export default function FormPanel() {
         if (s !== "connected") connect();
         return s;
       });
-    }, 30000);
+      if (Date.now() - lastSyncAtRef.current > 45000) {
+        resync(false);
+        connect();
+      }
+    }, 15000);
 
-    // Backup polling: every 20s, fetch latest lead and ingest if new
-    const polling = window.setInterval(() => { resync(false); }, 20000);
+    // Backup polling: fetch missed leads even if realtime silently drops
+    const polling = window.setInterval(() => { resync(false); }, 10000);
 
     // Reconnect on tab focus
     const onVisibility = () => {
