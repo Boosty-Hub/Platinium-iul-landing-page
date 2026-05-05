@@ -293,25 +293,21 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
             {/* Step 4: Ahorro semanal */}
             <div className={`transition-all duration-500 ease-out ${step === 4 ? "opacity-100 translate-x-0 max-h-[600px]" : "opacity-0 absolute inset-0 pointer-events-none translate-x-8 max-h-0"}`}>
               <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-6 text-center" style={{ color: textColor }}>
-                ¿Cuánto te gustaría ahorrar semanalmente?
+                ¿Cuánto te gustaría ahorrar mensualmente?
               </h3>
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                {["12.5", "25", "37.5", "50"].map((amt) => {
-                  const monthly = (parseFloat(amt) * 4.33).toFixed(0);
-                  return (
-                    <button
-                      key={amt}
-                      type="button"
-                      onClick={() => updateField("ahorro_semanal", amt)}
-                      className={`${amtBtnBase} ${form.ahorro_semanal === amt ? amtBtnActive : amtBtnIdle}`}
-                      style={{ backgroundColor: form.ahorro_semanal === amt ? "rgba(29,159,169,0.25)" : "rgba(29,159,169,0.1)", color: textColor }}
-                    >
-                      <div className="text-lg sm:text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>${amt}</div>
-                      <div className="text-[10px] mt-0.5" style={{ color: mutedColor }}>a la semana</div>
-                      <div className="text-[10px] mt-0.5" style={{ color: mutedColor }}>≈ ${monthly}/mes</div>
-                    </button>
-                  );
-                })}
+                {["50", "100", "150", "200"].map((amt) => (
+                  <button
+                    key={amt}
+                    type="button"
+                    onClick={() => updateField("ahorro_semanal", amt)}
+                    className={`${amtBtnBase} ${form.ahorro_semanal === amt ? amtBtnActive : amtBtnIdle}`}
+                    style={{ backgroundColor: form.ahorro_semanal === amt ? "rgba(29,159,169,0.25)" : "rgba(29,159,169,0.1)", color: textColor }}
+                  >
+                    <div className="text-lg sm:text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>${amt}</div>
+                    <div className="text-[10px] mt-0.5" style={{ color: mutedColor }}>al mes</div>
+                  </button>
+                ))}
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-5">
                 <button type="button" onClick={() => setStep(3)} className="sm:flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
