@@ -467,7 +467,14 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
         </>
       ) : (
         <div className="text-center py-6 sm:py-8 animate-[fadeUp_0.6s_ease]">
-          <div className="text-5xl mb-5">✅</div>
+          <div className="flex justify-center mb-3">
+            {createElement("dotlottie-wc", {
+              src: "https://lottie.host/2cc75de8-e7e4-4e1f-a39d-ec059a5b4721/3T89PisqSr.lottie",
+              autoplay: true,
+              loop: true,
+              style: { width: "240px", height: "240px" },
+            })}
+          </div>
           <h3 className="text-xl sm:text-2xl font-semibold mb-3" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
             ¡Gracias por completar el formulario!
           </h3>
