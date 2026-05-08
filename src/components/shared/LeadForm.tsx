@@ -1,8 +1,9 @@
-import { useState, useRef, useCallback, useEffect, createElement } from "react";
+import { useState, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { ThemeClasses } from "./theme";
 import { CheckIcon, WhatsAppIcon } from "./Icons";
 import familyHomeImg from "@/assets/family-home.jpg";
+import agentSuccessImg from "@/assets/agent-success.png";
 import { Anim } from "./Anim";
 
 interface LeadFormData {
