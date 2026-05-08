@@ -117,15 +117,6 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   const [honeypot, setHoneypot] = useState("");
   const formLoadedAt = useRef(Date.now());
 
-  useEffect(() => {
-    if (formState !== "success") return;
-    const SRC = "https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.10/dist/dotlottie-wc.js";
-    if (document.querySelector(`script[src="${SRC}"]`)) return;
-    const s = document.createElement("script");
-    s.type = "module";
-    s.src = SRC;
-    document.head.appendChild(s);
-  }, [formState]);
 
 
   const handleSubmit = useCallback(
