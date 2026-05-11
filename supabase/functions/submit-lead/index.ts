@@ -67,7 +67,6 @@ function validateLead(body: Record<string, unknown>): { valid: boolean; error?: 
   }
 
   const gclid = body.gclid ? String(body.gclid).trim().slice(0, 500) : null;
-  const fbclid = body.fbclid ? String(body.fbclid).trim().slice(0, 500) : null;
 
   return {
     valid: true,
@@ -83,7 +82,6 @@ function validateLead(body: Record<string, unknown>): { valid: boolean; error?: 
       genero,
       notas,
       gclid,
-      fbclid,
       ...utms,
     },
   };
@@ -202,7 +200,6 @@ serve(async (req) => {
         utm_term: leadData.utm_term || null,
         notas: leadData.notas,
         gclid: leadData.gclid || null,
-        fbclid: leadData.fbclid || null,
         created_at,
       };
 

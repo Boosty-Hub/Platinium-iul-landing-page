@@ -13,37 +13,11 @@ interface Lead {
   region?: string | null;
   ip_address?: string | null;
   interes?: string | null;
-  utm_source?: string | null;
-  utm_medium?: string | null;
-  utm_campaign?: string | null;
-  utm_term?: string | null;
-  utm_content?: string | null;
-  gclid?: string | null;
-  fbclid?: string | null;
-  referrer?: string | null;
 }
 
 type ConnState = "connected" | "reconnecting" | "disconnected";
 
-const SELECT_COLS = "id, created_at, nombre, telefono, email, city, region, ip_address, interes, utm_source, utm_medium, utm_campaign, utm_term, utm_content, gclid, fbclid, referrer";
-
-type OriginInfo = { label: string; cls: string };
-
-function getOrigin(l: Lead): OriginInfo {
-  const src = (l.utm_source || "").toLowerCase();
-  const med = (l.utm_medium || "").toLowerCase();
-  const ref = (l.referrer || "").toLowerCase();
-  const isPaid = med.includes("cpc") || med.includes("paid") || med.includes("ads");
-
-  if (l.gclid || (src.includes("google") && isPaid)) return { label: "Google Ads", cls: "bg-blue-500/20 text-blue-300 border-blue-400/40" };
-  if (l.fbclid || src.includes("facebook") || src.includes("meta") || src.includes("instagram") || src === "ig" || src === "fb")
-    return { label: isPaid ? "Meta Ads" : "Meta", cls: "bg-pink-500/20 text-pink-300 border-pink-400/40" };
-  if (src.includes("google") || ref.includes("google.")) return { label: "Google Orgánico", cls: "bg-emerald-500/20 text-emerald-300 border-emerald-400/40" };
-  if (ref.includes("facebook.") || ref.includes("instagram.") || ref.includes("fb.")) return { label: "Meta Orgánico", cls: "bg-pink-500/10 text-pink-200 border-pink-400/30" };
-  if (src.includes("tiktok") || ref.includes("tiktok.")) return { label: "TikTok", cls: "bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-400/40" };
-  if (src || med || ref) return { label: src || ref.replace(/^https?:\/\//, "").split("/")[0] || "Referencia", cls: "bg-amber-500/20 text-amber-300 border-amber-400/40" };
-  return { label: "Directo", cls: "bg-white/10 text-[#94B3BB] border-white/20" };
-}
+const SELECT_COLS = "id, created_at, nombre, telefono, email, city, region, ip_address, interes";
 
 export default function FormPanel() {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -290,18 +264,15 @@ export default function FormPanel() {
                   <th className="text-left px-4 py-3">Teléfono</th>
                   <th className="text-left px-4 py-3">Email</th>
                   <th className="text-left px-4 py-3">Ciudad</th>
-                  <th className="text-left px-4 py-3">Origen</th>
-                  <th className="text-left px-4 py-3">Búsqueda / Campaña</th>
+                  <th className="text-left px-4 py-3">IP</th>
                   <th className="text-left px-4 py-3">Interés</th>
                 </tr>
               </thead>
               <tbody>
                 {leads.length === 0 && (
-                  <tr><td colSpan={9} className="text-center py-12 text-[#94B3BB]">Aún no hay leads. Esperando…</td></tr>
+                  <tr><td colSpan={7} className="text-center py-12 text-[#94B3BB]">Aún no hay leads. Esperando…</td></tr>
                 )}
-                {leads.map((l) => {
-                  const origin = getOrigin(l);
-                  return (
+                {leads.map((l) => (
                   <tr
                     key={l.id}
                     className={`border-t border-[#1d9fa9]/10 transition-colors ${
@@ -313,24 +284,10 @@ export default function FormPanel() {
                     <td className="px-4 py-3"><a href={`tel:${l.telefono}`} className="text-[#1d9fa9] hover:underline">{l.telefono}</a></td>
                     <td className="px-4 py-3"><a href={`mailto:${l.email}`} className="text-[#1d9fa9] hover:underline">{l.email}</a></td>
                     <td className="px-4 py-3">{l.city ? `${l.city}${l.region ? `, ${l.region}` : ""}` : <span className="text-[#6A8E98]">—</span>}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-1 rounded-md text-xs font-semibold border ${origin.cls}`}>{origin.label}</span>
-                    </td>
-                    <td className="px-4 py-3 text-xs max-w-[220px]">
-                      {l.utm_term ? (
-                        <div className="text-[#1d9fa9] font-medium truncate" title={l.utm_term}>🔍 {l.utm_term}</div>
-                      ) : null}
-                      {l.utm_campaign ? (
-                        <div className="text-[#94B3BB] truncate" title={l.utm_campaign}>📣 {l.utm_campaign}</div>
-                      ) : null}
-                      {!l.utm_term && !l.utm_campaign && (
-                        <span className="text-[#6A8E98]">—</span>
-                      )}
-                    </td>
+                    <td className="px-4 py-3 font-mono text-xs text-[#94B3BB]">{l.ip_address || "—"}</td>
                     <td className="px-4 py-3 text-[#94B3BB] max-w-xs truncate">{l.interes || "—"}</td>
                   </tr>
-                  );
-                })}
+                ))}
               </tbody>
             </table>
           </div>
