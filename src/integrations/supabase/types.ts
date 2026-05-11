@@ -21,7 +21,6 @@ export type Database = {
           city: string | null
           created_at: string
           email: string
-          fbclid: string | null
           fuente: string | null
           gclid: string | null
           genero: string | null
@@ -48,7 +47,6 @@ export type Database = {
           city?: string | null
           created_at?: string
           email: string
-          fbclid?: string | null
           fuente?: string | null
           gclid?: string | null
           genero?: string | null
@@ -75,7 +73,6 @@ export type Database = {
           city?: string | null
           created_at?: string
           email?: string
-          fbclid?: string | null
           fuente?: string | null
           gclid?: string | null
           genero?: string | null
