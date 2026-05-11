@@ -13,11 +13,30 @@ interface Lead {
   region?: string | null;
   ip_address?: string | null;
   interes?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_term?: string | null;
+  utm_content?: string | null;
+  gclid?: string | null;
+  fbclid?: string | null;
 }
 
 type ConnState = "connected" | "reconnecting" | "disconnected";
 
-const SELECT_COLS = "id, created_at, nombre, telefono, email, city, region, ip_address, interes";
+const SELECT_COLS = "id, created_at, nombre, telefono, email, city, region, ip_address, interes, utm_source, utm_medium, utm_campaign, utm_term, utm_content, gclid, fbclid";
+
+function getLeadSource(l: Lead): { label: string; cls: string } {
+  const src = (l.utm_source || "").toLowerCase();
+  if (l.gclid || src.includes("google") || src === "adwords" || src === "gads") {
+    return { label: "Google Ads", cls: "bg-blue-500/20 text-blue-300 border-blue-500/40" };
+  }
+  if (l.fbclid || src.includes("facebook") || src.includes("meta") || src.includes("instagram") || src === "fb" || src === "ig") {
+    return { label: "Meta Ads", cls: "bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/40" };
+  }
+  if (src) return { label: src, cls: "bg-[#1d9fa9]/20 text-[#1d9fa9] border-[#1d9fa9]/40" };
+  return { label: "Directo", cls: "bg-white/10 text-[#94B3BB] border-white/10" };
+}
 
 export default function FormPanel() {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -264,15 +283,18 @@ export default function FormPanel() {
                   <th className="text-left px-4 py-3">Teléfono</th>
                   <th className="text-left px-4 py-3">Email</th>
                   <th className="text-left px-4 py-3">Ciudad</th>
-                  <th className="text-left px-4 py-3">IP</th>
+                  <th className="text-left px-4 py-3">Origen</th>
+                  <th className="text-left px-4 py-3">Búsqueda / Campaña</th>
                   <th className="text-left px-4 py-3">Interés</th>
                 </tr>
               </thead>
               <tbody>
                 {leads.length === 0 && (
-                  <tr><td colSpan={7} className="text-center py-12 text-[#94B3BB]">Aún no hay leads. Esperando…</td></tr>
+                  <tr><td colSpan={8} className="text-center py-12 text-[#94B3BB]">Aún no hay leads. Esperando…</td></tr>
                 )}
-                {leads.map((l) => (
+                {leads.map((l) => {
+                  const source = getLeadSource(l);
+                  return (
                   <tr
                     key={l.id}
                     className={`border-t border-[#1d9fa9]/10 transition-colors ${
@@ -284,10 +306,22 @@ export default function FormPanel() {
                     <td className="px-4 py-3"><a href={`tel:${l.telefono}`} className="text-[#1d9fa9] hover:underline">{l.telefono}</a></td>
                     <td className="px-4 py-3"><a href={`mailto:${l.email}`} className="text-[#1d9fa9] hover:underline">{l.email}</a></td>
                     <td className="px-4 py-3">{l.city ? `${l.city}${l.region ? `, ${l.region}` : ""}` : <span className="text-[#6A8E98]">—</span>}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-[#94B3BB]">{l.ip_address || "—"}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`inline-block px-2 py-1 rounded-md border text-xs font-semibold ${source.cls}`}>{source.label}</span>
+                    </td>
+                    <td className="px-4 py-3 text-xs max-w-[240px]">
+                      {l.utm_term ? (
+                        <div className="text-white truncate" title={l.utm_term}>🔎 {l.utm_term}</div>
+                      ) : null}
+                      {l.utm_campaign ? (
+                        <div className="text-[#94B3BB] truncate" title={l.utm_campaign}>📣 {l.utm_campaign}</div>
+                      ) : null}
+                      {!l.utm_term && !l.utm_campaign && <span className="text-[#6A8E98]">—</span>}
+                    </td>
                     <td className="px-4 py-3 text-[#94B3BB] max-w-xs truncate">{l.interes || "—"}</td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
