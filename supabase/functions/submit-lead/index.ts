@@ -67,6 +67,7 @@ function validateLead(body: Record<string, unknown>): { valid: boolean; error?: 
   }
 
   const gclid = body.gclid ? String(body.gclid).trim().slice(0, 500) : null;
+  const fbclid = body.fbclid ? String(body.fbclid).trim().slice(0, 500) : null;
 
   return {
     valid: true,
@@ -82,6 +83,7 @@ function validateLead(body: Record<string, unknown>): { valid: boolean; error?: 
       genero,
       notas,
       gclid,
+      fbclid,
       ...utms,
     },
   };
