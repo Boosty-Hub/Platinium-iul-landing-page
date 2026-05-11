@@ -290,15 +290,18 @@ export default function FormPanel() {
                   <th className="text-left px-4 py-3">Teléfono</th>
                   <th className="text-left px-4 py-3">Email</th>
                   <th className="text-left px-4 py-3">Ciudad</th>
-                  <th className="text-left px-4 py-3">IP</th>
+                  <th className="text-left px-4 py-3">Origen</th>
+                  <th className="text-left px-4 py-3">Búsqueda / Campaña</th>
                   <th className="text-left px-4 py-3">Interés</th>
                 </tr>
               </thead>
               <tbody>
                 {leads.length === 0 && (
-                  <tr><td colSpan={7} className="text-center py-12 text-[#94B3BB]">Aún no hay leads. Esperando…</td></tr>
+                  <tr><td colSpan={9} className="text-center py-12 text-[#94B3BB]">Aún no hay leads. Esperando…</td></tr>
                 )}
-                {leads.map((l) => (
+                {leads.map((l) => {
+                  const origin = getOrigin(l);
+                  return (
                   <tr
                     key={l.id}
                     className={`border-t border-[#1d9fa9]/10 transition-colors ${
@@ -310,10 +313,24 @@ export default function FormPanel() {
                     <td className="px-4 py-3"><a href={`tel:${l.telefono}`} className="text-[#1d9fa9] hover:underline">{l.telefono}</a></td>
                     <td className="px-4 py-3"><a href={`mailto:${l.email}`} className="text-[#1d9fa9] hover:underline">{l.email}</a></td>
                     <td className="px-4 py-3">{l.city ? `${l.city}${l.region ? `, ${l.region}` : ""}` : <span className="text-[#6A8E98]">—</span>}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-[#94B3BB]">{l.ip_address || "—"}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-block px-2 py-1 rounded-md text-xs font-semibold border ${origin.cls}`}>{origin.label}</span>
+                    </td>
+                    <td className="px-4 py-3 text-xs max-w-[220px]">
+                      {l.utm_term ? (
+                        <div className="text-[#1d9fa9] font-medium truncate" title={l.utm_term}>🔍 {l.utm_term}</div>
+                      ) : null}
+                      {l.utm_campaign ? (
+                        <div className="text-[#94B3BB] truncate" title={l.utm_campaign}>📣 {l.utm_campaign}</div>
+                      ) : null}
+                      {!l.utm_term && !l.utm_campaign && (
+                        <span className="text-[#6A8E98]">—</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-[#94B3BB] max-w-xs truncate">{l.interes || "—"}</td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
