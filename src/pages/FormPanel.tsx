@@ -13,11 +13,37 @@ interface Lead {
   region?: string | null;
   ip_address?: string | null;
   interes?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_term?: string | null;
+  utm_content?: string | null;
+  gclid?: string | null;
+  fbclid?: string | null;
+  referrer?: string | null;
 }
 
 type ConnState = "connected" | "reconnecting" | "disconnected";
 
-const SELECT_COLS = "id, created_at, nombre, telefono, email, city, region, ip_address, interes";
+const SELECT_COLS = "id, created_at, nombre, telefono, email, city, region, ip_address, interes, utm_source, utm_medium, utm_campaign, utm_term, utm_content, gclid, fbclid, referrer";
+
+type OriginInfo = { label: string; cls: string };
+
+function getOrigin(l: Lead): OriginInfo {
+  const src = (l.utm_source || "").toLowerCase();
+  const med = (l.utm_medium || "").toLowerCase();
+  const ref = (l.referrer || "").toLowerCase();
+  const isPaid = med.includes("cpc") || med.includes("paid") || med.includes("ads");
+
+  if (l.gclid || (src.includes("google") && isPaid)) return { label: "Google Ads", cls: "bg-blue-500/20 text-blue-300 border-blue-400/40" };
+  if (l.fbclid || src.includes("facebook") || src.includes("meta") || src.includes("instagram") || src === "ig" || src === "fb")
+    return { label: isPaid ? "Meta Ads" : "Meta", cls: "bg-pink-500/20 text-pink-300 border-pink-400/40" };
+  if (src.includes("google") || ref.includes("google.")) return { label: "Google Orgánico", cls: "bg-emerald-500/20 text-emerald-300 border-emerald-400/40" };
+  if (ref.includes("facebook.") || ref.includes("instagram.") || ref.includes("fb.")) return { label: "Meta Orgánico", cls: "bg-pink-500/10 text-pink-200 border-pink-400/30" };
+  if (src.includes("tiktok") || ref.includes("tiktok.")) return { label: "TikTok", cls: "bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-400/40" };
+  if (src || med || ref) return { label: src || ref.replace(/^https?:\/\//, "").split("/")[0] || "Referencia", cls: "bg-amber-500/20 text-amber-300 border-amber-400/40" };
+  return { label: "Directo", cls: "bg-white/10 text-[#94B3BB] border-white/20" };
+}
 
 export default function FormPanel() {
   const [leads, setLeads] = useState<Lead[]>([]);
