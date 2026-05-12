@@ -300,10 +300,10 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
               </h3>
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 {[
-                  { weekly: "12.50", monthly: "50" },
                   { weekly: "25", monthly: "100" },
-                  { weekly: "37.50", monthly: "150" },
                   { weekly: "50", monthly: "200" },
+                  { weekly: "75", monthly: "300" },
+                  { weekly: "100", monthly: "400" },
                 ].map(({ weekly, monthly }) => (
                   <button
                     key={weekly}
