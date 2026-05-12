@@ -50,7 +50,6 @@ function validatePhone(rawPhone: string, countryCode: string): { valid: boolean;
   return { valid: true, fullNumber };
 }
 
-import { getStoredAttribution, captureAttribution } from "@/lib/attribution";
 
 async function submitLead(data: LeadFormData, formLoadedAt: number): Promise<{ ok: boolean; leadId?: string }> {
   try {
