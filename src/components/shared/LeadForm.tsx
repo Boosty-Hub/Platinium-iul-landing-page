@@ -5,6 +5,7 @@ import { CheckIcon, WhatsAppIcon } from "./Icons";
 import familyHomeImg from "@/assets/family-home.jpg";
 import agentSuccessImg from "@/assets/agent-success.png";
 import { Anim } from "./Anim";
+import { getStoredAttribution, captureAttribution } from "@/lib/attribution";
 
 interface LeadFormData {
   nombre: string;
