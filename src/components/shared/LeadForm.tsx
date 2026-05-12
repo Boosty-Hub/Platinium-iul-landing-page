@@ -49,20 +49,13 @@ function validatePhone(rawPhone: string, countryCode: string): { valid: boolean;
   return { valid: true, fullNumber };
 }
 
-function getUTMParams(): Record<string, string> {
-  const params = new URLSearchParams(window.location.search);
-  const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "fbclid"];
-  const result: Record<string, string> = {};
-  utmKeys.forEach((key) => {
-    const val = params.get(key);
-    if (val) result[key] = val.slice(0, 200);
-  });
-  return result;
-}
+import { getStoredAttribution, captureAttribution } from "@/lib/attribution";
 
 async function submitLead(data: LeadFormData, formLoadedAt: number): Promise<{ ok: boolean; leadId?: string }> {
   try {
-    const utms = getUTMParams();
+    // Re-capture in case URL was updated after initial load, then read persisted values
+    captureAttribution();
+    const utms = getStoredAttribution();
     const res = await supabase.functions.invoke("submit-lead", {
       body: {
         nombre: data.nombre,
