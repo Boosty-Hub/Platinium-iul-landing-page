@@ -312,9 +312,9 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                     className={`${amtBtnBase} ${form.ahorro_semanal === weekly ? amtBtnActive : amtBtnIdle}`}
                     style={{ backgroundColor: form.ahorro_semanal === weekly ? "rgba(29,159,169,0.25)" : "rgba(29,159,169,0.1)", color: textColor }}
                   >
-                    <div className="text-lg sm:text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>${weekly}</div>
-                    <div className="text-[10px] mt-0.5" style={{ color: mutedColor }}>a la semana</div>
-                    <div className="text-[10px] mt-0.5 opacity-70" style={{ color: mutedColor }}>(${monthly} al mes)</div>
+                    <div className="text-xl sm:text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>${weekly}</div>
+                    <div className="text-xs mt-1" style={{ color: midColor }}>a la semana</div>
+                    <div className="text-xs mt-0.5 opacity-80" style={{ color: midColor }}>(${monthly} al mes)</div>
                   </button>
                 ))}
               </div>
