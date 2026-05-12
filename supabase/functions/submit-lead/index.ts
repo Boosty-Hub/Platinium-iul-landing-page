@@ -88,23 +88,6 @@ function validateLead(body: Record<string, unknown>): { valid: boolean; error?: 
     },
   };
 }
-    valid: true,
-    data: {
-      nombre,
-      telefono,
-      email,
-      interes: interes || "",
-      fuente: "landing-iul",
-      referrer: body.referrer ? String(body.referrer).slice(0, 1000) : "",
-      anio_nacimiento,
-      ahorro_semanal: ahorro,
-      genero,
-      notas,
-      gclid,
-      ...utms,
-    },
-  };
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
