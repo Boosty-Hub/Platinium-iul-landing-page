@@ -1,57 +1,41 @@
-## Landing dedicada para campaña Meta: `/cotiza`
+## Problema
 
-### Objetivo
-Crear una página independiente, ultra enfocada en conversión, sin navbar ni footer ni distracciones, para usar como destino del tráfico pagado de Meta Ads. Solo logo + formulario + prueba social mínima.
+Los UTMs (`utm_source`, `utm_medium`, `utm_campaign`, etc.), `gclid` y `fbclid` solo se leen desde `window.location.search` **en el momento exacto del submit**, dentro de `getUTMParams()` en `src/components/shared/LeadForm.tsx` (línea 52).
 
----
+Esto significa que si el usuario:
+- Llega con `?utm_source=facebook&fbclid=...` y **navega a otra página** antes de enviar el form → los UTMs se pierden.
+- Hace scroll, espera, recarga, o el SPA cambia la URL → se pierden.
+- Llega a `/cotiza` desde un anuncio pero el form lo envía después de moverse → se pierden.
 
-### Ruta
-- Nueva ruta: **`/cotiza`** (corta, fácil de recordar y de poner en anuncios)
-- Se mantiene el `GeoGate` (US-only) y el `CookieBanner` por compliance
-- **NO** se incluye Navbar ni Footer ni links a otras páginas (evita fugas de tráfico pagado)
+Por eso llegan en `null` al webhook de n8n aunque el anuncio sí los traía.
 
-### Estructura de la página (mobile-first)
-1. **Top bar mínima**
-   - Logo de Platinum Insurance (centrado en mobile, izquierda en desktop)
-   - Badge de confianza: "Licenciados en USA · Atención en Español"
-   - Sin links de navegación
-2. **Hero compacto** (encima del formulario en mobile, al lado en desktop)
-   - Título grande: "Cotiza tu IUL Gratis con Platinum Insurance"
-   - Subtítulo: beneficios en 3 bullets cortos (protección familiar, ahorro con interés, sin examen médico)
-   - Iconos de confianza (5 estrellas, "+1,000 familias protegidas", "Respuesta en 24 hrs")
-3. **Formulario de leads (protagonista absoluto)**
-   - Reutiliza el componente actual `LeadForm` (mismo wizard de 6 pasos, misma validación, misma Edge Function `submit-lead`)
-   - Captura automática de UTMs / `gclid` / `fbclid` (ya está implementado, solo se asegura `fbclid`)
-4. **Mini prueba social debajo del form**
-   - 1 testimonio corto con foto
-   - Logos de aseguradoras partners (marquee actual reducido)
-5. **Footer minimal**
-   - Solo: copyright + WhatsApp + link a Política de Privacidad (requerido por Meta Ads)
+## Solución
 
-### Atribución de campaña Meta
-- Capturar y enviar al backend: `fbclid`, `utm_source=facebook`, `utm_medium=cta`, `utm_campaign=...`
-- Ajuste menor en `getUTMParams()` (en `LeadForm.tsx`) para incluir `fbclid` en la lista de claves capturadas
-- Estos datos viajan al webhook de n8n → Kommo (ya configurado), permitiendo identificar leads por campaña
+Capturar UTMs + `gclid` + `fbclid` **una sola vez al cargar la app** y persistirlos en `sessionStorage` (con fallback a `localStorage` con TTL de 90 días para atribución cross-session típica de Meta/Google Ads). Al enviar el lead, leer desde el storage en vez de la URL actual.
 
-### SEO / Indexación
-- `noindex, nofollow` en esta página (es landing pagada, no debe aparecer en Google orgánico ni competir con SEO)
-- Título y descripción optimizados para Meta Ads scraper (preview bonito al pegar el link)
-- OG Image dedicada (usa la actual del sitio)
+### Cambios
 
-### Detalles técnicos
-- **Crear**: `src/pages/Cotiza.tsx` (no usa `Layout` para evitar Navbar/Footer)
-- **Modificar**: 
-  - `src/App.tsx` → registrar la ruta `/cotiza` (lazy import)
-  - `src/components/shared/LeadForm.tsx` → agregar `fbclid` a `getUTMParams()`
-- **No** se modifica el formulario actual de las otras páginas (queda igual)
-- **No** requiere migración de DB (los UTMs/fbclid se guardan en el campo existente)
+**1. Nuevo archivo `src/lib/attribution.ts`**
+- `captureAttribution()`: lee UTMs, `gclid`, `fbclid` y `referrer` de la URL/documento actual. Si hay alguno nuevo, lo guarda en `localStorage` con timestamp. Solo sobrescribe si llegan parámetros nuevos (no pisa una atribución previa con vacío).
+- `getStoredAttribution()`: devuelve los UTMs guardados si tienen menos de 90 días, sino `{}`.
+- TTL: 90 días (estándar de atribución de Meta/Google).
 
-### Resultado esperado
-Una URL `platiniuminsuranceusa.com/cotiza` lista para pegar en los anuncios de Meta:
-- 0 distracciones → mayor tasa de conversión
-- Tracking automático de qué campaña/anuncio generó cada lead
-- Mismo flujo de notificación en `/form-panel` (alarma sonora + sync a Kommo)
+**2. `src/main.tsx`** (o `src/App.tsx`)
+- Llamar a `captureAttribution()` al arrancar la app, **antes** del primer render, así se captura aunque el usuario navegue por el SPA.
+
+**3. `src/components/shared/LeadForm.tsx`**
+- Reemplazar `getUTMParams()` por `getStoredAttribution()` desde `@/lib/attribution`.
+- Mantener fallback: si no hay nada en storage, leer de la URL actual igual que antes.
+
+**4. (Opcional) `supabase/functions/submit-lead/index.ts`**
+- Ya acepta `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `gclid`. **Agregar también `fbclid`** (Meta Ads) para que se guarde en DB y se reenvíe al webhook de n8n. Hoy se está perdiendo aunque el frontend lo mande.
+- Esto requiere agregar la columna `fbclid` a la tabla `leads` (migración corta).
 
 ### Archivos
-- **Crear**: `src/pages/Cotiza.tsx`
-- **Modificar**: `src/App.tsx`, `src/components/shared/LeadForm.tsx`
+- **Crear**: `src/lib/attribution.ts`
+- **Modificar**: `src/main.tsx`, `src/components/shared/LeadForm.tsx`, `supabase/functions/submit-lead/index.ts`
+- **Migración DB**: agregar columna `fbclid TEXT` a `public.leads`
+
+### Resultado
+- Un usuario que llega desde `https://platiniuminsuranceusa.com/cotiza?utm_source=facebook&utm_campaign=iul-mayo&fbclid=xyz` y completa el form 5 minutos después (incluso si navegó a otras páginas) llegará al webhook de n8n con todos los UTMs poblados.
+- Atribución correcta en Kommo por campaña.
