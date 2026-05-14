@@ -1,23 +1,18 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LeadAlertModal } from "@/components/panel/LeadAlertModal";
+import { LeadDetails } from "@/components/panel/LeadDetails";
+import { OriginBadge } from "@/components/panel/OriginBadge";
+import { Lead, LEAD_SELECT_COLS } from "@/components/panel/types";
+import { getLeadOrigin } from "@/lib/leadOrigin";
 import { toast } from "@/hooks/use-toast";
+import { ChevronDown } from "lucide-react";
 
-interface Lead {
-  id: string;
-  created_at: string;
-  nombre: string;
-  telefono: string;
-  email: string;
-  city?: string | null;
-  region?: string | null;
-  ip_address?: string | null;
-  interes?: string | null;
-}
+export type { Lead } from "@/components/panel/types";
 
 type ConnState = "connected" | "reconnecting" | "disconnected";
 
-const SELECT_COLS = "id, created_at, nombre, telefono, email, city, region, ip_address, interes";
+const SELECT_COLS = LEAD_SELECT_COLS;
 
 export default function FormPanel() {
   const [leads, setLeads] = useState<Lead[]>([]);
