@@ -20,6 +20,8 @@ export default function FormPanel() {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [connState, setConnState] = useState<ConnState>("reconnecting");
   const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const toggleExpanded = (id: string) => setExpandedId((cur) => (cur === id ? null : id));
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
