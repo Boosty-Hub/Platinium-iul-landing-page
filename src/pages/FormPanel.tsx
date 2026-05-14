@@ -1,23 +1,18 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, Fragment } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LeadAlertModal } from "@/components/panel/LeadAlertModal";
+import { LeadDetails } from "@/components/panel/LeadDetails";
+import { OriginBadge } from "@/components/panel/OriginBadge";
+import { Lead, LEAD_SELECT_COLS } from "@/components/panel/types";
+import { getLeadOrigin } from "@/lib/leadOrigin";
 import { toast } from "@/hooks/use-toast";
+import { ChevronDown } from "lucide-react";
 
-interface Lead {
-  id: string;
-  created_at: string;
-  nombre: string;
-  telefono: string;
-  email: string;
-  city?: string | null;
-  region?: string | null;
-  ip_address?: string | null;
-  interes?: string | null;
-}
+export type { Lead } from "@/components/panel/types";
 
 type ConnState = "connected" | "reconnecting" | "disconnected";
 
-const SELECT_COLS = "id, created_at, nombre, telefono, email, city, region, ip_address, interes";
+const SELECT_COLS = LEAD_SELECT_COLS;
 
 export default function FormPanel() {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -25,6 +20,8 @@ export default function FormPanel() {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [connState, setConnState] = useState<ConnState>("reconnecting");
   const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const toggleExpanded = (id: string) => setExpandedId((cur) => (cur === id ? null : id));
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
@@ -191,12 +188,6 @@ export default function FormPanel() {
     setAudioEnabled(true);
   };
 
-  const fmtTime = (iso: string) => {
-    const d = new Date(iso);
-    return d.toLocaleTimeString("es-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) +
-      " · " + d.toLocaleDateString("es-US", { day: "2-digit", month: "2-digit" });
-  };
-
   const dismissCurrent = () => setAlertQueue((q) => q.slice(1));
   const dismissAll = () => setAlertQueue([]);
 
@@ -253,44 +244,143 @@ export default function FormPanel() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-6">
-        <div className="rounded-xl border border-[#1d9fa9]/20 overflow-hidden bg-[#0F2229]">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-[#0B1A1E] text-[#94B3BB] uppercase text-xs">
-                <tr>
-                  <th className="text-left px-4 py-3">Hora</th>
-                  <th className="text-left px-4 py-3">Nombre</th>
-                  <th className="text-left px-4 py-3">Teléfono</th>
-                  <th className="text-left px-4 py-3">Email</th>
-                  <th className="text-left px-4 py-3">Ciudad</th>
-                  <th className="text-left px-4 py-3">IP</th>
-                  <th className="text-left px-4 py-3">Interés</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leads.length === 0 && (
-                  <tr><td colSpan={7} className="text-center py-12 text-[#94B3BB]">Aún no hay leads. Esperando…</td></tr>
-                )}
-                {leads.map((l) => (
-                  <tr
-                    key={l.id}
-                    className={`border-t border-[#1d9fa9]/10 transition-colors ${
-                      highlightId === l.id ? "bg-[#1d9fa9]/20 animate-in fade-in slide-in-from-top-2" : "hover:bg-[#1d9fa9]/5"
-                    }`}
-                  >
-                    <td className="px-4 py-3 text-[#94B3BB] whitespace-nowrap">{fmtTime(l.created_at)}</td>
-                    <td className="px-4 py-3 font-medium">{l.nombre}</td>
-                    <td className="px-4 py-3"><a href={`tel:${l.telefono}`} className="text-[#1d9fa9] hover:underline">{l.telefono}</a></td>
-                    <td className="px-4 py-3"><a href={`mailto:${l.email}`} className="text-[#1d9fa9] hover:underline">{l.email}</a></td>
-                    <td className="px-4 py-3">{l.city ? `${l.city}${l.region ? `, ${l.region}` : ""}` : <span className="text-[#6A8E98]">—</span>}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-[#94B3BB]">{l.ip_address || "—"}</td>
-                    <td className="px-4 py-3 text-[#94B3BB] max-w-xs truncate">{l.interes || "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
+        {leads.length === 0 && (
+          <div className="rounded-xl border border-[#1d9fa9]/20 bg-[#0F2229] py-12 text-center text-[#94B3BB]">
+            Aún no hay leads. Esperando…
           </div>
+        )}
+
+        {/* DESKTOP / TABLET TABLE */}
+        <div className="hidden md:block rounded-xl border border-[#1d9fa9]/20 overflow-hidden bg-[#0F2229]">
+          <table className="w-full text-sm table-fixed">
+            <colgroup>
+              <col className="w-[110px]" />
+              <col />
+              <col className="w-[200px] lg:w-[220px]" />
+              <col className="w-[240px] lg:w-[280px]" />
+              <col className="w-[40px]" />
+            </colgroup>
+            <thead className="bg-[#0B1A1E] text-[#94B3BB] uppercase text-[11px] tracking-wider">
+              <tr>
+                <th className="text-left px-4 py-3">Hora</th>
+                <th className="text-left px-4 py-3">Contacto</th>
+                <th className="text-left px-4 py-3">Ubicación</th>
+                <th className="text-left px-4 py-3">Origen</th>
+                <th className="px-2 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {leads.map((l) => {
+                const origin = getLeadOrigin(l);
+                const isOpen = expandedId === l.id;
+                return (
+                  <Fragment key={l.id}>
+                    <tr
+                      onClick={() => toggleExpanded(l.id)}
+                      className={`border-t border-[#1d9fa9]/10 transition-colors cursor-pointer align-top ${
+                        highlightId === l.id ? "bg-[#1d9fa9]/15 animate-in fade-in slide-in-from-top-2" : "hover:bg-[#1d9fa9]/5"
+                      }`}
+                    >
+                      <td className="px-4 py-3 text-[#94B3BB] whitespace-nowrap text-xs leading-tight">
+                        <div className="font-mono">{new Date(l.created_at).toLocaleTimeString("es-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</div>
+                        <div className="text-[#6A8E98]">{new Date(l.created_at).toLocaleDateString("es-US", { day: "2-digit", month: "2-digit" })}</div>
+                      </td>
+                      <td className="px-4 py-3 leading-tight">
+                        <div className="font-semibold text-[#E4EEF0] truncate">{l.nombre}</div>
+                        <a href={`tel:${l.telefono}`} onClick={(e) => e.stopPropagation()} className="text-[#1d9fa9] hover:underline text-xs block">{l.telefono}</a>
+                        <a href={`mailto:${l.email}`} onClick={(e) => e.stopPropagation()} className="text-[#94B3BB] hover:text-[#1d9fa9] hover:underline text-xs block truncate">{l.email}</a>
+                      </td>
+                      <td className="px-4 py-3 leading-tight">
+                        <div className="text-[#E4EEF0] text-sm truncate">
+                          {l.city ? `${l.city}${l.region ? `, ${l.region}` : ""}` : <span className="text-[#6A8E98]">—</span>}
+                        </div>
+                        <div className="font-mono text-[11px] text-[#6A8E98] hidden lg:block truncate">{l.ip_address || "—"}</div>
+                      </td>
+                      <td className="px-4 py-3 leading-tight">
+                        <OriginBadge origin={origin} />
+                        {origin.campaign && (
+                          <div className="mt-1 text-xs text-[#E4EEF0] truncate" title={origin.campaign}>{origin.campaign}</div>
+                        )}
+                        {origin.detail && (
+                          <div className="text-[11px] text-[#6A8E98] hidden lg:block truncate" title={origin.detail}>{origin.detail}</div>
+                        )}
+                      </td>
+                      <td className="px-2 py-3 text-[#6A8E98]">
+                        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                      </td>
+                    </tr>
+                    {isOpen && (
+                      <tr className="bg-[#0B1A1E]/60 border-t border-[#1d9fa9]/10">
+                        <td colSpan={5} className="px-6 py-4">
+                          <LeadDetails lead={l} />
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* MOBILE CARDS */}
+        <div className="md:hidden space-y-3">
+          {leads.map((l) => {
+            const origin = getLeadOrigin(l);
+            const isOpen = expandedId === l.id;
+            return (
+              <div
+                key={l.id}
+                className={`rounded-xl border bg-[#0F2229] p-4 transition-colors ${
+                  highlightId === l.id ? "border-[#1d9fa9] bg-[#1d9fa9]/10" : "border-[#1d9fa9]/20"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-[#E4EEF0] truncate">{l.nombre}</div>
+                    <a href={`tel:${l.telefono}`} className="text-[#1d9fa9] text-sm block">{l.telefono}</a>
+                    <a href={`mailto:${l.email}`} className="text-[#94B3BB] text-xs block truncate">{l.email}</a>
+                  </div>
+                  <div className="text-right text-[11px] text-[#6A8E98] whitespace-nowrap font-mono">
+                    <div>{new Date(l.created_at).toLocaleTimeString("es-US", { hour: "2-digit", minute: "2-digit" })}</div>
+                    <div>{new Date(l.created_at).toLocaleDateString("es-US", { day: "2-digit", month: "2-digit" })}</div>
+                  </div>
+                </div>
+                <div className="space-y-1.5 text-xs border-t border-[#1d9fa9]/10 pt-2">
+                  <div className="flex items-center gap-2 text-[#94B3BB]">
+                    <span aria-hidden>📍</span>
+                    <span className="truncate">
+                      {l.city ? `${l.city}${l.region ? `, ${l.region}` : ""}` : "Ubicación desconocida"}
+                      {l.ip_address && <span className="text-[#6A8E98] font-mono ml-2">{l.ip_address}</span>}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <OriginBadge origin={origin} />
+                    {origin.campaign && <span className="text-[#E4EEF0] truncate">{origin.campaign}</span>}
+                  </div>
+                  {l.interes && (
+                    <div className="flex items-start gap-2 text-[#94B3BB]">
+                      <span aria-hidden>💬</span>
+                      <span className="truncate">{l.interes}</span>
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() => toggleExpanded(l.id)}
+                  className="mt-3 w-full flex items-center justify-center gap-1 text-xs text-[#1d9fa9] hover:text-[#5fd0d9] py-2 border-t border-[#1d9fa9]/10"
+                >
+                  {isOpen ? "Ocultar detalles" : "Ver más"}
+                  <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                </button>
+                {isOpen && (
+                  <div className="mt-3 pt-3 border-t border-[#1d9fa9]/10">
+                    <LeadDetails lead={l} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </main>
 
