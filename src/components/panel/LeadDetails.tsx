@@ -1,4 +1,4 @@
-import { Lead } from "@/pages/FormPanel";
+import { Lead } from "./types";
 
 export function LeadDetails({ lead }: { lead: Lead }) {
   const items: { label: string; value: string | null | undefined }[] = [
