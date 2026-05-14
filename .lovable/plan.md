@@ -1,41 +1,114 @@
-## Problema
+# Panel de Leads — Mostrar origen (UTMs) y rediseñar tabla
 
-Los UTMs (`utm_source`, `utm_medium`, `utm_campaign`, etc.), `gclid` y `fbclid` solo se leen desde `window.location.search` **en el momento exacto del submit**, dentro de `getUTMParams()` en `src/components/shared/LeadForm.tsx` (línea 52).
+## Objetivo
+1. Que cada lead muestre **de dónde viene** (campaña, fuente, medio, contenido) de forma clara y resumida.
+2. Reorganizar la tabla para que **no se vea saturada** y funcione bien en **móvil/tablet/desktop**, sin perder información.
 
-Esto significa que si el usuario:
-- Llega con `?utm_source=facebook&fbclid=...` y **navega a otra página** antes de enviar el form → los UTMs se pierden.
-- Hace scroll, espera, recarga, o el SPA cambia la URL → se pierden.
-- Llega a `/cotiza` desde un anuncio pero el form lo envía después de moverse → se pierden.
+---
 
-Por eso llegan en `null` al webhook de n8n aunque el anuncio sí los traía.
+## 1. Traer los datos de atribución desde la base
 
-## Solución
+Hoy `FormPanel.tsx` solo selecciona:
+`id, created_at, nombre, telefono, email, city, region, ip_address, interes`
 
-Capturar UTMs + `gclid` + `fbclid` **una sola vez al cargar la app** y persistirlos en `sessionStorage` (con fallback a `localStorage` con TTL de 90 días para atribución cross-session típica de Meta/Google Ads). Al enviar el lead, leer desde el storage en vez de la URL actual.
+Voy a ampliar el SELECT para incluir:
+- `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`
+- `gclid`, `fbclid`
+- `referrer`, `fuente`
+- `ahorro_semanal`, `anio_nacimiento`, `genero` (útiles para el agente al llamar)
 
-### Cambios
+La RLS ya permite SELECT público al panel, así que no hace falta migración.
 
-**1. Nuevo archivo `src/lib/attribution.ts`**
-- `captureAttribution()`: lee UTMs, `gclid`, `fbclid` y `referrer` de la URL/documento actual. Si hay alguno nuevo, lo guarda en `localStorage` con timestamp. Solo sobrescribe si llegan parámetros nuevos (no pisa una atribución previa con vacío).
-- `getStoredAttribution()`: devuelve los UTMs guardados si tienen menos de 90 días, sino `{}`.
-- TTL: 90 días (estándar de atribución de Meta/Google).
+---
 
-**2. `src/main.tsx`** (o `src/App.tsx`)
-- Llamar a `captureAttribution()` al arrancar la app, **antes** del primer render, así se captura aunque el usuario navegue por el SPA.
+## 2. Lógica de "Origen" (resumen humano)
 
-**3. `src/components/shared/LeadForm.tsx`**
-- Reemplazar `getUTMParams()` por `getStoredAttribution()` desde `@/lib/attribution`.
-- Mantener fallback: si no hay nada en storage, leer de la URL actual igual que antes.
+Crear un helper `getLeadOrigin(lead)` que devuelva un objeto:
+```
+{
+  channel: "Facebook Ads" | "Google Ads" | "Instagram" | "TikTok" | "Orgánico" | "Directo" | "Referido",
+  campaign: string | null,    // utm_campaign legible
+  detail: string | null,      // utm_content / utm_term / referrer corto
+  badgeColor: string,         // color por canal
+  icon: emoji o ícono
+}
+```
 
-**4. (Opcional) `supabase/functions/submit-lead/index.ts`**
-- Ya acepta `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `gclid`. **Agregar también `fbclid`** (Meta Ads) para que se guarde en DB y se reenvíe al webhook de n8n. Hoy se está perdiendo aunque el frontend lo mande.
-- Esto requiere agregar la columna `fbclid` a la tabla `leads` (migración corta).
+Reglas:
+- `fbclid` o `utm_source=facebook|fb|meta|ig|instagram` → **Facebook/Instagram Ads**
+- `gclid` o `utm_source=google|adwords` con `utm_medium=cpc|paid` → **Google Ads**
+- `utm_source=tiktok` → **TikTok Ads**
+- `utm_medium=organic` o `utm_source=google` sin gclid → **Búsqueda orgánica**
+- `referrer` con dominio (no propio) → **Referido (dominio)**
+- Sin nada → **Directo**
 
-### Archivos
-- **Crear**: `src/lib/attribution.ts`
-- **Modificar**: `src/main.tsx`, `src/components/shared/LeadForm.tsx`, `supabase/functions/submit-lead/index.ts`
-- **Migración DB**: agregar columna `fbclid TEXT` a `public.leads`
+Cada canal tiene color y emoji distinto para escaneo visual rápido.
 
-### Resultado
-- Un usuario que llega desde `https://platiniuminsuranceusa.com/cotiza?utm_source=facebook&utm_campaign=iul-mayo&fbclid=xyz` y completa el form 5 minutos después (incluso si navegó a otras páginas) llegará al webhook de n8n con todos los UTMs poblados.
-- Atribución correcta en Kommo por campaña.
+---
+
+## 3. Rediseño de la tabla (desktop)
+
+Estructura nueva con 2 líneas por fila para densidad sin saturación:
+
+```text
+┌──────────┬─────────────────────────┬──────────────────────┬─────────────────────────┐
+│ Hora     │ Contacto                │ Ubicación / IP       │ Origen                  │
+├──────────┼─────────────────────────┼──────────────────────┼─────────────────────────┤
+│ 14:32:05 │ Juan Pérez              │ Miami, FL            │ [FB Ads] iul-mayo-25    │
+│ 12/05    │ +1 414 202 1709         │ 190.12.x.x           │ creative-A · interes-fam│
+│          │ juan@gmail.com          │                      │                         │
+└──────────┴─────────────────────────┴──────────────────────┴─────────────────────────┘
+```
+
+Columnas finales (4 en lugar de 7):
+1. **Hora** — hh:mm:ss + dd/mm
+2. **Contacto** — Nombre (bold), tel (link), email (link, text-xs)
+3. **Ubicación** — Ciudad, Estado + IP debajo (text-xs muted)
+4. **Origen** — Badge de canal (color) + campaña + detalle (utm_content/term) debajo
+
+El campo "Interés" + edad/género/ahorro pasa a una fila expandible (click en la fila → fila secundaria con esos detalles + UTMs crudos para debug).
+
+---
+
+## 4. Responsive
+
+**Desktop (≥1024px):** tabla con 4 columnas como arriba.
+
+**Tablet (768–1023px):** se ocultan las columnas IP y "detalle" del origen (se queda solo el badge + campaña).
+
+**Móvil (<768px):** la tabla se convierte en **lista de tarjetas**:
+```
+┌─────────────────────────────────┐
+│ Juan Pérez          14:32 · 12/05│
+│ +1 414 202 1709                 │
+│ juan@gmail.com                  │
+│ ─────────────────────────────── │
+│ 📍 Miami, FL  ·  190.12.x.x     │
+│ 🎯 [FB Ads] iul-mayo-25         │
+│ 💬 Proteger a mi familia        │
+│ [▾ Ver más]                     │
+└─────────────────────────────────┘
+```
+Tap "Ver más" abre detalles (UTMs, gclid, fbclid, ahorro, edad, género, user agent).
+
+---
+
+## 5. Cambios técnicos concretos
+
+**Archivos a editar:**
+- `src/pages/FormPanel.tsx` — ampliar `SELECT_COLS`, ampliar interface `Lead`, integrar nuevo componente de tabla.
+
+**Archivos a crear:**
+- `src/lib/leadOrigin.ts` — helper `getLeadOrigin()` con la lógica del canal.
+- `src/components/panel/LeadRow.tsx` — fila de tabla (desktop/tablet) con expansión.
+- `src/components/panel/LeadCard.tsx` — tarjeta para móvil.
+- `src/components/panel/OriginBadge.tsx` — badge de canal con color.
+
+**Sin migración de DB**, sin tocar el formulario de captura ni el edge function.
+
+---
+
+## Resultado esperado
+- En desktop: tabla limpia de 4 columnas, escaneable de un vistazo, con el origen del lead visible y coloreado.
+- En móvil: tarjetas apiladas, sin scroll horizontal.
+- Click/tap en una fila/tarjeta muestra todos los detalles crudos (UTMs, gclid, etc.) por si el agente los necesita.
