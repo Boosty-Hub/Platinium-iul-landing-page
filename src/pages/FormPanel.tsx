@@ -188,12 +188,6 @@ export default function FormPanel() {
     setAudioEnabled(true);
   };
 
-  const fmtTime = (iso: string) => {
-    const d = new Date(iso);
-    return d.toLocaleTimeString("es-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) +
-      " · " + d.toLocaleDateString("es-US", { day: "2-digit", month: "2-digit" });
-  };
-
   const dismissCurrent = () => setAlertQueue((q) => q.slice(1));
   const dismissAll = () => setAlertQueue([]);
 
