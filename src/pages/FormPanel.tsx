@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, Fragment } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LeadAlertModal } from "@/components/panel/LeadAlertModal";
 import { LeadDetails } from "@/components/panel/LeadDetails";
@@ -281,9 +281,8 @@ export default function FormPanel() {
                 const origin = getLeadOrigin(l);
                 const isOpen = expandedId === l.id;
                 return (
-                  <>
+                  <Fragment key={l.id}>
                     <tr
-                      key={l.id}
                       onClick={() => toggleExpanded(l.id)}
                       className={`border-t border-[#1d9fa9]/10 transition-colors cursor-pointer align-top ${
                         highlightId === l.id ? "bg-[#1d9fa9]/15 animate-in fade-in slide-in-from-top-2" : "hover:bg-[#1d9fa9]/5"
@@ -318,13 +317,13 @@ export default function FormPanel() {
                       </td>
                     </tr>
                     {isOpen && (
-                      <tr key={`${l.id}-d`} className="bg-[#0B1A1E]/60 border-t border-[#1d9fa9]/10">
+                      <tr className="bg-[#0B1A1E]/60 border-t border-[#1d9fa9]/10">
                         <td colSpan={5} className="px-6 py-4">
                           <LeadDetails lead={l} />
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>
