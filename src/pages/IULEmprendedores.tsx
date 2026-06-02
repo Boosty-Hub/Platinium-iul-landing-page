@@ -170,8 +170,9 @@ export default function IULEmprendedores() {
 
               <Anim delay={0.3}>
                 <div className="mt-10 text-center flex flex-wrap justify-center gap-4">
-                  <Link to="/jubilacion-sin-401k" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">← Jubilación sin 401k</Link>
+                  <Link to="/proteccion-familiar" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">← Retiro privado con IUL</Link>
                   <Link to="/seguro-vida-itin" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">¿Tienes ITIN? →</Link>
+                  <Link to="/cotizacion-iul" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">Cotiza tu plan →</Link>
                 </div>
               </Anim>
             </div>

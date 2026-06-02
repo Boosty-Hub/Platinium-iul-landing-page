@@ -186,8 +186,10 @@ export default function SeguroSinExamen() {
 
               <Anim delay={0.3}>
                 <div className="mt-10 text-center flex flex-wrap justify-center gap-4">
-                  <Link to="/proteccion-familiar" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">← Protección Familiar</Link>
+                  <Link to="/seguro-de-vida-iul" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">← ¿Qué es el IUL?</Link>
+                  <Link to="/proteccion-familiar" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">Protección y Retiro →</Link>
                   <Link to="/beneficios-en-vida" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">Beneficios en Vida →</Link>
+                  <Link to="/cotizacion-iul" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">Cotiza tu plan →</Link>
                 </div>
               </Anim>
             </div>

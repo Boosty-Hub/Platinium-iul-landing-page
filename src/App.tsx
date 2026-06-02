@@ -9,8 +9,9 @@ import { CookieBanner } from "@/components/shared/CookieBanner";
 
 const Index = lazy(() => import("./pages/Index.tsx"));
 const SeguroVidaIUL = lazy(() => import("./pages/SeguroVidaIUL.tsx"));
-const IULParaJubilacion = lazy(() => import("./pages/IULParaJubilacion.tsx"));
 const IULParaIndocumentados = lazy(() => import("./pages/IULParaIndocumentados.tsx"));
+const CotizacionIUL = lazy(() => import("./pages/CotizacionIUL.tsx"));
+const IULParaHijos = lazy(() => import("./pages/IULParaHijos.tsx"));
 const IULvs401k = lazy(() => import("./pages/IULvs401k.tsx"));
 const Contacto = lazy(() => import("./pages/Contacto.tsx"));
 const ProteccionFamiliar = lazy(() => import("./pages/ProteccionFamiliar.tsx"));
@@ -37,7 +38,7 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/seguro-de-vida-iul" element={<SeguroVidaIUL />} />
-        <Route path="/jubilacion-sin-401k" element={<IULParaJubilacion />} />
+        <Route path="/jubilacion-sin-401k" element={<Navigate to="/proteccion-familiar" replace />} />
         <Route path="/seguro-vida-itin" element={<IULParaIndocumentados />} />
         <Route path="/iul-vs-401k" element={<IULvs401k />} />
         <Route path="/contacto" element={<Contacto />} />
@@ -48,9 +49,11 @@ const AppRoutes = () => {
         <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
         <Route path="/links" element={<Links />} />
         <Route path="/form-panel" element={<FormPanel />} />
-        <Route path="/cotiza" element={<Cotiza />} />
+        <Route path="/cotiza" element={<Navigate to="/cotizacion-iul" replace />} />
+        <Route path="/cotizacion-iul" element={<CotizacionIUL />} />
+        <Route path="/iul-para-hijos" element={<IULParaHijos />} />
         {/* Redirects from old URLs */}
-        <Route path="/iul-para-jubilacion" element={<Navigate to="/jubilacion-sin-401k" replace />} />
+        <Route path="/iul-para-jubilacion" element={<Navigate to="/proteccion-familiar" replace />} />
         <Route path="/iul-para-indocumentados" element={<Navigate to="/seguro-vida-itin" replace />} />
         <Route path="/iul-proteccion-familiar" element={<Navigate to="/proteccion-familiar" replace />} />
         <Route path="/iul-para-emprendedores" element={<Navigate to="/iul-emprendedores" replace />} />

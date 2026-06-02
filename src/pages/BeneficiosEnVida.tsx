@@ -175,8 +175,10 @@ export default function BeneficiosEnVida() {
 
               <Anim delay={0.3}>
                 <div className="mt-10 text-center flex flex-wrap justify-center gap-4">
-                  <Link to="/proteccion-familiar" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">← Protección Familiar</Link>
-                  <Link to="/seguro-vida-sin-examen-medico" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">Sin Examen Médico →</Link>
+                  <Link to="/proteccion-familiar" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">← Protección y Retiro</Link>
+                  <Link to="/seguro-vida-itin" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">Acceso con ITIN →</Link>
+                  <Link to="/iul-para-hijos" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">Plan para Hijos →</Link>
+                  <Link to="/cotizacion-iul" className="text-[#1d9fa9] font-semibold no-underline hover:underline text-sm">Cotiza tu plan →</Link>
                 </div>
               </Anim>
             </div>

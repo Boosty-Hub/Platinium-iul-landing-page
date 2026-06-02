@@ -39,7 +39,7 @@ export const FAQS = [
 
 export const BENEFITS = [
   { icon: "🏠", title: "Protección Familiar", desc: "Asegura el futuro de tu familia con un beneficio por fallecimiento que cubre hipoteca, deudas y nivel de vida. Tu legado, garantizado.", link: "/proteccion-familiar" },
-  { icon: "📈", title: "Plan de Retiro", desc: "Construye tu jubilación con crecimiento indexado al mercado y acceso a tu dinero libre de impuestos mediante préstamos de la póliza.", link: "/jubilacion-sin-401k" },
+  { icon: "📈", title: "Plan de Retiro", desc: "Construye tu jubilación con crecimiento indexado al mercado y acceso a tu dinero libre de impuestos mediante préstamos de la póliza.", link: "/proteccion-familiar" },
   { icon: "🏡", title: "Paga tu Hipoteca", desc: "Usa el valor acumulado para liquidar tu hipoteca en 15-20 años en vez de 30. Tu casa libre de deudas, más rápido.", link: "/seguro-de-vida-iul" },
   { icon: "❤️", title: "Beneficios en Vida", desc: "Riders para enfermedades crónicas, críticas y terminales. Accede a tu beneficio cuando más lo necesitas, sin esperar.", link: "/beneficios-en-vida" },
   { icon: "💼", title: "Negocio Familiar", desc: "Protege tu negocio y planifica la sucesión patrimonial. Ideal para dueños de restaurantes, construcción y comercio.", link: "/iul-emprendedores" },
@@ -88,11 +88,12 @@ export const TESTIMONIALS = [
 
 export const SERVICE_PAGES = [
   { label: "¿Qué es el IUL?", href: "/seguro-de-vida-iul" },
-  { label: "Jubilación sin 401k", href: "/jubilacion-sin-401k" },
+  { label: "Protección y Retiro", href: "/proteccion-familiar" },
   { label: "Seguro con ITIN", href: "/seguro-vida-itin" },
   { label: "IUL vs 401(k)", href: "/iul-vs-401k" },
-  { label: "Protección Familiar", href: "/proteccion-familiar" },
+  { label: "Plan para Hijos", href: "/iul-para-hijos" },
   { label: "Para Emprendedores", href: "/iul-emprendedores" },
   { label: "Sin Examen Médico", href: "/seguro-vida-sin-examen-medico" },
   { label: "Beneficios en Vida", href: "/beneficios-en-vida" },
+  { label: "Cotiza tu Plan", href: "/cotizacion-iul" },
 ];
