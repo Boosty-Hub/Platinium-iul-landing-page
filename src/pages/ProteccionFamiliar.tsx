@@ -6,6 +6,7 @@ import { Anim } from "@/components/shared/Anim";
 import { CheckIcon } from "@/components/shared/Icons";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { LeadForm } from "@/components/shared/LeadForm";
+import { ContactBar } from "@/components/shared/ContactBar";
 
 const PAGE_FAQS = [
   { q: "¿El IUL solo sirve cuando fallezco?", a: "No. El IUL tiene dos funciones simultáneas: proteger a tu familia si falleces, y acumular un fondo de valor en efectivo que tú puedes usar en vida para el retiro. Además, los riders de enfermedades críticas, crónicas y terminales te permiten acceder al beneficio si te diagnostican una condición grave — sin necesidad de fallecer." },
@@ -26,7 +27,7 @@ export default function ProteccionFamiliar() {
           <SEOHead
             title="IUL: Protección Familiar y Retiro en Uno | Platinium"
             description="Un IUL protege a tu familia si algo te pasa y acumula valor para tu retiro privado. Sin SSN — aplica con ITIN o pasaporte. Cotiza gratis con asesor en español."
-            keywords="seguro de vida con ahorro para retiro, IUL protección y retiro, protección familiar y jubilación, IUL para retiro privado, ahorro retiro USA latinos, alternativa retiro privado, seguro de vida familiar Miami"
+            keywords="seguro de vida con ahorro para retiro, IUL protección y retiro, protección familiar y jubilación, IUL para retiro privado, ahorro retiro USA latinos, alternativa retiro privado, seguro de vida familiar"
             canonical={`${DOMAIN}/proteccion-familiar`}
             jsonLd={[
               {
@@ -95,10 +96,15 @@ export default function ProteccionFamiliar() {
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" inline />
+                  <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" inline cardTitle="Cotiza tu plan de protección y retiro" />
                 </Anim>
               </div>
             </div>
+          </section>
+
+          {/* BANNER CTA */}
+          <section className="px-6 pb-6">
+            <ContactBar t={t} compact />
           </section>
 
           {/* MITOS VS REALIDAD — después del hero */}
@@ -240,6 +246,11 @@ export default function ProteccionFamiliar() {
                         <p className={`text-xs ${t.textMuted} leading-relaxed`}>{item.desc}</p>
                       </div>
                     ))}
+                  </div>
+                  <div className={`border border-dashed border-[#1d9fa9]/50 rounded-xl p-4 mt-2 text-center`}>
+                    <div className="text-[#1d9fa9] font-bold text-lg mb-1">Personalizado</div>
+                    <div className={`text-xs font-bold uppercase tracking-wide mb-1`} style={{ color: "#4A6B73" }}>A tu medida</div>
+                    <p className={`text-xs leading-relaxed`} style={{ color: "#7A9BA3" }}>Para metas específicas — el asesor diseña el monto exacto según tu situación</p>
                   </div>
                   <p className={`text-[11px] ${t.textMuted} italic mt-4 text-center`}>Proyecciones ilustrativas. Los resultados reales dependen de la edad, salud y diseño de la póliza. Un asesor licenciado entrega tu proyección personalizada.</p>
                 </div>

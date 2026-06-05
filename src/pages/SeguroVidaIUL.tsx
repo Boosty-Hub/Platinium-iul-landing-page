@@ -6,6 +6,7 @@ import { Anim } from "@/components/shared/Anim";
 import { CheckIcon } from "@/components/shared/Icons";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { LeadForm } from "@/components/shared/LeadForm";
+import { ContactBar } from "@/components/shared/ContactBar";
 
 const PAGE_FAQS = [
   { q: "¿Qué es exactamente un IUL?", a: "IUL son las siglas de Indexed Universal Life — Seguro de Vida Universal Indexado. Es una póliza de vida permanente que combina una cobertura por fallecimiento con un componente de ahorro (valor en efectivo) que crece vinculado al rendimiento de índices como el S&P 500, con protección contra pérdidas mediante un piso del 0%." },
@@ -68,13 +69,13 @@ export default function SeguroVidaIUL() {
                     <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">Guía Completa · IUL en Español</span>
                   </div>
                   <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-normal leading-[1.08] mb-5 ${t.text}`} style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-                    ¿Qué es un IUL?{" "}
+                    ¿Qué es un IUL? El instrumento que protege tus ahorros{" "}
                     <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
-                      El instrumento que protege tus ahorros del IRS y de las caídas de la bolsa
+                      del IRS y de las caídas de la bolsa
                     </span>
                   </h1>
                   <p className={`text-base lg:text-lg ${t.textMid} leading-relaxed mb-7`}>
-                    Un IUL (Indexed Universal Life) es un seguro de vida permanente que acumula dinero en efectivo indexado al S&P 500 con <strong className={t.text}>piso del 0%</strong> — si el mercado cae, tu saldo no pierde. Los retiros se estructuran libres de impuestos bajo la <strong className="text-[#1d9fa9]">Sección 7702</strong>. Aplica con SSN, ITIN o Pasaporte, desde $50 hasta $800 al mes.
+                    Un IUL (Indexed Universal Life) es un seguro de vida permanente que acumula dinero en efectivo indexado al S&P 500 con <strong className={t.text}>piso del 0%</strong> — si el mercado cae, tu saldo no pierde. Los retiros se estructuran libres de impuestos bajo la <strong className="text-[#1d9fa9]">Sección 7702</strong>. Aplica con SSN, ITIN o Pasaporte, desde $100 hasta $800 al mes.
                   </p>
                   <div className="space-y-3 mb-7">
                     {[
@@ -96,10 +97,15 @@ export default function SeguroVidaIUL() {
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Ahorro a largo plazo / retiro" inline />
+                  <LeadForm t={t} dark={dark} defaultInteres="Ahorro a largo plazo / retiro" inline cardTitle="Cotiza tu plan IUL de vida — gratis" />
                 </Anim>
               </div>
             </div>
+          </section>
+
+          {/* BANNER CTA */}
+          <section className="px-6 pb-6">
+            <ContactBar t={t} compact />
           </section>
 
           {/* BLOQUE 3 PILARES */}
@@ -124,7 +130,7 @@ export default function SeguroVidaIUL() {
                     icon: "💳",
                     title: "Aportas capital",
                     desc: "Cada prima mensual se divide en dos: una porción cubre el costo del seguro de vida y el excedente entra a tu fondo de valor en efectivo (Cash Value), donde actúa el interés compuesto.",
-                    detail: "Desde $50 hasta $800/mes según tu capacidad",
+                    detail: "Desde $100 hasta $800/mes según tu capacidad",
                   },
                   {
                     step: "02",
@@ -269,7 +275,7 @@ export default function SeguroVidaIUL() {
               </Anim>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 {[
-                  { range: "$50 – $150", label: "Plan Esencial", sub: "Inicio o complemento" },
+                  { range: "$100 – $150", label: "Plan Esencial", sub: "Inicio o complemento" },
                   { range: "$150 – $400", label: "Plan Optimizado", sub: "Recomendado ✦", highlight: true },
                   { range: "$400 – $800", label: "Plan Acelerado", sub: "Dueños de negocio" },
                   { range: "$800+", label: "Plan Premium", sub: "Estructura corporativa" },
@@ -283,6 +289,13 @@ export default function SeguroVidaIUL() {
                   </Anim>
                 ))}
               </div>
+              <Anim delay={0.25}>
+                <div className={`${t.card} border border-dashed border-[#1d9fa9]/50 rounded-xl p-4 mt-2 text-center`}>
+                  <div className="text-[#1d9fa9] font-bold text-lg mb-1">Personalizado</div>
+                  <div className={`text-xs font-bold ${t.text} uppercase tracking-wide mb-1`}>A tu medida</div>
+                  <div className={`text-xs ${t.textMuted}`}>Para objetivos específicos — el asesor diseña el monto exacto según tu perfil</div>
+                </div>
+              </Anim>
               <Anim delay={0.3}>
                 <p className={`text-[11px] ${t.textMuted} italic mt-4 text-center`}>
                   Rangos orientativos. El diseño exacto lo calcula un asesor licenciado según tu perfil, edad y meta.
@@ -356,7 +369,7 @@ export default function SeguroVidaIUL() {
                   { title: "Protección y Retiro", desc: "Protege a tu familia y construye tu jubilación privada con un solo plan.", href: "/proteccion-familiar", icon: "🏠" },
                   { title: "Seguro con ITIN", desc: "Aplica sin SSN. Solo necesitas ITIN o pasaporte vigente.", href: "/seguro-vida-itin", icon: "🌎" },
                   { title: "IUL vs 401(k)", desc: "Compara ventajas fiscales, acceso anticipado y protección contra caídas.", href: "/iul-vs-401k", icon: "⚖️" },
-                  { title: "Para Emprendedores", desc: "Ideal para dueños de negocio y contratistas 1099 en Miami-Dade.", href: "/iul-emprendedores", icon: "💼" },
+                  { title: "Para Emprendedores", desc: "Ideal para dueños de negocio, contratistas 1099 y self-employed.", href: "/iul-emprendedores", icon: "💼" },
                   { title: "Plan para Hijos", desc: "El tiempo compuesto empieza cuanto antes. Asegura el futuro de tus hijos hoy.", href: "/iul-para-hijos", icon: "👶" },
                   { title: "Beneficios en Vida", desc: "Usa tu seguro si te enfermas gravemente, no solo cuando falleces.", href: "/beneficios-en-vida", icon: "❤️" },
                 ].map((item, i) => (

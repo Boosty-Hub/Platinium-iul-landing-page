@@ -6,6 +6,7 @@ import { Anim } from "@/components/shared/Anim";
 import { CheckIcon } from "@/components/shared/Icons";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { LeadForm } from "@/components/shared/LeadForm";
+import { ContactBar } from "@/components/shared/ContactBar";
 
 const PAGE_FAQS = [
   { q: "¿Necesito Seguro Social para aplicar?", a: "No. Puedes aplicar con ITIN (Individual Taxpayer Identification Number) o con pasaporte vigente de tu país de origen. La Sección 7702 del Código Fiscal de EE.UU. no requiere SSN para acceder a este tipo de póliza." },
@@ -27,7 +28,7 @@ export default function IULParaIndocumentados() {
           <SEOHead
             title="Seguro de Vida con ITIN o Pasaporte — Sin SSN | Platinium"
             description="Aplica a un IUL con ITIN o Pasaporte vigente, sin Seguro Social. Respaldo legal bajo la Sección 7702. Confidencial, en español, con asesor licenciado. Cotiza gratis."
-            keywords="seguro de vida con ITIN, IUL con ITIN, seguro de vida sin Seguro Social, IUL con pasaporte, ahorro USA sin SSN, seguro vida inmigrantes USA, seguro vida Tax ID, seguro de vida para inmigrante Miami"
+            keywords="seguro de vida con ITIN, IUL con ITIN, seguro de vida sin Seguro Social, IUL con pasaporte, ahorro USA sin SSN, seguro vida inmigrantes USA, seguro vida Tax ID, seguro de vida para inmigrante"
             canonical={`${DOMAIN}/seguro-vida-itin`}
             jsonLd={[
               {
@@ -95,10 +96,15 @@ export default function IULParaIndocumentados() {
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" inline />
+                  <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" inline cardTitle="Cotiza con tu ITIN o Pasaporte — gratis" />
                 </Anim>
               </div>
             </div>
+          </section>
+
+          {/* BANNER CTA */}
+          <section className="px-6 pb-6">
+            <ContactBar t={t} compact />
           </section>
 
           {/* MITOS VS REALIDAD — inmediatamente después del hero */}
@@ -278,7 +284,7 @@ export default function IULParaIndocumentados() {
               </Anim>
               <div className="space-y-5">
                 {[
-                  { step: "01", title: "Completa el formulario (5 minutos)", desc: "Datos básicos: nombre, edad aproximada, aportación estimada, meta principal y tipo de identificación (ITIN o pasaporte). Sin documentos en esta etapa." },
+                  { step: "01", title: "Completa el formulario (1 minuto)", desc: "Datos básicos: nombre, edad aproximada, aportación estimada, meta principal y tipo de identificación (ITIN o pasaporte). Sin documentos en esta etapa." },
                   { step: "02", title: "Habla con un asesor especialista", desc: "Un asesor de Platinium especializado en ITIN/Pasaporte te llama en español para revisar tu caso, responder dudas y confirmar los parámetros de tu plan." },
                   { step: "03", title: "Recibe tu proyección en PDF", desc: "El asesor prepara tu ilustración personalizada con cobertura, valor en efectivo estimado por año y prima mensual. Sin presión de contratación." },
                 ].map((item, i) => (

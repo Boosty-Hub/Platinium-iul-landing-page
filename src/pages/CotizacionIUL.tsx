@@ -5,6 +5,7 @@ import { SEOHead, DOMAIN } from "@/components/shared/SEOHead";
 import { Anim } from "@/components/shared/Anim";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { LeadForm } from "@/components/shared/LeadForm";
+import { ContactBar } from "@/components/shared/ContactBar";
 
 const PAGE_FAQS = [
   { q: "¿Cuánto tarda en llegar el PDF con mi proyección?", a: "Normalmente en menos de 24-48 horas hábiles. Un asesor licenciado te contacta primero para validar algunos datos adicionales y luego prepara tu ilustración personalizada." },
@@ -54,31 +55,81 @@ export default function CotizacionIUL() {
 
           <Breadcrumbs items={[{ label: "Cotización IUL Personalizada" }]} t={t} />
 
-          {/* HERO + FORMULARIO */}
+          {/* HERO */}
           <section className="pt-8 pb-16 px-6">
-            <div className="max-w-4xl mx-auto">
-              <Anim>
-                <div className="text-center mb-10">
-                  <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-5 py-2 mb-7`}>
+            <div className="max-w-6xl mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+                {/* Columna izquierda */}
+                <Anim>
+                  <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-5 py-2 mb-6`}>
                     <span className="w-2 h-2 rounded-full bg-[#1d9fa9] animate-pulse" />
                     <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">Proyección en PDF · Gratis · Sin compromiso</span>
                   </div>
-                  <h1 className={`text-4xl sm:text-5xl font-normal leading-[1.1] mb-6 ${t.text}`} style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                  <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-normal leading-[1.08] mb-5 ${t.text}`} style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                     Recibe tu proyección IUL{" "}
                     <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
                       personalizada en PDF
                     </span>
                   </h1>
-                  <p className={`text-lg ${t.textMid} max-w-2xl mx-auto leading-relaxed`}>
+                  <p className={`text-base lg:text-lg ${t.textMid} leading-relaxed mb-7`}>
                     No es una calculadora automática — es mejor: un asesor licenciado de Platinium analiza tu caso y te entrega una ilustración real con tus números, en español, sin costo y sin presión.
                   </p>
-                </div>
-              </Anim>
+                  <div className="space-y-3 mb-7">
+                    {[
+                      { icon: "📄", text: "Proyección en PDF con tus números reales — no estimaciones genéricas" },
+                      { icon: "🗣️", text: "Llamada con asesor licenciado en español para revisar tu caso" },
+                      { icon: "✅", text: "Sin compromiso — recibes la proyección y decides con calma" },
+                      { icon: "🌎", text: "Aplica con SSN, ITIN o Pasaporte — sin Seguro Social" },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <span className="text-xl shrink-0 mt-0.5">{item.icon}</span>
+                        <span className={`text-sm ${t.textMid} leading-relaxed`}>{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className={`text-xs ${t.textMuted} italic`}>
+                    Asesoría gratuita en español · Sin compromiso · Licenciados en USA
+                  </p>
+                </Anim>
 
-              {/* FORMULARIO — visible desde arriba */}
-              <Anim delay={0.1}>
-                <LeadForm t={t} dark={dark} defaultInteres="Cotización / Proyección IUL" />
+                {/* Columna derecha — Formulario */}
+                <Anim delay={0.15}>
+                  <LeadForm t={t} dark={dark} defaultInteres="Cotización / Proyección IUL" inline cardTitle="Recibe tu proyección IUL en PDF — gratis" />
+                </Anim>
+              </div>
+            </div>
+          </section>
+
+          {/* BANNER CTA */}
+          <section className="px-6 pb-6">
+            <ContactBar t={t} compact />
+          </section>
+
+          {/* CÓMO FUNCIONA EL PROCESO */}
+          <section className="py-20 px-6">
+            <div className="max-w-3xl mx-auto">
+              <Anim>
+                <h2 className={`text-3xl font-normal ${t.text} text-center mb-10`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                  El proceso en <span className="italic text-[#1d9fa9]">3 pasos</span>
+                </h2>
               </Anim>
+              <div className="space-y-5">
+                {[
+                  { step: "01", title: "Completas el formulario (1 minuto)", desc: "Datos básicos: nombre, edad, aportación estimada, meta principal y tipo de identificación (SSN, ITIN o pasaporte). No necesitas documentos en esta etapa." },
+                  { step: "02", title: "Te llama un asesor licenciado", desc: "En las próximas horas hábiles, un asesor de Platinium te contacta en español para validar tu información, aclarar dudas y confirmar los parámetros de tu proyección." },
+                  { step: "03", title: "Recibes tu PDF personalizado", desc: "El asesor prepara tu ilustración con los números reales según tu caso y te la envía. Puedes revisarla con calma y hacer preguntas antes de decidir cualquier cosa." },
+                ].map((item, i) => (
+                  <Anim key={i} delay={i * 0.1}>
+                    <div className={`${t.card} border rounded-xl p-6 backdrop-blur-xl flex gap-5 items-start`}>
+                      <div className="text-[#1d9fa9] font-bold text-2xl shrink-0" style={{ fontFamily: "'Playfair Display', serif" }}>{item.step}</div>
+                      <div>
+                        <h3 className={`text-base font-semibold ${t.text} mb-1`} style={{ fontFamily: "'Playfair Display', serif" }}>{item.title}</h3>
+                        <p className={`text-sm ${t.textMuted} leading-relaxed`}>{item.desc}</p>
+                      </div>
+                    </div>
+                  </Anim>
+                ))}
+              </div>
             </div>
           </section>
 
@@ -101,34 +152,6 @@ export default function CotizacionIUL() {
                       <span className="text-4xl mb-4 block">{item.icon}</span>
                       <h3 className={`text-lg font-semibold ${t.text} mb-2`} style={{ fontFamily: "'Playfair Display', serif" }}>{item.title}</h3>
                       <p className={`text-sm ${t.textMuted} leading-relaxed`}>{item.desc}</p>
-                    </div>
-                  </Anim>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* CÓMO FUNCIONA EL PROCESO */}
-          <section className="py-20 px-6">
-            <div className="max-w-3xl mx-auto">
-              <Anim>
-                <h2 className={`text-3xl font-normal ${t.text} text-center mb-10`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                  El proceso en <span className="italic text-[#1d9fa9]">3 pasos</span>
-                </h2>
-              </Anim>
-              <div className="space-y-5">
-                {[
-                  { step: "01", title: "Completas el formulario (5 minutos)", desc: "Datos básicos: nombre, edad, aportación estimada, meta principal y tipo de identificación (SSN, ITIN o pasaporte). No necesitas documentos en esta etapa." },
-                  { step: "02", title: "Te llama un asesor licenciado", desc: "En las próximas horas hábiles, un asesor de Platinium te contacta en español para validar tu información, aclarar dudas y confirmar los parámetros de tu proyección." },
-                  { step: "03", title: "Recibes tu PDF personalizado", desc: "El asesor prepara tu ilustración con los números reales según tu caso y te la envía. Puedes revisarla con calma y hacer preguntas antes de decidir cualquier cosa." },
-                ].map((item, i) => (
-                  <Anim key={i} delay={i * 0.1}>
-                    <div className={`${t.card} border rounded-xl p-6 backdrop-blur-xl flex gap-5 items-start`}>
-                      <div className="text-[#1d9fa9] font-bold text-2xl shrink-0" style={{ fontFamily: "'Playfair Display', serif" }}>{item.step}</div>
-                      <div>
-                        <h3 className={`text-base font-semibold ${t.text} mb-1`} style={{ fontFamily: "'Playfair Display', serif" }}>{item.title}</h3>
-                        <p className={`text-sm ${t.textMuted} leading-relaxed`}>{item.desc}</p>
-                      </div>
                     </div>
                   </Anim>
                 ))}

@@ -13,9 +13,9 @@ export default function BeneficiosEnVida() {
       {({ t, dark }) => (
         <>
           <SEOHead
-            title="Beneficios en Vida Seguro IUL Miami | Enfermedad Crítica | Platinium Insurance"
-            description="¿Sabías que puedes adelantar dinero de tu seguro si tienes cáncer u otra enfermedad grave? Conoce los beneficios en vida del IUL. En español, Miami."
-            keywords="beneficios en vida seguro de vida, living benefits seguro de vida, seguro de vida con cobertura enfermedad crítica, qué pasa con mi seguro si me da cáncer, seguro de vida que paga por enfermedad, puedo usar mi seguro de vida si me enfermo, seguro de vida con cobertura de cáncer, beneficio por enfermedad terminal seguro de vida, seguro de vida que paga en vida Miami"
+            title="Beneficios en Vida Seguro IUL | Enfermedad Crítica, Crónica y Terminal | Platinium Insurance"
+            description="¿Sabías que puedes adelantar dinero de tu seguro si tienes cáncer u otra enfermedad grave? Conoce los beneficios en vida del IUL. En español, para hispanos en EE.UU."
+            keywords="beneficios en vida seguro de vida, living benefits seguro de vida, seguro de vida con cobertura enfermedad crítica, qué pasa con mi seguro si me da cáncer, seguro de vida que paga por enfermedad, puedo usar mi seguro de vida si me enfermo, seguro de vida con cobertura de cáncer, beneficio por enfermedad terminal seguro de vida, seguro de vida que paga en vida"
             canonical={`${DOMAIN}/beneficios-en-vida`}
             jsonLd={[
               {
@@ -32,7 +32,7 @@ export default function BeneficiosEnVida() {
                 "@type": "Service",
                 name: "Beneficios en Vida del IUL",
                 provider: { "@type": "InsuranceAgency", name: "Platinium Insurance Group" },
-                description: "Riders de beneficios en vida para enfermedades crónicas, críticas y terminales incluidos en pólizas IUL para hispanos en Miami.",
+                description: "Riders de beneficios en vida para enfermedades crónicas, críticas y terminales incluidos en pólizas IUL para hispanos en EE.UU.",
                 areaServed: { "@type": "State", name: "Florida" },
               },
             ]}
@@ -41,20 +41,53 @@ export default function BeneficiosEnVida() {
           <Breadcrumbs items={[{ label: "Seguro de Vida IUL", href: "/seguro-de-vida-iul" }, { label: "Beneficios en Vida" }]} t={t} />
 
           {/* HERO */}
-          <section className="pt-8 pb-20 px-6">
-            <div className="max-w-4xl mx-auto text-center">
-              <Anim>
-                <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-5 py-2 mb-7`}>
-                  <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">❤️ Beneficios en Vida</span>
-                </div>
-                <h1 className={`text-4xl sm:text-5xl font-normal leading-[1.1] mb-6 ${t.text}`} style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-                  Usa tu seguro de vida <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">mientras vives</span> — no solo cuando mueras
-                </h1>
-                <p className={`text-lg ${t.textMid} max-w-2xl mx-auto leading-relaxed`}>
-                  La mayoría piensa que el seguro de vida solo sirve cuando falleces. Con el IUL, puedes <strong className="text-[#1d9fa9]">adelantar dinero de tu póliza</strong> si te diagnostican una enfermedad grave. Es protección real, cuando realmente la necesitas.
-                </p>
-              </Anim>
+          <section className="pt-8 pb-16 px-6">
+            <div className="max-w-6xl mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+                {/* Columna izquierda */}
+                <Anim>
+                  <div className={`inline-flex items-center gap-2 ${t.brandBg} border border-[#1d9fa9]/20 rounded-full px-5 py-2 mb-6`}>
+                    <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">❤️ Beneficios en Vida</span>
+                  </div>
+                  <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-normal leading-[1.08] mb-5 ${t.text}`} style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+                    Usa tu seguro de vida{" "}
+                    <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
+                      mientras vives
+                    </span>
+                    {" "}— no solo cuando mueras
+                  </h1>
+                  <p className={`text-base lg:text-lg ${t.textMid} leading-relaxed mb-7`}>
+                    La mayoría piensa que el seguro de vida solo sirve cuando falleces. Con el IUL, puedes <strong className="text-[#1d9fa9]">adelantar dinero de tu póliza</strong> si te diagnostican una enfermedad grave. Es protección real, cuando realmente la necesitas.
+                  </p>
+                  <div className="space-y-3 mb-7">
+                    {[
+                      { icon: "🩺", text: "Enfermedad crónica — Alzheimer, Parkinson, artritis severa y más" },
+                      { icon: "💔", text: "Enfermedad crítica — cáncer, infarto, derrame cerebral cubiertos" },
+                      { icon: "🕊️", text: "Enfermedad terminal — accede a tu beneficio cuando más lo necesitas" },
+                      { icon: "🌎", text: "Aplica con ITIN o SSN — disponible en todo EE.UU." },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <span className="text-xl shrink-0 mt-0.5">{item.icon}</span>
+                        <span className={`text-sm ${t.textMid} leading-relaxed`}>{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className={`text-xs ${t.textMuted} italic`}>
+                    Asesoría gratuita en español · Sin compromiso · Licenciados en USA
+                  </p>
+                </Anim>
+
+                {/* Columna derecha — Formulario */}
+                <Anim delay={0.15}>
+                  <LeadForm t={t} dark={dark} defaultInteres="Protección por enfermedad" inline cardTitle="Accede a tus beneficios en vida — cotiza gratis" />
+                </Anim>
+              </div>
             </div>
+          </section>
+
+          {/* BANNER CTA */}
+          <section className="px-6 pb-6">
+            <ContactBar t={t} compact />
           </section>
 
           {/* TRES TIPOS DE RIDERS */}
@@ -135,7 +168,7 @@ export default function BeneficiosEnVida() {
             <div className="max-w-3xl mx-auto text-center">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} mb-6`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                  ¿Por qué esto importa para <span className="italic text-[#1d9fa9]">hispanos en Miami</span>?
+                  ¿Por qué esto importa para <span className="italic text-[#1d9fa9]">hispanos en EE.UU.</span>?
                 </h2>
                 <div className={`text-sm ${t.textMid} leading-relaxed space-y-4 text-left max-w-xl mx-auto`}>
                   <p>El cáncer es la segunda causa de muerte entre hispanos en EE.UU. La diabetes afecta a 1 de cada 5 hispanos. Y muchas familias inmigrantes no tienen seguro médico completo.</p>
@@ -162,7 +195,7 @@ export default function BeneficiosEnVida() {
                   "Dinero libre de impuestos para usar como necesites",
                   "Sin restricciones de uso — tratamiento, deudas, gastos diarios",
                   "Riders generalmente incluidos sin costo adicional en la prima",
-                  "Disponible para residentes de Florida con ITIN o SSN",
+                  "Disponible en EE.UU. con ITIN o SSN",
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.06}>
                     <div className="flex items-center gap-3">
@@ -184,8 +217,6 @@ export default function BeneficiosEnVida() {
             </div>
           </section>
 
-          <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" />
-          
         </>
       )}
     </Layout>

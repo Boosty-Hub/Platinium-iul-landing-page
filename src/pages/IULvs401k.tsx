@@ -6,6 +6,7 @@ import { Anim } from "@/components/shared/Anim";
 import { CheckIcon } from "@/components/shared/Icons";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { LeadForm } from "@/components/shared/LeadForm";
+import { ContactBar } from "@/components/shared/ContactBar";
 
 const PAGE_FAQS = [
   { q: "¿Puedo tener un IUL y un 401k al mismo tiempo?", a: "Sí. Son instrumentos complementarios, no excluyentes. La estrategia más común: aprovechar el employer matching del 401k hasta el tope (dinero gratuito), y canalizar el excedente a un IUL para agregar protección familiar, acceso anticipado sin penalidad y cobertura contra caídas del mercado." },
@@ -26,7 +27,7 @@ export default function IULvs401k() {
           <SEOHead
             title="IUL vs 401k vs Roth IRA: Comparativa Completa | Platinium"
             description="Compara IUL, 401k, Roth IRA y Traditional IRA: impuestos, acceso anticipado, límites y acceso con ITIN. Tabla de 4 columnas sin letras pequeñas."
-            keywords="IUL vs 401k, IUL vs Roth IRA, IUL vs IRA, diferencia IUL 401k, alternativa al 401k, mejor que un 401k, IUL o 401k cuál es mejor, penalidades del 401k hispanos Miami, bomba de tiempo fiscal 401k"
+            keywords="IUL vs 401k, IUL vs Roth IRA, IUL vs IRA, diferencia IUL 401k, alternativa al 401k, mejor que un 401k, IUL o 401k cuál es mejor, penalidades del 401k hispanos, bomba de tiempo fiscal 401k"
             canonical={`${DOMAIN}/iul-vs-401k`}
             jsonLd={[
               {
@@ -86,64 +87,15 @@ export default function IULvs401k() {
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Ahorro a largo plazo / retiro" inline />
+                  <LeadForm t={t} dark={dark} defaultInteres="Ahorro a largo plazo / retiro" inline cardTitle="¿IUL o 401k? Compara y cotiza gratis" />
                 </Anim>
               </div>
             </div>
           </section>
 
-          {/* POR QUÉ EL 401K PUEDE SER UNA TRAMPA FISCAL */}
-          <section className={`${t.bg2} py-20 px-6`}>
-            <div className="max-w-4xl mx-auto">
-              <Anim>
-                <h2 className={`text-3xl font-normal ${t.text} text-center mb-10`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                  Lo que nadie te dice sobre el <span className="italic text-red-500">401k tradicional</span>
-                </h2>
-              </Anim>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[
-                  {
-                    icon: "⏰",
-                    title: "La bomba de tiempo fiscal diferida",
-                    desc: "El 401k te ahorra impuestos hoy, pero acumulas una deuda impositiva futura. Cuando retires, pagas impuestos sobre el 100% — incluidas las ganancias acumuladas durante 30 años. Si las tasas fiscales suben en el futuro, el costo podría ser mayor de lo previsto.",
-                    highlight: false,
-                  },
-                  {
-                    icon: "📉",
-                    title: "Exposición total al mercado",
-                    desc: "Si el S&P 500 cae un -20%, tu saldo del 401k cae un -20%. Para recuperar ese capital necesitas que el mercado suba un +25%. El IUL opera con la regla matemática R = máx(0%, mín(R_mercado, Cap)): participas de las subidas, no de las caídas.",
-                    highlight: false,
-                  },
-                  {
-                    icon: "🔒",
-                    title: "Tu dinero queda bloqueado hasta los 59½",
-                    desc: "Retirar del 401k antes de los 59½ cuesta un 10% de penalidad federal más impuestos ordinarios. Si tienes una emergencia, una crisis de negocio o quieres acceder a tu propio dinero, pagas por ello. El IUL no tiene esa penalidad.",
-                    highlight: false,
-                  },
-                  {
-                    icon: "🔗",
-                    title: "Está atado a tu empleo",
-                    desc: "Si cambias de trabajo, cierras tu empresa o te despiden, el 401k se complica — tienes que hacer un rollover, dejarlo donde está o retirarlo pagando impuestos. El IUL es un contrato personal que no depende de tu relación laboral.",
-                    highlight: false,
-                  },
-                ].map((item, i) => (
-                  <Anim key={i} delay={i * 0.1}>
-                    <div className={`${t.card} border rounded-xl p-6 backdrop-blur-xl`}>
-                      <span className="text-3xl mb-3 block">{item.icon}</span>
-                      <h3 className={`text-base font-semibold ${t.text} mb-2`} style={{ fontFamily: "'Playfair Display', serif" }}>{item.title}</h3>
-                      <p className={`text-sm ${t.textMuted} leading-relaxed`}>{item.desc}</p>
-                    </div>
-                  </Anim>
-                ))}
-              </div>
-              <Anim delay={0.3}>
-                <div className={`mt-8 ${t.card} border border-[#1d9fa9]/30 rounded-xl p-5 backdrop-blur-xl`}>
-                  <p className={`text-sm ${t.textMid} text-center`}>
-                    <strong className={t.text}>Nota importante:</strong> Si tu empleador ofrece matching en el 401k, ese es dinero gratis que deberías aprovechar hasta el tope. La estrategia inteligente es aprovechar el matching del 401k y diversificar el excedente en un IUL para protección adicional y flexibilidad.
-                  </p>
-                </div>
-              </Anim>
-            </div>
+          {/* BANNER CTA */}
+          <section className="px-6 pb-6">
+            <ContactBar t={t} compact />
           </section>
 
           {/* TABLA COMPARATIVA 4 COLUMNAS */}
@@ -198,6 +150,60 @@ export default function IULvs401k() {
                 <p className={`text-[11px] ${t.textMuted} italic mt-4`}>
                   *Los préstamos sobre valor en efectivo pueden ser libres de impuestos cuando la póliza está correctamente estructurada bajo la Sec. 7702 y permanece activa. Consulta con tu asesor fiscal y de seguros licenciado.
                 </p>
+              </Anim>
+            </div>
+          </section>
+
+          {/* POR QUÉ EL 401K PUEDE SER UNA TRAMPA FISCAL */}
+          <section className={`${t.bg2} py-20 px-6`}>
+            <div className="max-w-4xl mx-auto">
+              <Anim>
+                <h2 className={`text-3xl font-normal ${t.text} text-center mb-10`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                  Lo que nadie te dice sobre el <span className="italic text-red-500">401k tradicional</span>
+                </h2>
+              </Anim>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  {
+                    icon: "⏰",
+                    title: "La bomba de tiempo fiscal diferida",
+                    desc: "El 401k te ahorra impuestos hoy, pero acumulas una deuda impositiva futura. Cuando retires, pagas impuestos sobre el 100% — incluidas las ganancias acumuladas durante 30 años. Si las tasas fiscales suben en el futuro, el costo podría ser mayor de lo previsto.",
+                    highlight: false,
+                  },
+                  {
+                    icon: "📉",
+                    title: "Exposición total al mercado",
+                    desc: "Si el S&P 500 cae un -20%, tu saldo del 401k cae un -20%. Para recuperar ese capital necesitas que el mercado suba un +25%. El IUL opera con la regla matemática R = máx(0%, mín(R_mercado, Cap)): participas de las subidas, no de las caídas.",
+                    highlight: false,
+                  },
+                  {
+                    icon: "🔒",
+                    title: "Tu dinero queda bloqueado hasta los 59½",
+                    desc: "Retirar del 401k antes de los 59½ cuesta un 10% de penalidad federal más impuestos ordinarios. Si tienes una emergencia, una crisis de negocio o quieres acceder a tu propio dinero, pagas por ello. El IUL no tiene esa penalidad.",
+                    highlight: false,
+                  },
+                  {
+                    icon: "🔗",
+                    title: "Está atado a tu empleo",
+                    desc: "Si cambias de trabajo, cierras tu empresa o te despiden, el 401k se complica — tienes que hacer un rollover, dejarlo donde está o retirarlo pagando impuestos. El IUL es un contrato personal que no depende de tu relación laboral.",
+                    highlight: false,
+                  },
+                ].map((item, i) => (
+                  <Anim key={i} delay={i * 0.1}>
+                    <div className={`${t.card} border rounded-xl p-6 backdrop-blur-xl`}>
+                      <span className="text-3xl mb-3 block">{item.icon}</span>
+                      <h3 className={`text-base font-semibold ${t.text} mb-2`} style={{ fontFamily: "'Playfair Display', serif" }}>{item.title}</h3>
+                      <p className={`text-sm ${t.textMuted} leading-relaxed`}>{item.desc}</p>
+                    </div>
+                  </Anim>
+                ))}
+              </div>
+              <Anim delay={0.3}>
+                <div className={`mt-8 ${t.card} border border-[#1d9fa9]/30 rounded-xl p-5 backdrop-blur-xl`}>
+                  <p className={`text-sm ${t.textMid} text-center`}>
+                    <strong className={t.text}>Nota importante:</strong> Si tu empleador ofrece matching en el 401k, ese es dinero gratis que deberías aprovechar hasta el tope. La estrategia inteligente es aprovechar el matching del 401k y diversificar el excedente en un IUL para protección adicional y flexibilidad.
+                  </p>
+                </div>
               </Anim>
             </div>
           </section>
@@ -276,19 +282,19 @@ export default function IULvs401k() {
               <div className="space-y-5">
                 {[
                   {
-                    name: "Roberto, 35, camionero 1099 en Miami",
+                    name: "Roberto, 35, camionero 1099",
                     scenario: "Sin acceso a 401k ni empleador. El IUL es su única opción de retiro formal con protección familiar incluida. Con $300/mes inicia la acumulación y tiene cobertura desde el día uno.",
                     tag: "Solo IUL",
                     tagColor: "text-[#1d9fa9] bg-[#1d9fa9]/10 border-[#1d9fa9]/20",
                   },
                   {
-                    name: "Laura, 28, asistente dental W-2 en Doral",
+                    name: "Laura, 28, asistente dental W-2",
                     scenario: "Su empleador ofrece 401k con 3% matching. Aprovecha el matching ($200/mes) para no dejar dinero en la mesa, y abre un IUL ($200/mes) para protección familiar y flexibilidad de acceso antes de los 65.",
                     tag: "401k hasta el matching + IUL",
                     tagColor: "text-purple-500 bg-purple-500/10 border-purple-500/20",
                   },
                   {
-                    name: "Miguel, 42, dueño de taquería con ITIN en Hialeah",
+                    name: "Miguel, 42, dueño de taquería con ITIN en El Paso",
                     scenario: "No puede abrir 401k ni Roth IRA. El IUL bajo la Sec. 7702 es el único instrumento de retiro formal al que tiene acceso con ITIN. Empieza con $250/mes para construir su jubilación privada.",
                     tag: "Solo IUL con ITIN",
                     tagColor: "text-[#1d9fa9] bg-[#1d9fa9]/10 border-[#1d9fa9]/20",

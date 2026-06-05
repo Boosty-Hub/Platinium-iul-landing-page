@@ -6,6 +6,7 @@ import { Anim } from "@/components/shared/Anim";
 import { CheckIcon } from "@/components/shared/Icons";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { LeadForm } from "@/components/shared/LeadForm";
+import { ContactBar } from "@/components/shared/ContactBar";
 
 const PAGE_FAQS = [
   { q: "¿Mi hijo necesita SSN para tener el plan?", a: "No necesariamente. El titular de la póliza eres tú (el padre, madre o tutor legal), no el niño. Si tú tienes ITIN o pasaporte vigente, puedes ser el propietario del contrato sobre la vida de tu hijo." },
@@ -26,7 +27,7 @@ export default function IULParaHijos() {
           <SEOHead
             title="IUL para Hijos: Seguro e Inversión desde la Infancia | Platinium"
             description="Un IUL para tus hijos crece con el tiempo: cobertura de por vida asegurada + fondo para universidad, primera casa o negocio. El 90% de la prima va al ahorro. Con ITIN."
-            keywords="seguro de vida para niños, IUL para hijos, ahorro para la universidad de mis hijos USA, seguro vida para mis hijos, plan ahorro hijos USA, IUL infantil, ahorro indexado para niños, seguro de vida para menores Miami"
+            keywords="seguro de vida para niños, IUL para hijos, ahorro para la universidad de mis hijos USA, seguro vida para mis hijos, plan ahorro hijos USA, IUL infantil, ahorro indexado para niños, seguro de vida para menores"
             canonical={`${DOMAIN}/iul-para-hijos`}
             jsonLd={[
               {
@@ -44,7 +45,7 @@ export default function IULParaHijos() {
                 name: "IUL para Hijos — Seguro e Inversión desde la Infancia",
                 provider: { "@type": "InsuranceAgency", name: "Platinium Insurance Group" },
                 description: "Plan IUL sobre la vida de menores. Cobertura de por vida asegurada + acumulación de valor en efectivo para universidad, vivienda o emprendimiento.",
-                areaServed: { "@type": "State", name: "Florida" },
+                areaServed: { "@type": "Country", name: "United States" },
               },
               {
                 "@context": "https://schema.org",
@@ -66,10 +67,11 @@ export default function IULParaHijos() {
                     <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">👶 El multiplicador de riqueza infantil</span>
                   </div>
                   <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-normal leading-[1.08] mb-5 ${t.text}`} style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-                    Compra una ventaja financiera de 20 años para tus hijos{" "}
+                    Compra una ventaja financiera de 20 años{" "}
                     <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
-                      usando interés compuesto seguro
+                      para tus hijos
                     </span>
+                    {" "}usando interés compuesto seguro
                   </h1>
                   <p className={`text-base lg:text-lg ${t.textMid} leading-relaxed mb-7`}>
                     Cuando empiezas en la infancia, el costo del seguro es mínimo — el 90% de cada aportación va directo al componente de ahorro indexado. Décadas de interés compuesto más una cobertura de por vida asegurada antes de que ninguna condición médica futura lo complique.
@@ -94,8 +96,42 @@ export default function IULParaHijos() {
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Plan para mis hijos" inline />
+                  <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" inline cardTitle="Cotiza el plan IUL para tus hijos — gratis" />
                 </Anim>
+              </div>
+            </div>
+          </section>
+
+          {/* BANNER CTA */}
+          <section className="px-6 pb-6">
+            <ContactBar t={t} compact />
+          </section>
+
+          {/* USOS DEL DINERO */}
+          <section className={`${t.bg2} py-20 px-6`}>
+            <div className="max-w-4xl mx-auto">
+              <Anim>
+                <h2 className={`text-3xl font-normal ${t.text} text-center mb-4`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                  Para qué puede usar ese dinero <span className="italic text-[#1d9fa9]">tu hijo cuando sea adulto</span>
+                </h2>
+                <p className={`text-center ${t.textMid} max-w-2xl mx-auto mb-10 text-[15px]`}>
+                  El valor en efectivo acumulado no tiene restricciones de uso. Lo que a los 18 ó 25 años haga tu hijo con ese capital depende solo de él — no de reglas del IRS, no de criterios de elegibilidad.
+                </p>
+              </Anim>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                  { icon: "🎓", title: "Universidad sin deuda", desc: "Paga la universidad sin préstamos estudiantiles. El valor acumulado puede accederse mediante préstamos de la póliza — sin restricciones sobre qué carrera o institución elegir." },
+                  { icon: "🏠", title: "Enganche de la primera casa", desc: "Muchos hijos adultos usan el valor de la póliza como enganche de su primera vivienda. Una ventaja que la mayoría de sus compañeros simplemente no tendrá." },
+                  { icon: "💼", title: "Capital para emprender", desc: "Fondos disponibles para iniciar un negocio sin pedir prestado a un banco. El valor en efectivo puede ser el capital inicial que cambie el rumbo de su carrera." },
+                ].map((item, i) => (
+                  <Anim key={i} delay={i * 0.1}>
+                    <div className={`${t.card} border rounded-2xl p-7 text-center backdrop-blur-xl`}>
+                      <span className="text-4xl mb-4 block">{item.icon}</span>
+                      <h3 className={`text-lg font-semibold ${t.text} mb-3`} style={{ fontFamily: "'Playfair Display', serif" }}>{item.title}</h3>
+                      <p className={`text-sm ${t.textMuted} leading-relaxed`}>{item.desc}</p>
+                    </div>
+                  </Anim>
+                ))}
               </div>
             </div>
           </section>
@@ -105,7 +141,7 @@ export default function IULParaHijos() {
             <div className="max-w-5xl mx-auto">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} text-center mb-4`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                  Por qué empezar joven{" "}
+                  Porqué empezar joven{" "}
                   <span className="italic text-[#1d9fa9]">multiplica el resultado</span>
                 </h2>
                 <p className={`text-center ${t.textMid} max-w-2xl mx-auto mb-12 text-[15px]`}>
@@ -117,14 +153,14 @@ export default function IULParaHijos() {
                 {[
                   {
                     title: "Empiezas cuando tu hijo tiene 5 años",
-                    aporte: "$150 / mes",
+                    aporte: "$400 / mes",
                     detail: "El costo del seguro infantil es prácticamente cero. El 90% de cada aportación va directo al componente de ahorro. 60 años de interés compuesto trabajan para tu hijo.",
                     tag: "Máximo potencial",
                     highlight: true,
                   },
                   {
                     title: "Esperas hasta que tu hijo tenga 20 años",
-                    aporte: "$150 / mes",
+                    aporte: "$100 / mes",
                     detail: "El costo del seguro adulto es mayor. La prima se divide diferente. Solo 45 años de interés compuesto. El resultado final puede ser significativamente menor con el mismo aporte mensual.",
                     tag: "Menos eficiente",
                     highlight: false,
@@ -186,35 +222,6 @@ export default function IULParaHijos() {
             </div>
           </section>
 
-          {/* USOS DEL DINERO */}
-          <section className={`${t.bg2} py-20 px-6`}>
-            <div className="max-w-4xl mx-auto">
-              <Anim>
-                <h2 className={`text-3xl font-normal ${t.text} text-center mb-4`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                  Para qué puede usar ese dinero <span className="italic text-[#1d9fa9]">tu hijo cuando sea adulto</span>
-                </h2>
-                <p className={`text-center ${t.textMid} max-w-2xl mx-auto mb-10 text-[15px]`}>
-                  El valor en efectivo acumulado no tiene restricciones de uso. Lo que a los 18 o 25 años haga tu hijo con ese capital depende solo de él — no de reglas del IRS, no de criterios de elegibilidad.
-                </p>
-              </Anim>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                  { icon: "🎓", title: "Universidad sin deuda", desc: "Paga la universidad sin préstamos estudiantiles. El valor acumulado puede accederse mediante préstamos de la póliza — sin restricciones sobre qué carrera o institución elegir." },
-                  { icon: "🏠", title: "Enganche de la primera casa", desc: "Muchos hijos adultos usan el valor de la póliza como enganche de su primera vivienda. Una ventaja que la mayoría de sus compañeros simplemente no tendrá." },
-                  { icon: "💼", title: "Capital para emprender", desc: "Fondos disponibles para iniciar un negocio sin pedir prestado a un banco. El valor en efectivo puede ser el capital inicial que cambie el rumbo de su carrera." },
-                ].map((item, i) => (
-                  <Anim key={i} delay={i * 0.1}>
-                    <div className={`${t.card} border rounded-2xl p-7 text-center backdrop-blur-xl`}>
-                      <span className="text-4xl mb-4 block">{item.icon}</span>
-                      <h3 className={`text-lg font-semibold ${t.text} mb-3`} style={{ fontFamily: "'Playfair Display', serif" }}>{item.title}</h3>
-                      <p className={`text-sm ${t.textMuted} leading-relaxed`}>{item.desc}</p>
-                    </div>
-                  </Anim>
-                ))}
-              </div>
-            </div>
-          </section>
-
           {/* CÓMO SE ESTRUCTURA */}
           <section className="py-20 px-6">
             <div className="max-w-4xl mx-auto">
@@ -264,7 +271,7 @@ export default function IULParaHijos() {
               </Anim>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                 {[
-                  { range: "$50 – $100", label: "Plan base" },
+                  { range: "$100 – $150", label: "Plan base" },
                   { range: "$100 – $250", label: "Plan equilibrado ✦", highlight: true },
                   { range: "$250 – $500", label: "Plan acelerado" },
                   { range: "$500+", label: "Plan élite" },
@@ -277,6 +284,13 @@ export default function IULParaHijos() {
                   </Anim>
                 ))}
               </div>
+              <Anim delay={0.15}>
+                <div className={`${t.card} border border-dashed border-[#1d9fa9]/50 rounded-xl p-4 mt-2 text-center`}>
+                  <div className="text-[#1d9fa9] font-bold text-base mb-1">Personalizado</div>
+                  <div className={`text-xs font-bold ${t.text} uppercase tracking-wide mb-1`}>A tu medida</div>
+                  <div className={`text-xs ${t.textMuted}`}>Para objetivos específicos — el asesor diseña el monto según la edad del niño</div>
+                </div>
+              </Anim>
               <Anim delay={0.2}>
                 <p className={`text-[11px] ${t.textMuted} italic`}>Rangos orientativos. El diseño exacto lo calcula el asesor según la edad del niño, tu presupuesto y la meta.</p>
               </Anim>

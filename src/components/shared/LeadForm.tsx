@@ -91,9 +91,10 @@ interface LeadFormProps {
   showSidebar?: boolean;
   inline?: boolean;
   sidebarContent?: React.ReactNode;
+  cardTitle?: string;
 }
 
-export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inline = false, sidebarContent }: LeadFormProps) {
+export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inline = false, sidebarContent, cardTitle = "" }: LeadFormProps) {
   const [form, setForm] = useState<LeadFormData>({
     nombre: "",
     telefono: "",
@@ -108,6 +109,8 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
   const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [step, setStep] = useState(1);
   const [honeypot, setHoneypot] = useState("");
+  const [customAmount, setCustomAmount] = useState("");
+  const [showCustomInput, setShowCustomInput] = useState(false);
   const formLoadedAt = useRef(Date.now());
 
 
@@ -169,7 +172,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
     <div className={`${t.card} border rounded-2xl p-4 sm:p-9 backdrop-blur-xl`} style={{ boxShadow: '0 0 60px rgba(29,159,169,0.25), 0 0 120px rgba(29,159,169,0.1)' }}>
       <div className="text-center mb-3 sm:mb-6">
         <h3 className="text-lg sm:text-2xl font-bold" style={{ color: textColor }}>
-          ¡Cotiza tu IUL <span style={{ color: "#1d9fa9" }}>Gratis</span> ahora con Platinum Insurance!
+          {cardTitle ? cardTitle : <>¡Cotiza tu IUL <span style={{ color: "#1d9fa9" }}>Gratis</span> ahora con Platinium Insurance!</>}
         </h3>
         <p className="text-xs sm:text-sm mt-1" style={{ color: mutedColor }}>Completa el formulario</p>
       </div>
@@ -301,7 +304,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                   <button
                     key={weekly}
                     type="button"
-                    onClick={() => updateField("ahorro_semanal", weekly)}
+                    onClick={() => { updateField("ahorro_semanal", weekly); setShowCustomInput(false); setCustomAmount(""); }}
                     className={`${amtBtnBase} ${form.ahorro_semanal === weekly ? amtBtnActive : amtBtnIdle}`}
                     style={{ backgroundColor: form.ahorro_semanal === weekly ? "rgba(29,159,169,0.25)" : "rgba(29,159,169,0.1)", color: textColor }}
                   >
@@ -311,13 +314,45 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                   </button>
                 ))}
               </div>
+              <div className="mt-2 sm:mt-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCustomInput(true);
+                    updateField("ahorro_semanal", "custom");
+                  }}
+                  className={`${amtBtnBase} w-full ${(showCustomInput || (form.ahorro_semanal && !["25","50","75","100"].includes(form.ahorro_semanal))) ? amtBtnActive : amtBtnIdle}`}
+                  style={{ backgroundColor: (showCustomInput || (form.ahorro_semanal && !["25","50","75","100"].includes(form.ahorro_semanal))) ? "rgba(29,159,169,0.25)" : "rgba(29,159,169,0.1)", color: textColor }}
+                >
+                  <div className="text-base sm:text-lg font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>Aporte personalizado</div>
+                  <div className="text-xs mt-1" style={{ color: midColor }}>Para aportes mayores</div>
+                </button>
+                {(showCustomInput || (form.ahorro_semanal && !["25","50","75","100"].includes(form.ahorro_semanal))) && (
+                  <div className="mt-2">
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      min="101"
+                      placeholder="Ej: 150 (semanal)"
+                      value={customAmount}
+                      onChange={(e) => {
+                        setCustomAmount(e.target.value);
+                        updateField("ahorro_semanal", e.target.value);
+                      }}
+                      className="w-full p-3 border rounded-xl text-center text-lg font-bold outline-none transition-colors focus:border-[#1d9fa9] focus:ring-1 focus:ring-[#1d9fa9]/30"
+                      style={{ fontFamily: "'Playfair Display', serif", backgroundColor: inputBg, borderColor: inputBorder, color: textColor }}
+                    />
+                    <p className="text-[11px] mt-1 text-center" style={{ color: mutedColor }}>Ingresa tu aporte semanal en dólares</p>
+                  </div>
+                )}
+              </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-5">
                 <button type="button" onClick={() => setStep(3)} className="sm:flex-1 py-3 rounded-xl font-semibold text-sm cursor-pointer transition-all hover:border-[#1d9fa9]" style={backBtnStyle}>
                   ← Atrás
                 </button>
                 <button
                   type="button"
-                  disabled={!form.ahorro_semanal}
+                  disabled={!form.ahorro_semanal || form.ahorro_semanal === "custom"}
                   onClick={() => setStep(5)}
                   className="sm:flex-1 bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white py-3 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
@@ -455,7 +490,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
           <div className="flex justify-center mb-3">
             <img
               src={agentSuccessImg}
-              alt="Asesora de Platinum Insurance lista para llamarte"
+              alt="Asesora de Platinium Insurance lista para llamarte"
               className="w-56 sm:w-64 h-auto object-contain"
               loading="lazy"
             />
