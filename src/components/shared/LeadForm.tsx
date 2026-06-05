@@ -175,6 +175,12 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
           {cardTitle ? cardTitle : <>¡Cotiza tu IUL <span style={{ color: "#1d9fa9" }}>GRATIS</span> ahora con Platinium!</>}
         </h3>
         <p className="text-xs sm:text-sm mt-1" style={{ color: mutedColor }}>Completa el formulario</p>
+        <div className="flex items-center justify-center gap-2 mt-3 pt-3" style={{ borderTop: `1px solid ${dividerBorder}` }}>
+          <span className="text-[11px]" style={{ color: mutedColor }}>¿Prefieres hablar ya?</span>
+          <a href="tel:+16893082809" className="text-[11px] font-bold hover:underline" style={{ color: "#1d9fa9" }}>📞 Llamar</a>
+          <span className="text-[11px]" style={{ color: mutedColor }}>·</span>
+          <a href="https://wa.me/17866787863" target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold hover:underline" style={{ color: "#25D366" }}>WhatsApp</a>
+        </div>
       </div>
 
       {formState !== "success" ? (
