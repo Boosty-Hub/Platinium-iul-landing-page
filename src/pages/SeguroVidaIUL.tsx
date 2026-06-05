@@ -270,19 +270,20 @@ export default function SeguroVidaIUL() {
             <div className="max-w-4xl mx-auto">
               <Anim>
                 <h2 className={`text-2xl font-normal ${t.text} text-center mb-8`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                  Rangos de aportación <span className="italic text-[#1d9fa9]">realistas</span>
+                  Aporte <span className="italic text-[#1d9fa9]">mensual</span>
                 </h2>
               </Anim>
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                  { range: "$100 – $150", label: "Plan Esencial", sub: "Inicio o complemento" },
-                  { range: "$150 – $400", label: "Plan Optimizado", sub: "Recomendado ✦", highlight: true },
-                  { range: "$400 – $800", label: "Plan Acelerado", sub: "Dueños de negocio" },
-                  { range: "$800+", label: "Plan Premium", sub: "Estructura corporativa" },
+                  { amount: "$100", label: "Plan Esencial", sub: "Para comenzar" },
+                  { amount: "$200", label: "Plan Optimizado", sub: "Recomendado ✦", highlight: true },
+                  { amount: "$300", label: "Plan Acelerado", sub: "Mayor proyección" },
+                  { amount: "$400", label: "Plan Premium", sub: "Máximo potencial" },
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.07}>
                     <div className={`${t.card} border rounded-xl p-5 text-center ${item.highlight ? "border-[#1d9fa9]" : ""}`}>
-                      <div className="text-[#1d9fa9] font-bold text-lg mb-1">{item.range}</div>
+                      <div className="text-[#1d9fa9] font-bold text-2xl mb-1">{item.amount}</div>
+                      <div className={`text-[10px] ${t.textMuted} mb-1`}>al mes</div>
                       <div className={`text-xs font-bold ${t.text} uppercase tracking-wide mb-1`}>{item.label}</div>
                       <div className={`text-xs ${t.textMuted}`}>{item.sub}</div>
                     </div>

@@ -232,16 +232,18 @@ export default function ProteccionFamiliar() {
               <Anim delay={0.2}>
                 <div className={`${t.card} border rounded-2xl p-8 backdrop-blur-xl`}>
                   <h3 className={`text-xl font-semibold ${t.text} mb-6 text-center`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                    Rangos de aportación según tu meta de retiro
+                    Aporte mensual según tu meta de retiro
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {[
-                      { rango: "$100 – $200 / mes", perfil: "Plan de inicio", desc: "Protección básica + acumulación progresiva. Ideal para quienes comienzan." },
-                      { rango: "$200 – $400 / mes", perfil: "Plan intermedio ✦", desc: "Protección sólida + fondo de retiro relevante en 20-25 años.", highlight: true },
-                      { rango: "$400 – $800 / mes", perfil: "Plan acelerado", desc: "Máxima acumulación. Para quienes empiezan más tarde o tienen una meta ambiciosa." },
+                      { amount: "$100", perfil: "Plan de inicio", desc: "Para comenzar con protección básica." },
+                      { amount: "$200", perfil: "Plan intermedio ✦", desc: "Protección sólida y buen fondo de retiro.", highlight: true },
+                      { amount: "$300", perfil: "Plan acelerado", desc: "Mayor acumulación a mediano plazo." },
+                      { amount: "$400", perfil: "Plan premium", desc: "Máximo potencial de crecimiento." },
                     ].map((item, i) => (
-                      <div key={i} className={`${i === 1 ? "border-2 border-[#1d9fa9]" : "border border-[#1d9fa9]/20"} rounded-xl p-5 text-center`}>
-                        <div className="text-[#1d9fa9] font-bold text-lg mb-1">{item.rango}</div>
+                      <div key={i} className={`${item.highlight ? "border-2 border-[#1d9fa9]" : "border border-[#1d9fa9]/20"} rounded-xl p-5 text-center`}>
+                        <div className="text-[#1d9fa9] font-bold text-2xl mb-1">{item.amount}</div>
+                        <div className={`text-[10px] ${t.textMuted} mb-2`}>al mes</div>
                         <div className={`text-xs font-bold tracking-widest uppercase ${t.textMuted} mb-2`}>{item.perfil}</div>
                         <p className={`text-xs ${t.textMuted} leading-relaxed`}>{item.desc}</p>
                       </div>

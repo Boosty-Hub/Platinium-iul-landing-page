@@ -263,22 +263,23 @@ export default function IULParaHijos() {
             <div className="max-w-3xl mx-auto text-center">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} mb-4`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                  Aportaciones <span className="italic text-[#1d9fa9]">a tu medida</span>
+                  Aporte <span className="italic text-[#1d9fa9]">mensual</span>
                 </h2>
                 <p className={`${t.textMid} mb-10 text-[15px]`}>
-                  No hay un monto fijo. El plan se diseña según tu capacidad y la edad de tu hijo. A menor edad del niño, mayor eficiencia de cada aportación.
+                  No hay un monto fijo. El plan se diseña según tu capacidad y la edad de tu hijo. A menor edad del niño, mayor eficiencia de cada aporte.
                 </p>
               </Anim>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                 {[
-                  { range: "$100 – $150", label: "Plan base" },
-                  { range: "$100 – $250", label: "Plan equilibrado ✦", highlight: true },
-                  { range: "$250 – $500", label: "Plan acelerado" },
-                  { range: "$500+", label: "Plan élite" },
+                  { amount: "$100", label: "Plan base" },
+                  { amount: "$200", label: "Plan equilibrado ✦", highlight: true },
+                  { amount: "$300", label: "Plan acelerado" },
+                  { amount: "$400", label: "Plan élite" },
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.07}>
-                    <div className={`${t.card} border rounded-xl p-5 ${item.highlight ? "border-[#1d9fa9]" : ""}`}>
-                      <div className="text-[#1d9fa9] font-bold text-base mb-1">{item.range}</div>
+                    <div className={`${t.card} border rounded-xl p-5 text-center ${item.highlight ? "border-[#1d9fa9]" : ""}`}>
+                      <div className="text-[#1d9fa9] font-bold text-2xl mb-1">{item.amount}</div>
+                      <div className={`text-[10px] ${t.textMuted} mb-1`}>al mes</div>
                       <div className={`text-xs font-bold ${t.text} uppercase tracking-wide`}>{item.label}</div>
                     </div>
                   </Anim>
