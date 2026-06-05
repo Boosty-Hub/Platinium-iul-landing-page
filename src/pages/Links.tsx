@@ -3,7 +3,7 @@ import { MessageCircle, Phone, BarChart3, MapPin } from "lucide-react";
 const links = [
   {
     label: "Chatear con un Asesor",
-    href: "https://wa.me/17866787863",
+    href: "https://wa.me/16893082809",
     icon: MessageCircle,
     external: true,
   },
@@ -70,7 +70,7 @@ export default function Links() {
             </svg>
           </a>
           <a
-            href="https://wa.me/17866787863"
+            href="https://wa.me/16893082809"
             target="_blank"
             rel="noopener noreferrer"
             className="w-10 h-10 rounded-full border border-[#1d9fa9]/30 flex items-center justify-center text-[#94B3BB] hover:text-[#1d9fa9] hover:border-[#1d9fa9]/60 transition-colors"

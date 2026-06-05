@@ -111,7 +111,7 @@ export default function Cotiza() {
           <div>© {new Date().getFullYear()} Platinum Insurance Group. Todos los derechos reservados.</div>
           <div className="flex items-center gap-4">
             <a
-              href="https://wa.me/17866787826"
+              href="https://wa.me/16893082809"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#1d9fa9] font-semibold hover:underline"

@@ -179,7 +179,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
           <span className="text-[11px]" style={{ color: mutedColor }}>¿Prefieres hablar ya?</span>
           <a href="tel:+16893082809" className="text-[11px] font-bold hover:underline" style={{ color: "#1d9fa9" }}>📞 Llamar</a>
           <span className="text-[11px]" style={{ color: mutedColor }}>·</span>
-          <a href="https://wa.me/17866787863" target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold hover:underline" style={{ color: "#25D366" }}>WhatsApp</a>
+          <a href="https://wa.me/16893082809" target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold hover:underline" style={{ color: "#25D366" }}>WhatsApp</a>
         </div>
       </div>
 
@@ -521,7 +521,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
               Llamar Ahora
             </a>
             <a
-              href="https://wa.me/17866787863"
+              href="https://wa.me/16893082809"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 border-2 border-[#25D366] text-[#25D366] px-8 py-4 rounded-xl font-bold text-base no-underline hover:bg-[#25D366]/10 transition-all"

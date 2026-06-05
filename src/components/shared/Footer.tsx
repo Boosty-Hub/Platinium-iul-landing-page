@@ -51,9 +51,9 @@ export function Footer({ t }: FooterProps) {
                 <Phone className="w-4 h-4 shrink-0 text-[#1d9fa9]" />
                 (689) 308-2809
               </a>
-              <a href="https://wa.me/17866787863" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 text-[#25D366] no-underline hover:opacity-80 transition-opacity">
+              <a href="https://wa.me/16893082809" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 text-[#25D366] no-underline hover:opacity-80 transition-opacity">
                 <WhatsAppIcon className="w-4 h-4 shrink-0" />
-                +1 (786) 678-7863
+                +1 (689) 308-2809
               </a>
               <a href="https://www.instagram.com/platiniuminsurancegroup" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2.5 ${t.textMuted} no-underline hover:text-[#E4405F] transition-colors`}>
                 <Instagram className="w-4 h-4 shrink-0 text-[#E4405F]" />

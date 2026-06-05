@@ -23,7 +23,7 @@ export function ContactBar({ t, compact = false }: ContactBarProps) {
                 </svg>
                 Llamar
               </a>
-              <a href="https://wa.me/17866787863" target="_blank" rel="noopener noreferrer" className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 border-2 border-[#25D366] text-[#25D366] px-4 sm:px-6 py-3 rounded-xl font-bold text-sm no-underline hover:bg-[#25D366]/10 transition-all">
+              <a href="https://wa.me/16893082809" target="_blank" rel="noopener noreferrer" className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 border-2 border-[#25D366] text-[#25D366] px-4 sm:px-6 py-3 rounded-xl font-bold text-sm no-underline hover:bg-[#25D366]/10 transition-all">
                 <WhatsAppIcon />
                 WhatsApp
               </a>
@@ -60,7 +60,7 @@ export function ContactBar({ t, compact = false }: ContactBarProps) {
               </svg>
               Llamar
             </a>
-            <a href="https://wa.me/17866787863" target="_blank" rel="noopener noreferrer" className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 border-2 border-[#25D366] text-[#25D366] px-4 sm:px-6 py-3 rounded-xl font-bold text-sm no-underline hover:bg-[#25D366]/10 transition-all">
+            <a href="https://wa.me/16893082809" target="_blank" rel="noopener noreferrer" className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 border-2 border-[#25D366] text-[#25D366] px-4 sm:px-6 py-3 rounded-xl font-bold text-sm no-underline hover:bg-[#25D366]/10 transition-all">
               <WhatsAppIcon />
               WhatsApp
             </a>
