@@ -11,9 +11,9 @@ import { ContactBar } from "@/components/shared/ContactBar";
 const PAGE_FAQS = [
   { q: "¿Mi hijo necesita SSN para tener el plan?", a: "No necesariamente. El titular de la póliza eres tú (el padre, madre o tutor legal), no el niño. Si tú tienes ITIN o pasaporte vigente, puedes ser el propietario del contrato sobre la vida de tu hijo." },
   { q: "¿Puedo retirar yo el dinero si lo necesito antes?", a: "Sí. Como titular, tienes acceso al valor en efectivo mediante préstamos de la póliza. Esto te da flexibilidad si surge una emergencia familiar, aunque el objetivo principal es que el fondo crezca para cuando tu hijo lo necesite." },
-  { q: "¿Qué pasa cuando mi hijo cumpla 18 años?", a: "Como titular, puedes transferirle la póliza a él/ella cuando sea mayor de edad. Tu hijo pasa a ser propietario del contrato con la cobertura de por vida ya aprobada y el valor acumulado a su favor — sin necesidad de pasar por un nuevo proceso de aprobación médica." },
+  { q: "¿Qué pasa cuando mi hijo cumpla 18 años?", a: "Como titular, puedes transferirle la póliza a él/ella cuando sea mayor de edad. Tu hijo pasa a ser propietario del contrato con la cobertura de por vida ya aprobada y el valor acumulado a su favor, sin necesidad de pasar por un nuevo proceso de aprobación médica." },
   { q: "¿Es mejor empezar joven o esperar a que el niño sea adulto?", a: "Empezar joven tiene dos ventajas que no se pueden recuperar: el costo del seguro a edades tempranas es muy bajo (el 90% de la prima va al componente de ahorro), y el interés compuesto tiene décadas más para trabajar. Un mismo aporte mensual produce un resultado mucho mayor si empieza a los 5 años que a los 20." },
-  { q: "¿El valor en efectivo puede usarse para la universidad?", a: "Sí. El valor acumulado puede accederse mediante préstamos de la póliza para pagar la universidad. No tiene restricciones sobre el uso del dinero — a diferencia del plan 529, puede usarse para cualquier meta: educación, primera casa, emprendimiento." },
+  { q: "¿El valor en efectivo puede usarse para la universidad?", a: "Sí. El valor acumulado puede accederse mediante préstamos de la póliza para pagar la universidad. No tiene restricciones sobre el uso del dinero; a diferencia del plan 529, puede usarse para cualquier meta: educación, primera casa, emprendimiento." },
   { q: "¿Qué condiciones médicas del niño pueden bloquear la aprobación?", a: "Condiciones serias pueden limitar el acceso o aumentar el costo. Sin embargo, una vez aprobada la póliza, la cobertura es permanente sin importar qué condiciones médicas desarrolle el niño en su adultez. Esa asegurabilidad de por vida es la mayor ventaja de iniciar en edad temprana." },
 ];
 
@@ -74,14 +74,14 @@ export default function IULParaHijos() {
                     {" "}usando interés compuesto seguro
                   </h1>
                   <p className={`text-base lg:text-lg ${t.textMid} leading-relaxed mb-7`}>
-                    Cuando empiezas en la infancia, el costo del seguro es mínimo — el 90% de cada aportación va directo al componente de ahorro indexado. Décadas de interés compuesto más una cobertura de por vida asegurada antes de que ninguna condición médica futura lo complique.
+                    Cuando empiezas en la infancia, el costo del seguro es mínimo: el 90% de cada aportación va directo al componente de ahorro indexado. Décadas de interés compuesto más una cobertura de por vida asegurada antes de que ninguna condición médica futura lo complique.
                   </p>
                   <div className="space-y-3 mb-7">
                     {[
                       { icon: "⚡", text: "Hackeo del tiempo: el costo infantil es bajo, el 90% de la prima va al ahorro indexado" },
                       { icon: "💸", text: "Retiros potencialmente libres de impuestos para universidad, vivienda o emprendimiento" },
                       { icon: "🏥", text: "Asegurabilidad de por vida: la cobertura no puede cancelarse por condiciones médicas futuras" },
-                      { icon: "🌎", text: "Aplica con ITIN o Pasaporte del padre o tutor — sin necesitar SSN del menor" },
+                      { icon: "🌎", text: "Aplica con ITIN o Pasaporte del padre o tutor, sin necesitar SSN del menor" },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3">
                         <span className="text-xl shrink-0 mt-0.5">{item.icon}</span>
@@ -96,7 +96,7 @@ export default function IULParaHijos() {
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" inline cardTitle="Cotiza el plan IUL para tus hijos — gratis" />
+                  <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" inline cardTitle="¡Cotiza el plan IUL para tus hijos con Platinium, GRATIS!" />
                 </Anim>
               </div>
             </div>
@@ -115,12 +115,12 @@ export default function IULParaHijos() {
                   Para qué puede usar ese dinero <span className="italic text-[#1d9fa9]">tu hijo cuando sea adulto</span>
                 </h2>
                 <p className={`text-center ${t.textMid} max-w-2xl mx-auto mb-10 text-[15px]`}>
-                  El valor en efectivo acumulado no tiene restricciones de uso. Lo que a los 18 ó 25 años haga tu hijo con ese capital depende solo de él — no de reglas del IRS, no de criterios de elegibilidad.
+                  El valor en efectivo acumulado no tiene restricciones de uso. Lo que a los 18 ó 25 años haga tu hijo con ese capital depende solo de él, no de reglas del IRS, no de criterios de elegibilidad.
                 </p>
               </Anim>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
-                  { icon: "🎓", title: "Universidad sin deuda", desc: "Paga la universidad sin préstamos estudiantiles. El valor acumulado puede accederse mediante préstamos de la póliza — sin restricciones sobre qué carrera o institución elegir." },
+                  { icon: "🎓", title: "Universidad sin deuda", desc: "Paga la universidad sin préstamos estudiantiles. El valor acumulado puede accederse mediante préstamos de la póliza, sin restricciones sobre qué carrera o institución elegir." },
                   { icon: "🏠", title: "Enganche de la primera casa", desc: "Muchos hijos adultos usan el valor de la póliza como enganche de su primera vivienda. Una ventaja que la mayoría de sus compañeros simplemente no tendrá." },
                   { icon: "💼", title: "Capital para emprender", desc: "Fondos disponibles para iniciar un negocio sin pedir prestado a un banco. El valor en efectivo puede ser el capital inicial que cambie el rumbo de su carrera." },
                 ].map((item, i) => (
@@ -145,7 +145,7 @@ export default function IULParaHijos() {
                   <span className="italic text-[#1d9fa9]">multiplica el resultado</span>
                 </h2>
                 <p className={`text-center ${t.textMid} max-w-2xl mx-auto mb-12 text-[15px]`}>
-                  No es sobre el monto mensual — es sobre los años. El mismo aporte mensual produce resultados radicalmente distintos según cuándo empieces.
+                  No es sobre el monto mensual, es sobre los años. El mismo aporte mensual produce resultados radicalmente distintos según cuándo empieces.
                 </p>
               </Anim>
 
@@ -197,7 +197,7 @@ export default function IULParaHijos() {
                   {
                     icon: "⚡",
                     title: "El hackeo matemático del tiempo",
-                    desc: "A edades infantiles, el costo del seguro es mínimo — prácticamente cero. Eso significa que el 90% de cada dólar que aportas va directo al componente de ahorro indexado, donde el interés compuesto lo multiplica durante décadas.",
+                    desc: "A edades infantiles, el costo del seguro es mínimo, prácticamente cero. Eso significa que el 90% de cada dólar que aportas va directo al componente de ahorro indexado, donde el interés compuesto lo multiplica durante décadas.",
                   },
                   {
                     icon: "💸",
@@ -207,7 +207,7 @@ export default function IULParaHijos() {
                   {
                     icon: "🏥",
                     title: "Asegurabilidad de por vida bloqueada",
-                    desc: "Una vez aprobada la póliza, la cobertura es permanente — sin importar qué condiciones médicas desarrolle tu hijo en su adultez. Diabetes, hipertensión, lo que sea: si la póliza ya existe, la cobertura ya está garantizada.",
+                    desc: "Una vez aprobada la póliza, la cobertura es permanente, sin importar qué condiciones médicas desarrolle tu hijo en su adultez. Diabetes, hipertensión, lo que sea: si la póliza ya existe, la cobertura ya está garantizada.",
                   },
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.1}>
@@ -233,7 +233,7 @@ export default function IULParaHijos() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {[
                   { icon: "👨‍👩‍👧", title: "El padre o tutor es el titular legal", desc: "El adulto que inicia el plan es el propietario del contrato. Es quien paga las primas y tiene acceso al valor en efectivo si lo necesita en una emergencia." },
-                  { icon: "👶", title: "El menor es el asegurado", desc: "El niño o niña es la vida asegurada. La cobertura se aprueba con base en su estado de salud al momento de la solicitud — sin importar condiciones futuras." },
+                  { icon: "👶", title: "El menor es el asegurado", desc: "El niño o niña es la vida asegurada. La cobertura se aprueba con base en su estado de salud al momento de la solicitud, sin importar condiciones futuras." },
                   { icon: "🔄", title: "Transferencia cuando cumpla la mayoría", desc: "Cuando el hijo sea mayor de edad, el titular puede transferirle la propiedad del contrato. El hijo hereda la cobertura de por vida y el valor acumulado ya construido." },
                   { icon: "🌎", title: "Aplica con ITIN o Pasaporte del titular", desc: "Como padre o tutor con ITIN o pasaporte vigente, puedes abrir el plan. El acceso sin SSN aplica también para estos contratos familiares bajo la Sec. 7702." },
                 ].map((item, i) => (
@@ -288,7 +288,7 @@ export default function IULParaHijos() {
                 <div className={`${t.card} border border-dashed border-[#1d9fa9]/50 rounded-xl p-4 mt-2 text-center`}>
                   <div className="text-[#1d9fa9] font-bold text-base mb-1">Personalizado</div>
                   <div className={`text-xs font-bold ${t.text} uppercase tracking-wide mb-1`}>A tu medida</div>
-                  <div className={`text-xs ${t.textMuted}`}>Para objetivos específicos — el asesor diseña el monto según la edad del niño</div>
+                  <div className={`text-xs ${t.textMuted}`}>Para objetivos específicos; el asesor diseña el monto según la edad del niño</div>
                 </div>
               </Anim>
               <Anim delay={0.2}>

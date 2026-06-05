@@ -70,7 +70,7 @@ export default function IULParaIndocumentados() {
                   <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-normal leading-[1.08] mb-5 ${t.text}`} style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
                     Acumula capital libre de impuestos en EE.UU.{" "}
                     <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
-                      con ITIN o Pasaporte — sin Seguro Social
+                      con ITIN o Pasaporte, sin Seguro Social
                     </span>
                   </h1>
                   <p className={`text-base lg:text-lg ${t.textMid} leading-relaxed mb-7`}>
@@ -78,10 +78,10 @@ export default function IULParaIndocumentados() {
                   </p>
                   <div className="space-y-3 mb-7">
                     {[
-                      { icon: "⚖️", text: "100% legal bajo la Sec. 7702 del IRS — acceso nativo para ITIN y Pasaporte" },
-                      { icon: "🔒", text: "Confidencialidad absoluta — tu información nunca se comparte con Inmigración" },
-                      { icon: "💰", text: "Acumula valor en efectivo con piso del 0% — si la bolsa cae, tu saldo no pierde" },
-                      { icon: "✈️", text: "Póliza portable — permanece activa si regresas a tu país de origen" },
+                      { icon: "⚖️", text: "100% legal bajo la Sec. 7702 del IRS, con acceso nativo para ITIN y Pasaporte" },
+                      { icon: "🔒", text: "Confidencialidad absoluta: tu información nunca se comparte con Inmigración" },
+                      { icon: "💰", text: "Acumula valor en efectivo con piso del 0%; si la bolsa cae, tu saldo no pierde" },
+                      { icon: "✈️", text: "Póliza portable: permanece activa si regresas a tu país de origen" },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3">
                         <span className="text-xl shrink-0 mt-0.5">{item.icon}</span>
@@ -96,7 +96,7 @@ export default function IULParaIndocumentados() {
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" inline cardTitle="Cotiza con tu ITIN o Pasaporte — gratis" />
+                  <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" inline cardTitle="¡Cotiza con tu ITIN o Pasaporte con Platinium, GRATIS!" />
                 </Anim>
               </div>
             </div>
@@ -119,13 +119,13 @@ export default function IULParaIndocumentados() {
                 {[
                   {
                     myth: "MITO #1: \"Los seguros solo sirven si falleces o si dejas dinero a alguien\"",
-                    reality: "REALIDAD — Beneficios en vida activos: El valor en efectivo se acumula desde el primer año y puedes usarlo en vida para emergencias, invalidez, enfermedades crónicas o como sueldo de retiro libre de impuestos.",
+                    reality: "REALIDAD. Beneficios en vida activos: El valor en efectivo se acumula desde el primer año y puedes usarlo en vida para emergencias, invalidez, enfermedades crónicas o como sueldo de retiro libre de impuestos.",
                     mythColor: "text-red-500",
                     realityColor: "text-emerald-500",
                   },
                   {
                     myth: "MITO #2: \"Necesitas Seguro Social (SSN) para ahorrar legalmente en EE.UU.\"",
-                    reality: "REALIDAD — Garantía legal aprobada con ITIN: Los contratos bajo la Sección 7702 están respaldados por el derecho mercantil privado. El ITIN es una vía 100% legal para abrir estos planes. Tu estatus migratorio no altera tus derechos de propiedad privada.",
+                    reality: "REALIDAD. Garantía legal aprobada con ITIN: Los contratos bajo la Sección 7702 están respaldados por el derecho mercantil privado. El ITIN es una vía 100% legal para abrir estos planes. Tu estatus migratorio no altera tus derechos de propiedad privada.",
                     mythColor: "text-red-500",
                     realityColor: "text-emerald-500",
                   },
@@ -159,7 +159,7 @@ export default function IULParaIndocumentados() {
                   Lo que dice la ley: acceso real con <span className="italic text-[#1d9fa9]">ITIN o Pasaporte</span>
                 </h2>
                 <p className={`text-center ${t.textMid} max-w-2xl mx-auto mb-10 text-[15px]`}>
-                  La Sección 7702 del Internal Revenue Code regula los seguros de vida en EE.UU. y no exige SSN como requisito de acceso. No es un vacío legal — es la norma vigente bajo el derecho comercial privado.
+                  La Sección 7702 del Internal Revenue Code regula los seguros de vida en EE.UU. y no exige SSN como requisito de acceso. No es un vacío legal; es la norma vigente bajo el derecho comercial privado.
                 </p>
               </Anim>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -193,12 +193,12 @@ export default function IULParaIndocumentados() {
                 {[
                   {
                     icon: "📋",
-                    title: "Opción A — Con ITIN",
+                    title: "Opción A: Con ITIN",
                     docs: ["ITIN vigente del IRS", "Declaraciones de impuestos (últimos 2-3 años)", "Comprobante de domicilio en EE.UU. (recibo de servicios o contrato de alquiler)", "Identificación con foto (pasaporte, matrícula consular)"],
                   },
                   {
                     icon: "🛂",
-                    title: "Opción B — Con Pasaporte",
+                    title: "Opción B: Con Pasaporte",
                     docs: ["Pasaporte vigente de tu país de origen con foto", "Comprobante de domicilio en EE.UU.", "Comprobante de ingresos (carta patronal, estados de cuenta o tax returns si disponibles)"],
                   },
                 ].map((item, i) => (

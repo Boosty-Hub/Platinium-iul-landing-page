@@ -9,12 +9,12 @@ import { LeadForm } from "@/components/shared/LeadForm";
 import { ContactBar } from "@/components/shared/ContactBar";
 
 const PAGE_FAQS = [
-  { q: "¿El IUL solo sirve cuando fallezco?", a: "No. El IUL tiene dos funciones simultáneas: proteger a tu familia si falleces, y acumular un fondo de valor en efectivo que tú puedes usar en vida para el retiro. Además, los riders de enfermedades críticas, crónicas y terminales te permiten acceder al beneficio si te diagnostican una condición grave — sin necesidad de fallecer." },
+  { q: "¿El IUL solo sirve cuando fallezco?", a: "No. El IUL tiene dos funciones simultáneas: proteger a tu familia si falleces, y acumular un fondo de valor en efectivo que tú puedes usar en vida para el retiro. Además, los riders de enfermedades críticas, crónicas y terminales te permiten acceder al beneficio si te diagnostican una condición grave, sin necesidad de fallecer." },
   { q: "¿Puedo retirar mi dinero sin impuestos antes de los 65?", a: "Bajo la Sección 7702 del Código Fiscal de EE.UU., los préstamos sobre el valor en efectivo pueden ser libres de impuestos y sin penalidades por edad, siempre que la póliza esté activa y correctamente estructurada. A diferencia del 401k, no hay multa del 10% por acceso anticipado." },
   { q: "¿Qué pasa con el retiro si mi póliza caduca?", a: "Si la póliza caduca antes de que liquides los préstamos, podría generarse una obligación fiscal. Por eso es fundamental mantener la póliza activa y diseñarla correctamente con un asesor licenciado desde el inicio." },
   { q: "¿Puedo aplicar sin Seguro Social?", a: "Sí. El IUL es accesible con ITIN o pasaporte vigente bajo la Sec. 7702. Tu estatus migratorio no determina tu acceso. Más detalles en nuestra página de acceso con ITIN." },
-  { q: "¿Cuánto necesito aportar para tener un retiro real?", a: "Con $200–$400 mensuales iniciando a los 35 años es posible acumular un fondo significativo para acceder a los 60–65. Un asesor calcula proyecciones específicas según tu caso real — sin promedios genéricos." },
-  { q: "¿El valor en efectivo puede bajar si el mercado cae?", a: "No. El mecanismo de indexación al S&P 500 incluye un piso del 0%. Si el mercado cae, tu rendimiento ese año es del 0% — tu saldo no retrocede. Las ganancias acumuladas quedan consolidadas y no pierdes el capital." },
+  { q: "¿Cuánto necesito aportar para tener un retiro real?", a: "Con $200–$400 mensuales iniciando a los 35 años es posible acumular un fondo significativo para acceder a los 60–65. Un asesor calcula proyecciones específicas según tu caso real, sin promedios genéricos." },
+  { q: "¿El valor en efectivo puede bajar si el mercado cae?", a: "No. El mecanismo de indexación al S&P 500 incluye un piso del 0%. Si el mercado cae, tu rendimiento ese año es del 0%; tu saldo no retrocede. Las ganancias acumuladas quedan consolidadas y no pierdes el capital." },
 ];
 
 export default function ProteccionFamiliar() {
@@ -26,7 +26,7 @@ export default function ProteccionFamiliar() {
         <>
           <SEOHead
             title="IUL: Protección Familiar y Retiro en Uno | Platinium"
-            description="Un IUL protege a tu familia si algo te pasa y acumula valor para tu retiro privado. Sin SSN — aplica con ITIN o pasaporte. Cotiza gratis con asesor en español."
+            description="Un IUL protege a tu familia si algo te pasa y acumula valor para tu retiro privado. Sin SSN: aplica con ITIN o pasaporte. Cotiza gratis con asesor en español."
             keywords="seguro de vida con ahorro para retiro, IUL protección y retiro, protección familiar y jubilación, IUL para retiro privado, ahorro retiro USA latinos, alternativa retiro privado, seguro de vida familiar"
             canonical={`${DOMAIN}/proteccion-familiar`}
             jsonLd={[
@@ -78,10 +78,10 @@ export default function ProteccionFamiliar() {
                   </p>
                   <div className="space-y-3 mb-7">
                     {[
-                      { icon: "🛡️", text: "Protección desde el día uno — beneficio por fallecimiento libre de impuestos para tu familia" },
-                      { icon: "📈", text: "Valor en efectivo que crece indexado al S&P 500 con piso del 0% — sin riesgo de mercado" },
+                      { icon: "🛡️", text: "Protección desde el día uno: beneficio por fallecimiento libre de impuestos para tu familia" },
+                      { icon: "📈", text: "Valor en efectivo que crece indexado al S&P 500 con piso del 0%, sin riesgo de mercado" },
                       { icon: "💸", text: "Retiros libres de impuestos para retiro bajo la Sec. 7702, sin penalidades por edad" },
-                      { icon: "❤️", text: "Riders de enfermedades graves — accede al beneficio si te diagnostican una condición crítica" },
+                      { icon: "❤️", text: "Riders de enfermedades graves: accede al beneficio si te diagnostican una condición crítica" },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3">
                         <span className="text-xl shrink-0 mt-0.5">{item.icon}</span>
@@ -96,7 +96,7 @@ export default function ProteccionFamiliar() {
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" inline cardTitle="Cotiza tu plan de protección y retiro" />
+                  <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" inline cardTitle="¡Cotiza tu plan de protección y retiro con Platinium!" />
                 </Anim>
               </div>
             </div>
@@ -119,11 +119,11 @@ export default function ProteccionFamiliar() {
                 {[
                   {
                     myth: "MITO: \"El seguro de vida solo sirve cuando me muera\"",
-                    reality: "REALIDAD — El valor en efectivo se acumula desde el primer año y puedes usarlo en vida: para retiro, emergencias, enfermedades crónicas o críticas. No tienes que morir para que tu dinero trabaje.",
+                    reality: "REALIDAD. El valor en efectivo se acumula desde el primer año y puedes usarlo en vida: para retiro, emergencias, enfermedades crónicas o críticas. No tienes que morir para que tu dinero trabaje.",
                   },
                   {
                     myth: "MITO: \"No califico porque no tengo Seguro Social\"",
-                    reality: "REALIDAD — Los contratos bajo la Sec. 7702 son accesibles con ITIN o pasaporte vigente. Tu estatus migratorio no altera tus derechos de propiedad privada bajo el derecho comercial de EE.UU.",
+                    reality: "REALIDAD. Los contratos bajo la Sec. 7702 son accesibles con ITIN o pasaporte vigente. Tu estatus migratorio no altera tus derechos de propiedad privada bajo el derecho comercial de EE.UU.",
                   },
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.1}>
@@ -164,15 +164,15 @@ export default function ProteccionFamiliar() {
                     icon: "🛡️",
                     tag: "Para tu familia",
                     title: "Protección por fallecimiento",
-                    desc: "Si falleces mientras la póliza está activa, tus beneficiarios reciben el beneficio libre de impuestos federales. Cubre hipoteca, deudas, gastos escolares, nivel de vida — todo lo que tú sostenías.",
-                    items: ["Desde $250,000+ libre de impuestos federales", "Cubre hipoteca, deudas y nivel de vida", "Riders de enfermedades graves incluidos", "Cobertura permanente — no expira como el Term Life"],
+                    desc: "Si falleces mientras la póliza está activa, tus beneficiarios reciben el beneficio libre de impuestos federales. Cubre hipoteca, deudas, gastos escolares, nivel de vida: todo lo que tú sostenías.",
+                    items: ["Desde $250,000+ libre de impuestos federales", "Cubre hipoteca, deudas y nivel de vida", "Riders de enfermedades graves incluidos", "Cobertura permanente, no expira como el Term Life"],
                   },
                   {
                     icon: "📈",
                     tag: "Para ti",
                     title: "Acumulación para tu retiro",
-                    desc: "El valor en efectivo crece indexado al S&P 500 con piso del 0%. Bajo la Sección 7702, puedes acceder a él mediante préstamos de la póliza — libres de impuestos y sin las penalidades del 401k — siempre que la póliza permanezca activa.",
-                    items: ["Crecimiento indexado al S&P 500", "Piso del 0% — no participas de las caídas", "Acceso sin penalidad por edad, sin RMD", "Retiros estructurados libres de impuestos bajo Sec. 7702*"],
+                    desc: "El valor en efectivo crece indexado al S&P 500 con piso del 0%. Bajo la Sección 7702, puedes acceder a él mediante préstamos de la póliza, libres de impuestos y sin las penalidades del 401k, siempre que la póliza permanezca activa.",
+                    items: ["Crecimiento indexado al S&P 500", "Piso del 0%: no participas de las caídas", "Acceso sin penalidad por edad, sin RMD", "Retiros estructurados libres de impuestos bajo Sec. 7702*"],
                   },
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.1}>
@@ -209,14 +209,14 @@ export default function ProteccionFamiliar() {
                   Cómo se construye tu <span className="italic text-[#1d9fa9]">fondo de retiro privado</span>
                 </h2>
                 <p className={`text-center ${t.textMid} max-w-2xl mx-auto mb-10 text-[15px]`}>
-                  El mecanismo es matemáticamente asimétrico: capturas las subidas del S&P 500 (hasta el cap del contrato) y tienes un piso del 0% en las caídas. Cada año de ganancias queda consolidado — tu saldo solo crece o se mantiene igual.
+                  El mecanismo es matemáticamente asimétrico: capturas las subidas del S&P 500 (hasta el cap del contrato) y tienes un piso del 0% en las caídas. Cada año de ganancias queda consolidado; tu saldo solo crece o se mantiene igual.
                 </p>
               </Anim>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                 {[
-                  { icon: "📊", title: "Indexado al S&P 500", desc: "Tu Cash Value gana intereses basados en el rendimiento del índice. No se invierte directamente en bolsa — sin exposición directa al riesgo bursátil." },
+                  { icon: "📊", title: "Indexado al S&P 500", desc: "Tu Cash Value gana intereses basados en el rendimiento del índice. No se invierte directamente en bolsa, sin exposición directa al riesgo bursátil." },
                   { icon: "🛡️", title: "Piso del 0%", desc: "Si el mercado cae un -20%, tu rendimiento ese año es del 0%. Las ganancias de años anteriores quedan consolidadas. No retrocedes." },
-                  { icon: "💰", title: "Acceso flexible", desc: "Accedes al valor acumulado mediante préstamos de la póliza antes de los 65 — sin las penalidades del 401k ni las restricciones de edad del sistema tradicional." },
+                  { icon: "💰", title: "Acceso flexible", desc: "Accedes al valor acumulado mediante préstamos de la póliza antes de los 65, sin las penalidades del 401k ni las restricciones de edad del sistema tradicional." },
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.1}>
                     <div className={`${t.card} border rounded-2xl p-7 backdrop-blur-xl`}>
@@ -250,7 +250,7 @@ export default function ProteccionFamiliar() {
                   <div className={`border border-dashed border-[#1d9fa9]/50 rounded-xl p-4 mt-2 text-center`}>
                     <div className="text-[#1d9fa9] font-bold text-lg mb-1">Personalizado</div>
                     <div className={`text-xs font-bold uppercase tracking-wide mb-1`} style={{ color: "#4A6B73" }}>A tu medida</div>
-                    <p className={`text-xs leading-relaxed`} style={{ color: "#7A9BA3" }}>Para metas específicas — el asesor diseña el monto exacto según tu situación</p>
+                    <p className={`text-xs leading-relaxed`} style={{ color: "#7A9BA3" }}>Para metas específicas: el asesor diseña el monto exacto según tu situación</p>
                   </div>
                   <p className={`text-[11px] ${t.textMuted} italic mt-4 text-center`}>Proyecciones ilustrativas. Los resultados reales dependen de la edad, salud y diseño de la póliza. Un asesor licenciado entrega tu proyección personalizada.</p>
                 </div>
@@ -263,7 +263,7 @@ export default function ProteccionFamiliar() {
             <div className="max-w-4xl mx-auto">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} text-center mb-4`} style={{ fontFamily: "'Playfair Display', serif" }}>
-                  Usa tu IUL si te enfermas —{" "}
+                  Usa tu IUL si te enfermas,{" "}
                   <span className="italic text-[#1d9fa9]">sin necesidad de fallecer</span>
                 </h2>
                 <p className={`text-center ${t.textMid} max-w-2xl mx-auto mb-10 text-[15px]`}>
@@ -273,7 +273,7 @@ export default function ProteccionFamiliar() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
                   { icon: "🩺", title: "Enfermedad crónica", desc: "Si no puedes realizar actividades básicas diarias por 90+ días (Alzheimer, Parkinson, esclerosis múltiple), puedes adelantar parte del beneficio." },
-                  { icon: "💔", title: "Enfermedad crítica", desc: "Cáncer, infarto, derrame cerebral, trasplante de órganos — recibes un adelanto del beneficio para cubrir tratamiento y gastos del hogar." },
+                  { icon: "💔", title: "Enfermedad crítica", desc: "Cáncer, infarto, derrame cerebral, trasplante de órganos: recibes un adelanto del beneficio para cubrir tratamiento y gastos del hogar." },
                   { icon: "🕊️", title: "Enfermedad terminal", desc: "Si tu expectativa de vida es 12-24 meses, puedes acceder a la mayor parte del beneficio para usarlo en vida con tu familia." },
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.08}>
@@ -308,7 +308,7 @@ export default function ProteccionFamiliar() {
                   { title: "¿Qué es un IUL?", desc: "Guía completa del producto: los tres pilares, la fórmula del piso del 0% y para quién aplica.", href: "/seguro-de-vida-iul", icon: "📚" },
                   { title: "IUL vs 401(k)", desc: "Comparativa de 4 columnas: IUL, 401k, Roth IRA y Traditional IRA. Los ejes que el mercado no muestra.", href: "/iul-vs-401k", icon: "⚖️" },
                   { title: "Seguro con ITIN o Pasaporte", desc: "Acceso legal sin Seguro Social. Documentación, legalidad, confidencialidad y portabilidad.", href: "/seguro-vida-itin", icon: "🌎" },
-                  { title: "Beneficios en Vida", desc: "Accede al beneficio si te diagnostican una enfermedad grave — sin necesidad de fallecer.", href: "/beneficios-en-vida", icon: "❤️" },
+                  { title: "Beneficios en Vida", desc: "Accede al beneficio si te diagnostican una enfermedad grave, sin necesidad de fallecer.", href: "/beneficios-en-vida", icon: "❤️" },
                   { title: "Plan para tus Hijos", desc: "Cobertura de por vida asegurada desde joven + fondo para universidad, primera casa o negocio.", href: "/iul-para-hijos", icon: "👶" },
                   { title: "Cotiza tu Plan", desc: "Proyección personalizada en PDF. Gratis, en español y sin compromiso.", href: "/cotizacion-iul", icon: "📋" },
                 ].map((item, i) => (

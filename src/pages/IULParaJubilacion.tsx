@@ -70,7 +70,7 @@ export default function IULParaJubilacion() {
               </Anim>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {[
-                  { icon: "❌", text: "Sin employer matching — nadie duplica tus ahorros" },
+                  { icon: "❌", text: "Sin employer matching: nadie duplica tus ahorros" },
                   { icon: "🏦", text: "El banco te paga 0.05% mientras la inflación sube 3-5% anual" },
                   { icon: "📉", text: "Sin plan formal, dependes de Social Security (que puede no ser suficiente)" },
                   { icon: "⏰", text: "Cada año que esperas, pierdes miles en interés compuesto" },

@@ -12,7 +12,7 @@ const PAGE_FAQS = [
   { q: "¿Puedo tener un IUL y un 401k al mismo tiempo?", a: "Sí. Son instrumentos complementarios, no excluyentes. La estrategia más común: aprovechar el employer matching del 401k hasta el tope (dinero gratuito), y canalizar el excedente a un IUL para agregar protección familiar, acceso anticipado sin penalidad y cobertura contra caídas del mercado." },
   { q: "¿Qué pasa con mi 401k si dejo mi trabajo?", a: "Tienes varias opciones: dejarlo en el plan del ex empleador, hacer un rollover a un IRA, o retirarlo pagando impuestos y la penalidad del 10%. El IUL no tiene este problema porque es un contrato personal que no depende de tu relación laboral." },
   { q: "¿Por qué el 401k puede ser una 'bomba de tiempo fiscal'?", a: "El 401k tradicional te ahorra impuestos hoy, pero te obliga a pagar impuestos sobre el 100% de lo que retires en el futuro. Si las tasas impositivas suben en los próximos 20-30 años, entregarías al IRS una porción significativa de lo que acumulaste. El IUL, bajo la Sec. 7702, permite retiros libres de esa carga si la póliza permanece activa." },
-  { q: "¿El IUL tiene límites de contribución del IRS?", a: "El IUL se diseña bajo la Sección 7702, que establece parámetros para que la póliza no sea clasificada como Modified Endowment Contract (MEC). Dentro de esos parámetros, la aportación se ajusta a la capacidad del titular y los objetivos del contrato — no hay un tope fijo como el del 401k." },
+  { q: "¿El IUL tiene límites de contribución del IRS?", a: "El IUL se diseña bajo la Sección 7702, que establece parámetros para que la póliza no sea clasificada como Modified Endowment Contract (MEC). Dentro de esos parámetros, la aportación se ajusta a la capacidad del titular y los objetivos del contrato, no hay un tope fijo como el del 401k." },
   { q: "¿Cuál da más rendimiento: el IUL o el 401k?", a: "Depende del mercado y el horizonte temporal. El 401k captura el upside completo del mercado, pero también absorbe las caídas. El IUL captura el upside hasta el cap y tiene piso del 0%. En mercados volátiles, el IUL suele preservar mejor el capital acumulado al no participar de las caídas." },
   { q: "¿Qué es el Roth IRA y en qué se diferencia del IUL?", a: "El Roth IRA es una cuenta de retiro con contribuciones post-impuesto y retiros libres de impuestos después de los 59½. A diferencia del IUL, no incluye protección por fallecimiento, no tiene piso contra pérdidas del mercado, tiene límite de contribución anual del IRS ($7,000 en 2024) y no está disponible para personas con ITIN." },
 ];
@@ -65,14 +65,14 @@ export default function IULvs401k() {
                     </span>
                   </h1>
                   <p className={`text-base lg:text-lg ${t.textMid} leading-relaxed mb-7`}>
-                    No todos los instrumentos de retiro son iguales. El 401k tiene ventajas reales — especialmente con employer matching. El IUL resuelve lo que el 401k no puede: protección familiar, acceso anticipado sin penalidad, y acceso con ITIN. Aquí comparas los cuatro con datos reales.
+                    No todos los instrumentos de retiro son iguales. El 401k tiene ventajas reales, especialmente con employer matching. El IUL resuelve lo que el 401k no puede: protección familiar, acceso anticipado sin penalidad, y acceso con ITIN. Aquí comparas los cuatro con datos reales.
                   </p>
                   <div className="space-y-3 mb-7">
                     {[
                       { icon: "🛡️", text: "Piso del 0%: si la bolsa cae, tu saldo IUL no retrocede ni un centavo" },
-                      { icon: "💸", text: "Retiros estructurados libres de impuestos — el 401k tributa al 100% cuando retiras" },
-                      { icon: "🔓", text: "Acceso anticipado sin penalidad — el 401k cobra 10% antes de los 59½" },
-                      { icon: "🌎", text: "El IUL acepta ITIN o Pasaporte — el 401k requiere SSN y empleo formal" },
+                      { icon: "💸", text: "Retiros estructurados libres de impuestos; el 401k tributa al 100% cuando retiras" },
+                      { icon: "🔓", text: "Acceso anticipado sin penalidad; el 401k cobra 10% antes de los 59½" },
+                      { icon: "🌎", text: "El IUL acepta ITIN o Pasaporte; el 401k requiere SSN y empleo formal" },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3">
                         <span className="text-xl shrink-0 mt-0.5">{item.icon}</span>
@@ -81,13 +81,13 @@ export default function IULvs401k() {
                     ))}
                   </div>
                   <p className={`text-xs ${t.textMuted} italic`}>
-                    El análisis completo incluye cuándo el 401k sí conviene — especialmente si tu empleador ofrece matching.
+                    El análisis completo incluye cuándo el 401k sí conviene, especialmente si tu empleador ofrece matching.
                   </p>
                 </Anim>
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Ahorro a largo plazo / retiro" inline cardTitle="¿IUL o 401k? Compara y cotiza gratis" />
+                  <LeadForm t={t} dark={dark} defaultInteres="Ahorro a largo plazo / retiro" inline cardTitle="¿IUL o 401k? ¡Compara y cotiza GRATIS con Platinium!" />
                 </Anim>
               </div>
             </div>
@@ -167,7 +167,7 @@ export default function IULvs401k() {
                   {
                     icon: "⏰",
                     title: "La bomba de tiempo fiscal diferida",
-                    desc: "El 401k te ahorra impuestos hoy, pero acumulas una deuda impositiva futura. Cuando retires, pagas impuestos sobre el 100% — incluidas las ganancias acumuladas durante 30 años. Si las tasas fiscales suben en el futuro, el costo podría ser mayor de lo previsto.",
+                    desc: "El 401k te ahorra impuestos hoy, pero acumulas una deuda impositiva futura. Cuando retires, pagas impuestos sobre el 100%, incluidas las ganancias acumuladas durante 30 años. Si las tasas fiscales suben en el futuro, el costo podría ser mayor de lo previsto.",
                     highlight: false,
                   },
                   {
@@ -185,7 +185,7 @@ export default function IULvs401k() {
                   {
                     icon: "🔗",
                     title: "Está atado a tu empleo",
-                    desc: "Si cambias de trabajo, cierras tu empresa o te despiden, el 401k se complica — tienes que hacer un rollover, dejarlo donde está o retirarlo pagando impuestos. El IUL es un contrato personal que no depende de tu relación laboral.",
+                    desc: "Si cambias de trabajo, cierras tu empresa o te despiden, el 401k se complica: tienes que hacer un rollover, dejarlo donde está o retirarlo pagando impuestos. El IUL es un contrato personal que no depende de tu relación laboral.",
                     highlight: false,
                   },
                 ].map((item, i) => (
@@ -223,7 +223,7 @@ export default function IULvs401k() {
                     color: "text-blue-500",
                     border: "border-blue-500/20",
                     items: [
-                      "Tu empleador ofrece matching — es dinero gratuito inmediato",
+                      "Tu empleador ofrece matching, es dinero gratuito inmediato",
                       "Tienes empleo W-2 estable con SSN",
                       "Quieres reducir tu base imponible este año fiscal",
                       "Priorizas el máximo upside de mercado a largo plazo",
@@ -235,7 +235,7 @@ export default function IULvs401k() {
                     border: "border-[#1d9fa9]/40",
                     items: [
                       "Eres 1099, freelance o no tienes acceso a 401k",
-                      "Tienes ITIN o Pasaporte — sin Seguro Social",
+                      "Tienes ITIN o Pasaporte, sin Seguro Social",
                       "Necesitas protección familiar integrada al ahorro",
                       "Quieres acceder al dinero antes de los 59½ sin penalidad",
                       "Quieres protección contra caídas del mercado",
@@ -330,7 +330,7 @@ export default function IULvs401k() {
                   ¿Quieres ver tu comparación personalizada?
                 </h2>
                 <p className={`${t.textMid} mb-6 text-[15px]`}>
-                  Un asesor licenciado de Platinium analiza tu situación específica — empleo, ITIN o SSN, meta de retiro — y te muestra qué instrumento o combinación hace más sentido para ti. Gratis y en español.
+                  Un asesor licenciado de Platinium analiza tu situación específica: empleo, ITIN o SSN, meta de retiro, y te muestra qué instrumento o combinación hace más sentido para ti. Gratis y en español.
                 </p>
                 <Link
                   to="/cotizacion-iul"

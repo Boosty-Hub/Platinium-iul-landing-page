@@ -61,10 +61,10 @@ export default function SeguroSinExamen() {
                   </p>
                   <div className="space-y-3 mb-7">
                     {[
-                      { icon: "⚡", text: "Aprobación en 48-72 horas — sin esperar semanas" },
+                      { icon: "⚡", text: "Aprobación en 48-72 horas, sin esperar semanas" },
                       { icon: "🩸", text: "Sin análisis de sangre ni cita médica presencial" },
                       { icon: "✅", text: "Opciones para personas con diabetes, presión alta y preexistencias" },
-                      { icon: "🌎", text: "Aplica con ITIN o SSN — asesoría 100% en español" },
+                      { icon: "🌎", text: "Aplica con ITIN o SSN, asesoría 100% en español" },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3">
                         <span className="text-xl shrink-0 mt-0.5">{item.icon}</span>
@@ -79,7 +79,7 @@ export default function SeguroSinExamen() {
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" inline cardTitle="Cotiza sin examen médico — aprobación en 48h" />
+                  <LeadForm t={t} dark={dark} defaultInteres="Proteger a mi familia" inline cardTitle="¡Cotiza sin examen médico con Platinium! Aprobación en 48h" />
                 </Anim>
               </div>
             </div>
@@ -203,7 +203,7 @@ export default function SeguroSinExamen() {
                   "Cobertura desde $100,000 hasta $1,000,000+",
                   "Opciones para personas con diabetes, presión alta y otras condiciones",
                   "Aplicable con ITIN o SSN",
-                  "Sin compromiso — cotización gratuita",
+                  "Sin compromiso, cotización gratuita",
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.06}>
                     <div className="flex items-center gap-3">

@@ -9,8 +9,8 @@ import { LeadForm } from "@/components/shared/LeadForm";
 import { ContactBar } from "@/components/shared/ContactBar";
 
 const PAGE_FAQS = [
-  { q: "¿Qué es exactamente un IUL?", a: "IUL son las siglas de Indexed Universal Life — Seguro de Vida Universal Indexado. Es una póliza de vida permanente que combina una cobertura por fallecimiento con un componente de ahorro (valor en efectivo) que crece vinculado al rendimiento de índices como el S&P 500, con protección contra pérdidas mediante un piso del 0%." },
-  { q: "¿Mi dinero se invierte directamente en la bolsa?", a: "No. Tu dinero no se invierte directamente en acciones. La aseguradora lo indexa al rendimiento del S&P 500: si el mercado sube, tú ganas hasta un tope (cap) establecido en el contrato. Si el mercado cae, tu saldo no retrocede — el piso del 0% lo protege." },
+  { q: "¿Qué es exactamente un IUL?", a: "IUL son las siglas de Indexed Universal Life, Seguro de Vida Universal Indexado. Es una póliza de vida permanente que combina una cobertura por fallecimiento con un componente de ahorro (valor en efectivo) que crece vinculado al rendimiento de índices como el S&P 500, con protección contra pérdidas mediante un piso del 0%." },
+  { q: "¿Mi dinero se invierte directamente en la bolsa?", a: "No. Tu dinero no se invierte directamente en acciones. La aseguradora lo indexa al rendimiento del S&P 500: si el mercado sube, tú ganas hasta un tope (cap) establecido en el contrato. Si el mercado cae, tu saldo no retrocede. El piso del 0% lo protege." },
   { q: "¿Los retiros son realmente libres de impuestos?", a: "Bajo la Sección 7702 del Código Fiscal de EE.UU., los préstamos sobre el valor en efectivo pueden ser libres de impuestos, siempre que la póliza esté correctamente estructurada y permanezca activa. Si la póliza caduca antes de que se liquiden los préstamos, pueden generarse consecuencias fiscales. Tu asesor licenciado diseña la póliza para evitar ese escenario." },
   { q: "¿Pierdo el dinero si dejo de pagar la prima?", a: "No necesariamente. Si tienes suficiente valor en efectivo acumulado, la póliza puede sostenerse con ese fondo durante un período. Sin embargo, si el valor en efectivo se agota sin aportes adicionales, la póliza podría caducar. Lo recomendable es mantener el plan activo con tu asesor." },
   { q: "¿Qué pasa si me regreso a mi país de origen?", a: "Tu póliza es un contrato legal en EE.UU. que permanece vigente independientemente de tu país de residencia, siempre que mantengas los pagos activos. Tus beneficiarios pueden cobrar el beneficio desde cualquier país." },
@@ -75,14 +75,14 @@ export default function SeguroVidaIUL() {
                     </span>
                   </h1>
                   <p className={`text-base lg:text-lg ${t.textMid} leading-relaxed mb-7`}>
-                    Un IUL (Indexed Universal Life) es un seguro de vida permanente que acumula dinero en efectivo indexado al S&P 500 con <strong className={t.text}>piso del 0%</strong> — si el mercado cae, tu saldo no pierde. Los retiros se estructuran libres de impuestos bajo la <strong className="text-[#1d9fa9]">Sección 7702</strong>. Aplica con SSN, ITIN o Pasaporte, desde $100 hasta $800 al mes.
+                    Un IUL (Indexed Universal Life) es un seguro de vida permanente que acumula dinero en efectivo indexado al S&P 500 con <strong className={t.text}>piso del 0%</strong>: si el mercado cae, tu saldo no pierde. Los retiros se estructuran libres de impuestos bajo la <strong className="text-[#1d9fa9]">Sección 7702</strong>. Aplica con SSN, ITIN o Pasaporte, desde $100 hasta $800 al mes.
                   </p>
                   <div className="space-y-3 mb-7">
                     {[
-                      { icon: "📊", text: "Crece vinculado al S&P 500 — participas de las subidas, no de las bajadas" },
+                      { icon: "📊", text: "Crece vinculado al S&P 500: participas de las subidas, no de las bajadas" },
                       { icon: "🛡️", text: "Piso del 0%: si el mercado cae, tu saldo se congela, no retrocede" },
                       { icon: "💸", text: "Retiros estructurados libres de impuestos bajo la Sec. 7702 del IRS" },
-                      { icon: "🌎", text: "Legal con ITIN o Pasaporte — sin necesitar Seguro Social" },
+                      { icon: "🌎", text: "Legal con ITIN o Pasaporte, sin necesitar Seguro Social" },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3">
                         <span className="text-xl shrink-0 mt-0.5">{item.icon}</span>
@@ -97,7 +97,7 @@ export default function SeguroVidaIUL() {
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Ahorro a largo plazo / retiro" inline cardTitle="Cotiza tu plan IUL de vida — gratis" />
+                  <LeadForm t={t} dark={dark} defaultInteres="Ahorro a largo plazo / retiro" inline cardTitle="¡Cotiza tu plan IUL de vida con Platinium, es GRATIS!" />
                 </Anim>
               </div>
             </div>
@@ -118,7 +118,7 @@ export default function SeguroVidaIUL() {
                     El IUL opera con una <span className="italic text-[#1d9fa9]">regla matemática asimétrica</span>
                   </h2>
                   <p className={`mt-4 text-[15px] ${t.textMid} max-w-2xl mx-auto`}>
-                    A diferencia de un 401k o un fondo de inversión, el IUL aplica la fórmula <code className="text-[#1d9fa9] font-mono text-sm">R = máx(0%, mín(R_mercado, Cap))</code> — capturas la subida hasta el tope, pero nunca participas de las caídas.
+                    A diferencia de un 401k o un fondo de inversión, el IUL aplica la fórmula <code className="text-[#1d9fa9] font-mono text-sm">R = máx(0%, mín(R_mercado, Cap))</code>: capturas la subida hasta el tope, pero nunca participas de las caídas.
                   </p>
                 </div>
               </Anim>
@@ -136,7 +136,7 @@ export default function SeguroVidaIUL() {
                     step: "02",
                     icon: "🛡️",
                     title: "El piso protege tu saldo",
-                    desc: "Si el mercado cae un -25%, tu rendimiento ese año es del 0% — no retrocedes. Las ganancias de años anteriores quedan consolidadas. Si el mercado sube un 10%, ganas hasta el cap del contrato.",
+                    desc: "Si el mercado cae un -25%, tu rendimiento ese año es del 0%, no retrocedes. Las ganancias de años anteriores quedan consolidadas. Si el mercado sube un 10%, ganas hasta el cap del contrato.",
                     detail: "Piso: 0% · Cap típico: 9% – 12%",
                   },
                   {
@@ -206,7 +206,7 @@ export default function SeguroVidaIUL() {
                   Para qué sirve un IUL <span className="italic text-[#1d9fa9]">mientras vives</span>
                 </h2>
                 <p className={`text-center ${t.textMid} max-w-2xl mx-auto mb-10 text-[15px]`}>
-                  No es solo un seguro de muerte. El valor en efectivo acumulado es un fondo líquido con múltiples usos en vida — sin las restricciones de edad ni las penalidades del 401k.
+                  No es solo un seguro de muerte. El valor en efectivo acumulado es un fondo líquido con múltiples usos en vida, sin las restricciones de edad ni las penalidades del 401k.
                 </p>
               </Anim>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -293,7 +293,7 @@ export default function SeguroVidaIUL() {
                 <div className={`${t.card} border border-dashed border-[#1d9fa9]/50 rounded-xl p-4 mt-2 text-center`}>
                   <div className="text-[#1d9fa9] font-bold text-lg mb-1">Personalizado</div>
                   <div className={`text-xs font-bold ${t.text} uppercase tracking-wide mb-1`}>A tu medida</div>
-                  <div className={`text-xs ${t.textMuted}`}>Para objetivos específicos — el asesor diseña el monto exacto según tu perfil</div>
+                  <div className={`text-xs ${t.textMuted}`}>Para objetivos específicos. El asesor diseña el monto exacto según tu perfil</div>
                 </div>
               </Anim>
               <Anim delay={0.3}>
@@ -343,7 +343,7 @@ export default function SeguroVidaIUL() {
                   ¿Listo para ver cuánto puedes acumular con un IUL?
                 </h2>
                 <p className={`${t.textMid} mb-6 text-[15px]`}>
-                  Un asesor licenciado de Platinium calcula tu proyección personalizada en PDF — números reales según tu edad, salud y aportación estimada. Gratis y sin compromiso.
+                  Un asesor licenciado de Platinium calcula tu proyección personalizada en PDF, con números reales según tu edad, salud y aportación estimada. Gratis y sin compromiso.
                 </p>
                 <Link
                   to="/cotizacion-iul"

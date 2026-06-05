@@ -54,17 +54,17 @@ export default function BeneficiosEnVida() {
                     <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
                       mientras vives
                     </span>
-                    {" "}— no solo cuando mueras
+                    {" "}y no solo cuando mueras
                   </h1>
                   <p className={`text-base lg:text-lg ${t.textMid} leading-relaxed mb-7`}>
                     La mayoría piensa que el seguro de vida solo sirve cuando falleces. Con el IUL, puedes <strong className="text-[#1d9fa9]">adelantar dinero de tu póliza</strong> si te diagnostican una enfermedad grave. Es protección real, cuando realmente la necesitas.
                   </p>
                   <div className="space-y-3 mb-7">
                     {[
-                      { icon: "🩺", text: "Enfermedad crónica — Alzheimer, Parkinson, artritis severa y más" },
-                      { icon: "💔", text: "Enfermedad crítica — cáncer, infarto, derrame cerebral cubiertos" },
-                      { icon: "🕊️", text: "Enfermedad terminal — accede a tu beneficio cuando más lo necesitas" },
-                      { icon: "🌎", text: "Aplica con ITIN o SSN — disponible en todo EE.UU." },
+                      { icon: "🩺", text: "Enfermedad crónica: Alzheimer, Parkinson, artritis severa y más" },
+                      { icon: "💔", text: "Enfermedad crítica: cáncer, infarto, derrame cerebral cubiertos" },
+                      { icon: "🕊️", text: "Enfermedad terminal: accede a tu beneficio cuando más lo necesitas" },
+                      { icon: "🌎", text: "Aplica con ITIN o SSN, disponible en todo EE.UU." },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3">
                         <span className="text-xl shrink-0 mt-0.5">{item.icon}</span>
@@ -79,7 +79,7 @@ export default function BeneficiosEnVida() {
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Protección por enfermedad" inline cardTitle="Accede a tus beneficios en vida — cotiza gratis" />
+                  <LeadForm t={t} dark={dark} defaultInteres="Protección por enfermedad" inline cardTitle="¡Accede a tus beneficios en vida! Cotiza GRATIS con Platinium" />
                 </Anim>
               </div>
             </div>
@@ -145,7 +145,7 @@ export default function BeneficiosEnVida() {
                   { step: "01", title: "Te diagnostican una condición cubierta", desc: "Tu médico confirma una enfermedad crónica, crítica o terminal." },
                   { step: "02", title: "Solicitas el adelanto", desc: "Contactas a la aseguradora con la documentación médica. El proceso es confidencial." },
                   { step: "03", title: "Recibes el dinero", desc: "Se te adelanta un porcentaje del beneficio por fallecimiento (generalmente 50-90%) libre de impuestos." },
-                  { step: "04", title: "Usas el dinero como quieras", desc: "Tratamiento médico, gastos del hogar, pago de deudas — sin restricciones de uso." },
+                  { step: "04", title: "Usas el dinero como quieras", desc: "Tratamiento médico, gastos del hogar, pago de deudas, sin restricciones de uso." },
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.08}>
                     <div className="flex gap-5 items-start">
@@ -173,7 +173,7 @@ export default function BeneficiosEnVida() {
                 <div className={`text-sm ${t.textMid} leading-relaxed space-y-4 text-left max-w-xl mx-auto`}>
                   <p>El cáncer es la segunda causa de muerte entre hispanos en EE.UU. La diabetes afecta a 1 de cada 5 hispanos. Y muchas familias inmigrantes no tienen seguro médico completo.</p>
                   <p>Sin los beneficios en vida, una enfermedad grave significa: <strong className={t.text}>deuda médica, pérdida de ingresos y una familia luchando por sobrevivir</strong>.</p>
-                  <p>Con los riders del IUL, tienes un colchón financiero que se activa exactamente cuando más lo necesitas — <strong className="text-[#1d9fa9]">sin esperar a morir para que tu familia reciba ayuda</strong>.</p>
+                  <p>Con los riders del IUL, tienes un colchón financiero que se activa exactamente cuando más lo necesitas, <strong className="text-[#1d9fa9]">sin esperar a morir para que tu familia reciba ayuda</strong>.</p>
                 </div>
               </Anim>
             </div>
@@ -193,7 +193,7 @@ export default function BeneficiosEnVida() {
                   "Adelanto del beneficio por enfermedad crítica (Critical Illness Rider)",
                   "Adelanto del beneficio por enfermedad terminal (Terminal Illness Rider)",
                   "Dinero libre de impuestos para usar como necesites",
-                  "Sin restricciones de uso — tratamiento, deudas, gastos diarios",
+                  "Sin restricciones de uso: tratamiento, deudas, gastos diarios",
                   "Riders generalmente incluidos sin costo adicional en la prima",
                   "Disponible en EE.UU. con ITIN o SSN",
                 ].map((item, i) => (

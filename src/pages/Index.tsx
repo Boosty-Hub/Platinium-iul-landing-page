@@ -123,7 +123,7 @@ export default function HomePage() {
                     </h1>
                     <p className="text-lg leading-relaxed max-w-xl mb-5" style={{ color: midColor }}>
                       Mientras tu dinero duerme en el banco ganando 0.05%, las familias con un{" "}
-                      <strong style={{ color: textColor }}>IUL ganan hasta 12% anual</strong> vinculado al S&P 500 —{" "}
+                      <strong style={{ color: textColor }}>IUL ganan hasta 12% anual</strong> vinculado al S&P 500,{" "}
                       <strong style={{ color: textColor }}>sin riesgo de pérdida</strong> cuando el mercado cae.
                     </p>
                     <p className="text-base leading-relaxed max-w-xl mb-9" style={{ color: midColor }}>
@@ -156,7 +156,7 @@ export default function HomePage() {
 
                 {/* Mobile: form below hero text */}
                 <div className="lg:hidden">
-                  <span className="sr-only">Seguro de Vida IUL — Protege a Tu Familia y Construye Riqueza</span>
+                  <span className="sr-only">Seguro de Vida IUL: Protege a Tu Familia y Construye Riqueza</span>
                   <LeadForm t={t} dark={dark} inline defaultInteres="Ahorro a largo plazo / retiro" />
                 </div>
 

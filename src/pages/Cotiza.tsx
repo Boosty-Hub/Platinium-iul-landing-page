@@ -101,7 +101,7 @@ export default function Cotiza() {
           <p className="text-base sm:text-lg italic text-gray-700 mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
             "Me explicaron todo en español y sin complicaciones. Hoy mi familia tiene la protección que siempre quise darles."
           </p>
-          <p className="text-sm font-semibold text-[#1d9fa9]">— María G., Cliente en Florida</p>
+          <p className="text-sm font-semibold text-[#1d9fa9]">María G., cliente de Platinium</p>
         </div>
       </section>
 

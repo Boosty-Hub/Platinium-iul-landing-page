@@ -56,14 +56,14 @@ export default function IULEmprendedores() {
                     </span>
                   </h1>
                   <p className={`text-base lg:text-lg ${t.textMid} leading-relaxed mb-7`}>
-                    Si eres dueño de negocio, contratista 1099 o self-employed, nadie te ofrece 401(k) ni beneficios. El IUL es tu <strong className="text-[#1d9fa9]">plan de retiro, protección y ahorro</strong> — todo en uno.
+                    Si eres dueño de negocio, contratista 1099 o self-employed, nadie te ofrece 401(k) ni beneficios. El IUL es tu <strong className="text-[#1d9fa9]">plan de retiro, protección y ahorro</strong>, todo en uno.
                   </p>
                   <div className="space-y-3 mb-7">
                     {[
-                      { icon: "📈", text: "Plan de retiro sin límites del IRS — contribuye lo que puedas, cuando puedas" },
-                      { icon: "🛡️", text: "Protección familiar integrada — si algo te pasa, tu negocio y familia están cubiertos" },
-                      { icon: "💵", text: "Acceso a capital sin bancos ni penalidades — liquidez cuando la necesites" },
-                      { icon: "🌎", text: "Aplica con ITIN o Pasaporte — ideal para emprendedores inmigrantes" },
+                      { icon: "📈", text: "Plan de retiro sin límites del IRS: contribuye lo que puedas, cuando puedas" },
+                      { icon: "🛡️", text: "Protección familiar integrada: si algo te pasa, tu negocio y familia están cubiertos" },
+                      { icon: "💵", text: "Acceso a capital sin bancos ni penalidades, con liquidez cuando la necesites" },
+                      { icon: "🌎", text: "Aplica con ITIN o Pasaporte, ideal para emprendedores inmigrantes" },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3">
                         <span className="text-xl shrink-0 mt-0.5">{item.icon}</span>
@@ -78,7 +78,7 @@ export default function IULEmprendedores() {
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Proteger mi negocio" inline cardTitle="Cotiza tu plan de retiro — emprendedores" />
+                  <LeadForm t={t} dark={dark} defaultInteres="Proteger mi negocio" inline cardTitle="¡Cotiza tu plan de retiro para emprendedores con Platinium!" />
                 </Anim>
               </div>
             </div>
@@ -182,11 +182,11 @@ export default function IULEmprendedores() {
               <div className="space-y-4">
                 {[
                   "Sin límites de contribución del IRS (a diferencia del SEP-IRA o Solo 401k)",
-                  "Crecimiento con impuestos diferidos — más dinero trabajando para ti",
+                  "Crecimiento con impuestos diferidos: más dinero trabajando para ti",
                   "Acceso a tu capital sin penalidades ni aprobación bancaria",
                   "Protección contra demandas (en muchos estados el valor en póliza es protegido)",
                   "Beneficio por fallecimiento que protege a tu familia Y tu negocio",
-                  "Aplicable con ITIN — ideal para emprendedores inmigrantes en EE.UU.",
+                  "Aplicable con ITIN, ideal para emprendedores inmigrantes en EE.UU.",
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.06}>
                     <div className="flex items-center gap-3">

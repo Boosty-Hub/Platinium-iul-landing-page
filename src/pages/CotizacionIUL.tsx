@@ -72,14 +72,14 @@ export default function CotizacionIUL() {
                     </span>
                   </h1>
                   <p className={`text-base lg:text-lg ${t.textMid} leading-relaxed mb-7`}>
-                    No es una calculadora automática — es mejor: un asesor licenciado de Platinium analiza tu caso y te entrega una ilustración real con tus números, en español, sin costo y sin presión.
+                    No es una calculadora automática, sino algo mejor: un asesor licenciado de Platinium analiza tu caso y te entrega una ilustración real con tus números, en español, sin costo y sin presión.
                   </p>
                   <div className="space-y-3 mb-7">
                     {[
-                      { icon: "📄", text: "Proyección en PDF con tus números reales — no estimaciones genéricas" },
+                      { icon: "📄", text: "Proyección en PDF con tus números reales, no estimaciones genéricas" },
                       { icon: "🗣️", text: "Llamada con asesor licenciado en español para revisar tu caso" },
-                      { icon: "✅", text: "Sin compromiso — recibes la proyección y decides con calma" },
-                      { icon: "🌎", text: "Aplica con SSN, ITIN o Pasaporte — sin Seguro Social" },
+                      { icon: "✅", text: "Sin compromiso: recibes la proyección y decides con calma" },
+                      { icon: "🌎", text: "Aplica con SSN, ITIN o Pasaporte, sin Seguro Social" },
                     ].map((item, i) => (
                       <div key={i} className="flex items-start gap-3">
                         <span className="text-xl shrink-0 mt-0.5">{item.icon}</span>
@@ -94,7 +94,7 @@ export default function CotizacionIUL() {
 
                 {/* Columna derecha — Formulario */}
                 <Anim delay={0.15}>
-                  <LeadForm t={t} dark={dark} defaultInteres="Cotización / Proyección IUL" inline cardTitle="Recibe tu proyección IUL en PDF — gratis" />
+                  <LeadForm t={t} dark={dark} defaultInteres="Cotización / Proyección IUL" inline cardTitle="¡Recibe tu proyección IUL en PDF con Platinium, GRATIS!" />
                 </Anim>
               </div>
             </div>
@@ -167,7 +167,7 @@ export default function CotizacionIUL() {
                   Variables que afectan tu <span className="italic text-[#1d9fa9]">cotización</span>
                 </h2>
                 <p className={`text-center ${t.textMid} max-w-2xl mx-auto mb-10 text-[15px]`}>
-                  Por eso no puede ser instantánea: los números reales dependen de tu situación personal. Un número genérico no te sirve de nada — puede estar muy lejos de lo que realmente te costaría o acumularías.
+                  Por eso no puede ser instantánea: los números reales dependen de tu situación personal. Un número genérico no te sirve de nada, puede estar muy lejos de lo que realmente te costaría o acumularías.
                 </p>
               </Anim>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -175,7 +175,7 @@ export default function CotizacionIUL() {
                   { icon: "🎂", label: "Tu edad", desc: "A menor edad, más años de crecimiento y menor costo del seguro." },
                   { icon: "❤️", label: "Estado de salud", desc: "Determina el costo del seguro de vida dentro de la póliza." },
                   { icon: "💵", label: "Aportación mensual", desc: "Define cuánto va al seguro y cuánto al componente de ahorro." },
-                  { icon: "🏁", label: "Meta y plazo", desc: "Retiro a los 60, educación de hijos, protección pura — cada meta cambia el diseño." },
+                  { icon: "🏁", label: "Meta y plazo", desc: "Retiro a los 60, educación de hijos, protección pura: cada meta cambia el diseño." },
                 ].map((item, i) => (
                   <Anim key={i} delay={i * 0.08}>
                     <div className={`${t.card} border rounded-xl p-5 text-center backdrop-blur-xl`}>
@@ -205,7 +205,7 @@ export default function CotizacionIUL() {
                   <div className="flex items-center gap-3 mb-6">
                     <span className="text-3xl">👤</span>
                     <div>
-                      <div className={`font-semibold ${t.text}`}>Carlos M. — 38 años, empleado 1099</div>
+                      <div className={`font-semibold ${t.text}`}>Carlos M., 38 años, empleado 1099</div>
                       <div className={`text-sm ${t.textMuted}`}>Aportación: $300/mes · Meta: retiro a los 65 · ITIN</div>
                     </div>
                   </div>
