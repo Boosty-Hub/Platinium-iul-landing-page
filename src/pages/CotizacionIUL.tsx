@@ -56,7 +56,7 @@ export default function CotizacionIUL() {
           <Breadcrumbs items={[{ label: "Cotización IUL Personalizada" }]} t={t} />
 
           {/* HERO */}
-          <section className="pt-8 pb-16 px-6">
+          <section data-section="hero" className="pt-8 pb-16 px-6">
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
                 {/* Columna izquierda */}
@@ -101,12 +101,12 @@ export default function CotizacionIUL() {
           </section>
 
           {/* BANNER CTA */}
-          <section className="px-6 pb-6">
+          <section data-section="cta-bar" className="px-6 pb-6">
             <ContactBar t={t} compact />
           </section>
 
           {/* CÓMO FUNCIONA EL PROCESO */}
-          <section className="py-20 px-6">
+          <section data-section="proceso" className="py-20 px-6">
             <div className="max-w-3xl mx-auto">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} text-center mb-10`} style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -134,7 +134,7 @@ export default function CotizacionIUL() {
           </section>
 
           {/* QUÉ RECIBIRÁS */}
-          <section className={`${t.bg2} py-20 px-6`}>
+          <section data-section="que-recibes" className={`${t.bg2} py-20 px-6`}>
             <div className="max-w-4xl mx-auto">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} text-center mb-10`} style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -160,7 +160,7 @@ export default function CotizacionIUL() {
           </section>
 
           {/* QUÉ INFORMACIÓN USAMOS */}
-          <section className={`${t.bg2} py-20 px-6`}>
+          <section data-section="variables" className={`${t.bg2} py-20 px-6`}>
             <div className="max-w-4xl mx-auto">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} text-center mb-4`} style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -190,7 +190,7 @@ export default function CotizacionIUL() {
           </section>
 
           {/* EJEMPLO ILUSTRATIVO */}
-          <section className="py-20 px-6">
+          <section data-section="ejemplo" className="py-20 px-6">
             <div className="max-w-3xl mx-auto">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} text-center mb-4`} style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -230,7 +230,7 @@ export default function CotizacionIUL() {
           </section>
 
           {/* ENLACES INFORMATIVOS */}
-          <section className={`${t.bg2} py-16 px-6`}>
+          <section data-section="enlaces" className={`${t.bg2} py-16 px-6`}>
             <div className="max-w-3xl mx-auto text-center">
               <Anim>
                 <h2 className={`text-xl font-normal ${t.text} mb-6`} style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -249,7 +249,7 @@ export default function CotizacionIUL() {
           </section>
 
           {/* FAQ */}
-          <section className="py-20 px-6">
+          <section data-section="faq" className="py-20 px-6">
             <div className="max-w-3xl mx-auto">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} text-center mb-10`} style={{ fontFamily: "'Playfair Display', serif" }}>

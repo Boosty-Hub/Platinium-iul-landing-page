@@ -59,7 +59,7 @@ export default function SeguroVidaIUL() {
           <Breadcrumbs items={[{ label: "Seguro de Vida IUL" }]} t={t} />
 
           {/* HERO — 2 columnas: contenido + formulario */}
-          <section className="pt-8 pb-16 px-6">
+          <section data-section="hero" className="pt-8 pb-16 px-6">
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
                 {/* Columna izquierda */}
@@ -104,12 +104,12 @@ export default function SeguroVidaIUL() {
           </section>
 
           {/* BANNER CTA */}
-          <section className="px-6 pb-6">
+          <section data-section="cta-bar" className="px-6 pb-6">
             <ContactBar t={t} compact />
           </section>
 
           {/* BLOQUE 3 PILARES */}
-          <section className={`${t.bg2} py-20 px-6`}>
+          <section data-section="tres-pilares" className={`${t.bg2} py-20 px-6`}>
             <div className="max-w-5xl mx-auto">
               <Anim>
                 <div className="text-center mb-12">
@@ -162,7 +162,7 @@ export default function SeguroVidaIUL() {
           </section>
 
           {/* COMPONENTES DE LA PÓLIZA */}
-          <section className="py-20 px-6">
+          <section data-section="componentes-poliza" className="py-20 px-6">
             <div className="max-w-4xl mx-auto">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} text-center mb-4`} style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -199,7 +199,7 @@ export default function SeguroVidaIUL() {
           </section>
 
           {/* PARA QUÉ SIRVE EN VIDA */}
-          <section className={`${t.bg2} py-20 px-6`}>
+          <section data-section="usos-en-vida" className={`${t.bg2} py-20 px-6`}>
             <div className="max-w-4xl mx-auto">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} text-center mb-4`} style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -232,7 +232,7 @@ export default function SeguroVidaIUL() {
           </section>
 
           {/* QUIÉN PUEDE ACCEDER */}
-          <section className="py-20 px-6">
+          <section data-section="quien-puede" className="py-20 px-6">
             <div className="max-w-4xl mx-auto">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} text-center mb-10`} style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -266,7 +266,7 @@ export default function SeguroVidaIUL() {
           </section>
 
           {/* RANGOS DE APORTACIÓN */}
-          <section className={`${t.bg2} py-16 px-6`}>
+          <section data-section="aportacion" className={`${t.bg2} py-16 px-6`}>
             <div className="max-w-4xl mx-auto">
               <Anim>
                 <h2 className={`text-2xl font-normal ${t.text} text-center mb-8`} style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -306,7 +306,7 @@ export default function SeguroVidaIUL() {
           </section>
 
           {/* DIFERENCIAS CLAVE */}
-          <section className="py-20 px-6">
+          <section data-section="diferencias" className="py-20 px-6">
             <div className="max-w-4xl mx-auto">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} text-center mb-4`} style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -337,7 +337,7 @@ export default function SeguroVidaIUL() {
           </section>
 
           {/* CTA INTERMEDIO */}
-          <section className={`${t.bg2} py-16 px-6`}>
+          <section data-section="cta-cotizacion" className={`${t.bg2} py-16 px-6`}>
             <div className="max-w-3xl mx-auto text-center">
               <Anim>
                 <h2 className={`text-2xl font-normal ${t.text} mb-4`} style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -358,7 +358,7 @@ export default function SeguroVidaIUL() {
           </section>
 
           {/* EXPLORA SEGÚN TU SITUACIÓN */}
-          <section className="py-20 px-6">
+          <section data-section="explora" className="py-20 px-6">
             <div className="max-w-5xl mx-auto">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} text-center mb-10`} style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -390,7 +390,7 @@ export default function SeguroVidaIUL() {
           </section>
 
           {/* FAQ */}
-          <section className={`${t.bg2} py-20 px-6`}>
+          <section data-section="faq" className={`${t.bg2} py-20 px-6`}>
             <div className="max-w-3xl mx-auto">
               <Anim>
                 <h2 className={`text-3xl font-normal ${t.text} text-center mb-10`} style={{ fontFamily: "'Playfair Display', serif" }}>

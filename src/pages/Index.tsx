@@ -95,7 +95,7 @@ export default function HomePage() {
             <SEOHead title={SEO.title} description={SEO.description} keywords={SEO.keywords} canonical={DOMAIN} jsonLd={JSON_LD} />
 
             {/* HERO */}
-            <section aria-label="Inicio" style={{ position: 'relative' }}>
+            <section data-section="hero" aria-label="Inicio" style={{ position: 'relative' }}>
               <div className="hidden lg:block absolute top-[8%] right-[3%] w-80 h-80 rounded-full border border-[#1d9fa9]/[0.06] animate-[spin_80s_linear_infinite] pointer-events-none" />
               <div className="hidden lg:block absolute bottom-[12%] left-[3%] w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(29,159,169,0.06),transparent_70%)] animate-[pulse_7s_ease-in-out_infinite] pointer-events-none" />
 
@@ -165,7 +165,7 @@ export default function HomePage() {
             </section>
 
             {/* VIDEO SECTION */}
-            <section className={`${t.bg2} py-16 sm:py-24`}>
+            <section data-section="video" className={`${t.bg2} py-16 sm:py-24`}>
               <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col lg:flex-row items-center gap-10 lg:gap-14">
                 {/* Left column - content */}
                 <Anim className="lg:w-[35%] text-center lg:text-left">
@@ -219,7 +219,7 @@ export default function HomePage() {
             </section>
 
             {/* Insurance logos marquee */}
-            <section aria-label="Aseguradoras aliadas">
+            <section data-section="logos" aria-label="Aseguradoras aliadas">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
                 <div className="overflow-hidden rounded-xl">
                   <div className="flex items-center" style={{ animation: "marquee 30s linear infinite", width: "max-content" }}>
@@ -234,7 +234,7 @@ export default function HomePage() {
             </section>
 
             {/* Offices & Hours */}
-            <section className="px-4 sm:px-6 pb-8">
+            <section data-section="oficinas" className="px-4 sm:px-6 pb-8">
               <div className="max-w-6xl mx-auto">
                 <div className={`${t.card} border rounded-2xl p-4 sm:p-8 backdrop-blur-xl`}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
@@ -277,7 +277,7 @@ export default function HomePage() {
             </section>
 
             {/* STATS BAR */}
-            <section className={`${t.bg2} ${t.divider} border-y`} aria-label="Estadísticas del mercado">
+            <section data-section="stats" className={`${t.bg2} ${t.divider} border-y`} aria-label="Estadísticas del mercado">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-11 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-4">
                 {[
                   { v: <CountUp end={3710} prefix="$" suffix="B" />, l: "Mercado de seguros EE.UU. para 2033" },
@@ -296,7 +296,7 @@ export default function HomePage() {
             </section>
 
             {/* PAIN POINTS */}
-            <section className="py-16 lg:py-24 px-4 sm:px-6" aria-labelledby="pain-heading">
+            <section data-section="pain-points" className="py-16 lg:py-24 px-4 sm:px-6" aria-labelledby="pain-heading">
               <div className="max-w-4xl mx-auto text-center">
                 <Anim>
                   <p className="text-xs tracking-[3px] text-[#1d9fa9] uppercase font-bold mb-4">¿Te identificas?</p>
@@ -328,7 +328,7 @@ export default function HomePage() {
             </section>
 
             {/* BENEFITS */}
-            <section id="beneficios" className={`${t.bg2} py-16 lg:py-24 px-4 sm:px-6`} aria-labelledby="benefits-heading">
+            <section id="beneficios" data-section="beneficios" className={`${t.bg2} py-16 lg:py-24 px-4 sm:px-6`} aria-labelledby="benefits-heading">
               <div className="max-w-7xl mx-auto">
                 <Anim>
                   <div className="text-center mb-10 lg:mb-14">
@@ -360,7 +360,7 @@ export default function HomePage() {
             </section>
 
             {/* HOW IT WORKS */}
-            <section id="como-funciona" className="py-16 lg:py-24 px-4 sm:px-6" aria-labelledby="steps-heading">
+            <section id="como-funciona" data-section="como-funciona" className="py-16 lg:py-24 px-4 sm:px-6" aria-labelledby="steps-heading">
               <div className="max-w-6xl mx-auto">
                 <Anim>
                   <div className="text-center mb-10 lg:mb-14">
@@ -399,7 +399,7 @@ export default function HomePage() {
             </section>
 
             {/* COMPARISON */}
-            <section id="comparativa" className={`${t.bg2} py-16 lg:py-24 px-4 sm:px-6`} aria-labelledby="comparison-heading">
+            <section id="comparativa" data-section="comparativa" className={`${t.bg2} py-16 lg:py-24 px-4 sm:px-6`} aria-labelledby="comparison-heading">
               <div className="max-w-4xl mx-auto">
                 <Anim>
                   <div className="text-center mb-10 lg:mb-12">
@@ -446,7 +446,7 @@ export default function HomePage() {
             </section>
 
             {/* NICHE TABS */}
-            <section className="py-16 lg:py-24 px-4 sm:px-6" aria-labelledby="niche-heading">
+            <section data-section="nichos" className="py-16 lg:py-24 px-4 sm:px-6" aria-labelledby="niche-heading">
               <div className="max-w-3xl mx-auto">
                 <Anim>
                   <div className="text-center mb-10">
@@ -488,7 +488,7 @@ export default function HomePage() {
             </section>
 
             {/* TESTIMONIALS */}
-            <section id="testimonios" className="py-16 lg:py-24 px-4 sm:px-6" aria-labelledby="testimonials-heading">
+            <section id="testimonios" data-section="testimonios" className="py-16 lg:py-24 px-4 sm:px-6" aria-labelledby="testimonials-heading">
               <div className="max-w-7xl mx-auto">
                 <Anim>
                   <div className="text-center mb-10 lg:mb-12">
@@ -524,7 +524,7 @@ export default function HomePage() {
             </section>
 
             {/* FAQ */}
-            <section id="faq" className={`${t.bg2} py-16 lg:py-24 px-4 sm:px-6`} aria-labelledby="faq-heading">
+            <section id="faq" data-section="faq" className={`${t.bg2} py-16 lg:py-24 px-4 sm:px-6`} aria-labelledby="faq-heading">
               <div className="max-w-3xl mx-auto">
                 <Anim>
                   <div className="text-center mb-10 lg:mb-12">
@@ -562,6 +562,7 @@ export default function HomePage() {
             </section>
 
             {/* LEAD FORM with hero image as sidebar */}
+            <section data-section="lead-form">
             <LeadForm t={t} dark={dark} defaultInteres="Ahorro a largo plazo / retiro" sidebarContent={
               <div className="relative">
                 <div className="overflow-hidden rounded-2xl">
@@ -573,10 +574,10 @@ export default function HomePage() {
                 </div>
               </div>
             } />
-
+            </section>
 
             {/* FINAL CTA */}
-            <section className="py-14 lg:py-20 px-4 sm:px-6 text-center" aria-label="Llamado final">
+            <section data-section="cta-final" className="py-14 lg:py-20 px-4 sm:px-6 text-center" aria-label="Llamado final">
               <Anim>
                 <div className="max-w-2xl mx-auto">
                   <h2 className="text-2xl sm:text-3xl lg:text-[44px] font-normal leading-tight mb-5" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>

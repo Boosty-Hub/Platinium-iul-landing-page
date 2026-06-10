@@ -247,7 +247,8 @@ function initPage(newPath: string) {
   tabVisible = document.visibilityState === "visible";
   if (tabVisible) startActivePeriod();
 
-  setupSectionObserver();
+  // Defer until React finishes painting the new page
+  requestAnimationFrame(() => requestAnimationFrame(() => setupSectionObserver()));
   scheduleFlush();
   clearInterval(heartbeatTimer);
   heartbeatTimer = window.setInterval(() => {
