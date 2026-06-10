@@ -21,13 +21,14 @@ const BeneficiosEnVida = lazy(() => import("./pages/BeneficiosEnVida.tsx"));
 const PoliticaPrivacidad = lazy(() => import("./pages/PoliticaPrivacidad.tsx"));
 const Links = lazy(() => import("./pages/Links.tsx"));
 const FormPanel = lazy(() => import("./pages/FormPanel.tsx"));
+const AnalyticsPanel = lazy(() => import("./pages/AnalyticsPanel.tsx"));
 const Cotiza = lazy(() => import("./pages/Cotiza.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient();
 
 // Routes that bypass GeoGate (accessible from anywhere)
-const BYPASS_GEO = ["/form-panel"];
+const BYPASS_GEO = ["/form-panel", "/analytics"];
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -49,6 +50,7 @@ const AppRoutes = () => {
         <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
         <Route path="/links" element={<Links />} />
         <Route path="/form-panel" element={<FormPanel />} />
+        <Route path="/analytics" element={<AnalyticsPanel />} />
         <Route path="/cotiza" element={<Cotiza />} />
         <Route path="/cotizacion-iul" element={<CotizacionIUL />} />
         <Route path="/iul-para-hijos" element={<IULParaHijos />} />
