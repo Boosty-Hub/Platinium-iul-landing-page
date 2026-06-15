@@ -43,8 +43,8 @@ export function SEOHead({
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
 
-      <meta name="geo.region" content="US-FL" />
-      <meta name="geo.placename" content="Miami" />
+      <meta name="geo.region" content="US" />
+      <meta name="geo.placename" content="United States" />
 
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

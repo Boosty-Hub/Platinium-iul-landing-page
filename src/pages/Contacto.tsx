@@ -12,8 +12,8 @@ export default function Contacto() {
         <>
           <SEOHead
             title="Agenda tu Consulta Gratuita | Platinium Insurance Group"
-            description="Agenda una consulta gratuita sobre seguros IUL. Asesoría en español, sin compromiso. Miami, FL. Aceptamos ITIN."
-            keywords="consulta IUL gratis, asesor IUL Miami, contacto Platinium Insurance, cotización IUL, agente seguros hispano Miami"
+            description="Agenda una consulta gratuita sobre seguros IUL. Asesoría en español, sin compromiso. Aceptamos ITIN, pasaporte y matrícula consular."
+            keywords="consulta IUL gratis, asesor IUL hispano, contacto Platinium Insurance, cotización IUL, agente seguros hispano USA"
             canonical={`${DOMAIN}/contacto`}
             jsonLd={[
               {

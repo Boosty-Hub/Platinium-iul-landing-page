@@ -13,9 +13,9 @@ export default function IULParaJubilacion() {
       {({ t, dark }) => (
         <>
           <SEOHead
-            title="Jubilación para Hispanos sin 401k Miami | Seguro IUL | Platinium Insurance"
-            description="¿Trabajas por tu cuenta o no tienes 401k? El IUL es tu alternativa para jubilarte con ingresos libres de impuestos. Asesoría en español en Miami. Cotiza gratis."
-            keywords="ahorro para jubilación sin 401k, IUL vs 401k, plan de jubilación para hispanos, retiro sin 401k Miami, cómo jubilarme si no tengo 401k, cómo ahorrar para el retiro siendo inmigrante, alternativas al 401k para hispanos, plan de retiro para trabajadores independientes, jubilación para hispanos Estados Unidos, ingreso libre de impuestos jubilación, plan de retiro trabajador por cuenta propia Florida, 401k vs IUL diferencias"
+            title="Jubilación para Hispanos sin 401k | Seguro IUL | Platinium Insurance"
+            description="¿Trabajas por tu cuenta o no tienes 401k? El IUL es tu alternativa para jubilarte con ingresos libres de impuestos. Asesoría en español para latinos en USA. Cotiza gratis."
+            keywords="ahorro para jubilación sin 401k, IUL vs 401k, plan de jubilación para hispanos, retiro sin 401k USA, cómo jubilarme si no tengo 401k, cómo ahorrar para el retiro siendo inmigrante, alternativas al 401k para hispanos, plan de retiro para trabajadores independientes, jubilación para hispanos Estados Unidos, ingreso libre de impuestos jubilación, plan de retiro trabajador por cuenta propia, 401k vs IUL diferencias"
             canonical={`${DOMAIN}/jubilacion-sin-401k`}
             jsonLd={[
               {
@@ -48,13 +48,13 @@ export default function IULParaJubilacion() {
                   <span className="text-xs text-[#1d9fa9] font-bold tracking-[1.5px] uppercase">📈 Plan de Retiro</span>
                 </div>
                 <h1 className={`text-4xl sm:text-5xl font-normal leading-[1.1] mb-6 ${t.text}`} style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-                  Planifica tu jubilación en Miami{" "}
+                  Planifica tu jubilación en USA{" "}
                   <span className="font-bold italic bg-gradient-to-br from-[#28C4CF] via-[#1d9fa9] to-[#177D85] bg-clip-text text-transparent">
                     sin necesitar un 401(k)
                   </span>
                 </h1>
                 <p className={`text-lg ${t.textMid} max-w-2xl mx-auto leading-relaxed`}>
-                  Si eres contratista 1099, trabajador independiente o simplemente no tienes acceso a un 401(k) en Miami-Dade, el IUL es tu vehículo para construir un retiro digno con <strong className="text-[#1d9fa9]">crecimiento indexado y acceso libre de impuestos</strong>.
+                  Si eres contratista 1099, trabajador independiente o simplemente no tienes acceso a un 401(k), el IUL es tu vehículo para construir un retiro digno con <strong className="text-[#1d9fa9]">crecimiento indexado y acceso libre de impuestos</strong>.
                 </p>
               </Anim>
             </div>

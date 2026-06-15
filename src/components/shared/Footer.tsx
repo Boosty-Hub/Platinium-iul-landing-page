@@ -22,7 +22,7 @@ export function Footer({ t }: FooterProps) {
               </div>
             </div>
             <p className={`text-sm ${t.textMuted} leading-relaxed max-w-xs`}>
-              Asesoría financiera especializada en la comunidad hispana de Miami. Protección, retiro y crecimiento financiero con transparencia.
+              Asesoría financiera especializada en la comunidad hispana en Estados Unidos. Protección, retiro y crecimiento financiero con transparencia.
             </p>
           </div>
 
