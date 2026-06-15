@@ -492,18 +492,20 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
           </div>
         </>
       ) : (
-        <div className="text-center py-6 sm:py-8 animate-[fadeUp_0.6s_ease]">
-          <div className="flex justify-center mb-3">
-            <img
-              src={agentSuccessImg}
-              alt="Asesora de Platinium Insurance lista para llamarte"
-              className="w-56 sm:w-64 h-auto object-contain"
-              loading="lazy"
-            />
-          </div>
-          <h3 className="text-xl sm:text-2xl font-semibold mb-3" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
+        <div className="text-center py-4 sm:py-6 animate-[fadeUp_0.6s_ease]">
+          <h3 className="text-xl sm:text-2xl font-semibold mb-4" style={{ fontFamily: "'Playfair Display', serif", color: textColor }}>
             ¡Gracias por completar el formulario!
           </h3>
+          <div className="rounded-xl overflow-hidden mb-5 shadow-lg">
+            <video
+              src="/videos/gracias-iul.mp4"
+              autoPlay
+              playsInline
+              controls
+              className="w-full"
+              style={{ maxHeight: "340px", objectFit: "cover" }}
+            />
+          </div>
           <p className="text-sm sm:text-[15px] leading-relaxed mb-6" style={{ color: midColor }}>
             Estamos generando su cotización en PDF, atienda nuestra llamada para confirmar los datos telefónicamente.
           </p>
