@@ -247,6 +247,32 @@ export default function FormPanel() {
         </div>
       </header>
 
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 pt-4">
+        <div className="inline-flex rounded-xl border border-[#1d9fa9]/20 bg-[#0F2229] p-1">
+          <button
+            onClick={() => setTab("leads")}
+            className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+              tab === "leads" ? "bg-[#1d9fa9] text-white" : "text-[#94B3BB] hover:text-white"
+            }`}
+          >
+            Leads entrantes
+          </button>
+          <button
+            onClick={() => setTab("analytics")}
+            className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+              tab === "analytics" ? "bg-[#1d9fa9] text-white" : "text-[#94B3BB] hover:text-white"
+            }`}
+          >
+            Analítica web
+          </button>
+        </div>
+      </div>
+
+      {tab === "analytics" ? (
+        <main className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
+          <AnalyticsContent />
+        </main>
+      ) : (
       <main className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
         {leads.length === 0 && (
           <div className="rounded-xl border border-[#1d9fa9]/20 bg-[#0F2229] py-12 text-center text-[#94B3BB]">
