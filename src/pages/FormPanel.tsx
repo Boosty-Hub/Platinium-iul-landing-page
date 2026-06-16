@@ -412,6 +412,7 @@ export default function FormPanel() {
           })}
         </div>
       </main>
+      )}
 
       <LeadAlertModal
         lead={currentAlert}
