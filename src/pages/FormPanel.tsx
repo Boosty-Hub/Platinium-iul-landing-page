@@ -4,6 +4,7 @@ import { LeadAlertModal } from "@/components/panel/LeadAlertModal";
 import { LeadDetails } from "@/components/panel/LeadDetails";
 import { OriginBadge } from "@/components/panel/OriginBadge";
 import { Lead, LEAD_SELECT_COLS } from "@/components/panel/types";
+import AnalyticsContent from "@/components/panel/AnalyticsContent";
 import { getLeadOrigin } from "@/lib/leadOrigin";
 import { toast } from "@/hooks/use-toast";
 import { ChevronDown } from "lucide-react";
@@ -11,6 +12,7 @@ import { ChevronDown } from "lucide-react";
 export type { Lead } from "@/components/panel/types";
 
 type ConnState = "connected" | "reconnecting" | "disconnected";
+type Tab = "leads" | "analytics";
 
 const SELECT_COLS = LEAD_SELECT_COLS;
 
