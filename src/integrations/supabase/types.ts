@@ -14,6 +14,124 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          data: Json
+          id: string
+          occurred_at: string
+          path: string
+          session_id: string
+          type: string
+          visitor_id: string
+        }
+        Insert: {
+          data?: Json
+          id?: string
+          occurred_at?: string
+          path: string
+          session_id: string
+          type: string
+          visitor_id: string
+        }
+        Update: {
+          data?: Json
+          id?: string
+          occurred_at?: string
+          path?: string
+          session_id?: string
+          type?: string
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "analytics_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analytics_pageviews: {
+        Row: {
+          active_time_ms: number
+          id: string
+          max_scroll_pct: number
+          path: string
+          session_id: string
+          viewed_at: string
+          visitor_id: string
+        }
+        Insert: {
+          active_time_ms?: number
+          id: string
+          max_scroll_pct?: number
+          path: string
+          session_id: string
+          viewed_at?: string
+          visitor_id: string
+        }
+        Update: {
+          active_time_ms?: number
+          id?: string
+          max_scroll_pct?: number
+          path?: string
+          session_id?: string
+          viewed_at?: string
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_pageviews_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "analytics_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      analytics_sessions: {
+        Row: {
+          entry_path: string
+          id: string
+          ip_anon: string | null
+          last_seen_at: string
+          referrer: string | null
+          started_at: string
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          visitor_id: string
+        }
+        Insert: {
+          entry_path?: string
+          id: string
+          ip_anon?: string | null
+          last_seen_at?: string
+          referrer?: string | null
+          started_at?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          visitor_id: string
+        }
+        Update: {
+          entry_path?: string
+          id?: string
+          ip_anon?: string | null
+          last_seen_at?: string
+          referrer?: string | null
+          started_at?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           ahorro_semanal: string | null
@@ -103,7 +221,52 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      analytics_click_heatmap: {
+        Args: { p_from?: string; p_path?: string; p_to?: string }
+        Returns: {
+          value: number
+          x: number
+          y: number
+        }[]
+      }
+      analytics_known_paths: {
+        Args: { p_from?: string; p_to?: string }
+        Returns: {
+          pageviews: number
+          path: string
+        }[]
+      }
+      analytics_scroll_distribution: {
+        Args: { p_from?: string; p_path?: string; p_to?: string }
+        Returns: {
+          pct: number
+          pct_reached: number
+          sessions_reached: number
+        }[]
+      }
+      analytics_section_attention: {
+        Args: { p_from?: string; p_path?: string; p_to?: string }
+        Returns: {
+          appearances: number
+          avg_active_ms: number
+          section: string
+        }[]
+      }
+      analytics_session_stats: {
+        Args: { p_from?: string; p_path?: string; p_to?: string }
+        Returns: Json
+      }
+      analytics_upsert_pageview: {
+        Args: {
+          p_active_ms: number
+          p_id: string
+          p_path: string
+          p_scroll_pct: number
+          p_session_id: string
+          p_visitor_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
