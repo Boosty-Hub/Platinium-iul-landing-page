@@ -17,6 +17,7 @@ type Tab = "leads" | "analytics";
 const SELECT_COLS = LEAD_SELECT_COLS;
 
 export default function FormPanel() {
+  const [tab, setTab] = useState<Tab>("leads");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [alertQueue, setAlertQueue] = useState<Lead[]>([]);
   const [audioEnabled, setAudioEnabled] = useState(false);
