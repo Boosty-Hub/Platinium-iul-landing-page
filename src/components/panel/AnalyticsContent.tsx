@@ -4,7 +4,6 @@ import {
   AreaChart, Area, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
 } from "recharts";
-import h337 from "heatmap.js";
 import { supabase } from "@/integrations/supabase/client";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -109,33 +108,88 @@ function Empty({ text = "Sin datos para el período seleccionado" }: { text?: st
   );
 }
 
+// Precomputed color palette: alpha 0-255 → [r, g, b, a] packed in Uint8ClampedArray
+function buildPalette(): Uint8ClampedArray {
+  const stops: [number, [number, number, number]][] = [
+    [0,   [29,  159, 169]],
+    [128, [249, 115,  22]],
+    [255, [239,  68,  68]],
+  ];
+  const palette = new Uint8ClampedArray(256 * 4);
+  for (let i = 0; i < 256; i++) {
+    let lo = stops[0], hi = stops[stops.length - 1];
+    for (let s = 1; s < stops.length; s++) {
+      if (i <= stops[s][0]) { lo = stops[s - 1]; hi = stops[s]; break; }
+    }
+    const t = (i - lo[0]) / (hi[0] - lo[0]);
+    palette[i * 4]     = Math.round(lo[1][0] + t * (hi[1][0] - lo[1][0]));
+    palette[i * 4 + 1] = Math.round(lo[1][1] + t * (hi[1][1] - lo[1][1]));
+    palette[i * 4 + 2] = Math.round(lo[1][2] + t * (hi[1][2] - lo[1][2]));
+    palette[i * 4 + 3] = Math.round(i * 0.85);
+  }
+  return palette;
+}
+const HEATMAP_PALETTE = buildPalette();
+
 function ClickHeatmap({ points }: { points: ClickPoint[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const instanceRef = useRef<ReturnType<typeof h337.create> | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    if (!containerRef.current) return;
-    if (!instanceRef.current) {
-      instanceRef.current = h337.create({
-        container: containerRef.current,
-        radius: 28, maxOpacity: 0.7, minOpacity: 0, blur: 0.8,
-        gradient: { "0.3": "#1d9fa9", "0.65": "#f97316", "1.0": "#ef4444" },
-      });
+    const container = containerRef.current;
+    if (!container) return;
+    const W = container.offsetWidth || 800;
+    const H = container.offsetHeight || 460;
+
+    if (!canvasRef.current) {
+      const canvas = document.createElement("canvas");
+      Object.assign(canvas.style, { position: "absolute", inset: "0", width: "100%", height: "100%", borderRadius: "8px" });
+      container.appendChild(canvas);
+      canvasRef.current = canvas;
     }
-    const el = containerRef.current;
-    const W = el.offsetWidth || 800;
-    const H = el.offsetHeight || 500;
-    if (points.length === 0) { instanceRef.current.setData({ max: 1, data: [] }); return; }
+
+    const canvas = canvasRef.current;
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.clearRect(0, 0, W, H);
+    if (points.length === 0) return;
+
+    // Pass 1: accumulate alpha blobs on shadow canvas
+    const shadow = document.createElement("canvas");
+    shadow.width = W;
+    shadow.height = H;
+    const sCtx = shadow.getContext("2d");
+    if (!sCtx) return;
     const max = Math.max(...points.map((p) => p.value));
-    instanceRef.current.setData({
-      max,
-      data: points.map((p) => ({
-        x: Math.round((p.x / 100) * W),
-        y: Math.round((p.y / 100) * H),
-        value: p.value,
-      })),
+    points.forEach((p) => {
+      const x = Math.round((p.x / 100) * W);
+      const y = Math.round((p.y / 100) * H);
+      const grad = sCtx.createRadialGradient(x, y, 0, x, y, 30);
+      grad.addColorStop(0, `rgba(0,0,0,${Math.min(1, (p.value / max) * 0.9 + 0.1)})`);
+      grad.addColorStop(1, "rgba(0,0,0,0)");
+      sCtx.beginPath();
+      sCtx.arc(x, y, 30, 0, Math.PI * 2);
+      sCtx.fillStyle = grad;
+      sCtx.fill();
     });
+
+    // Pass 2: map alpha → color via palette, mutating pixel data in place
+    const imgData = sCtx.getImageData(0, 0, W, H);
+    const px = imgData.data;
+    for (let i = 3; i < px.length; i += 4) {
+      const a = px[i];
+      if (a === 0) continue;
+      px[i - 3] = HEATMAP_PALETTE[a * 4];
+      px[i - 2] = HEATMAP_PALETTE[a * 4 + 1];
+      px[i - 1] = HEATMAP_PALETTE[a * 4 + 2];
+      px[i]     = HEATMAP_PALETTE[a * 4 + 3];
+    }
+    ctx.putImageData(imgData, 0, 0);
   }, [points]);
+
+  useEffect(() => () => { canvasRef.current?.remove(); canvasRef.current = null; }, []);
 
   return (
     <div className="relative w-full" style={{ height: 460 }}>
