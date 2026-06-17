@@ -131,11 +131,11 @@ export default function HomePage() {
                       <div className="grid grid-cols-2 gap-x-1 gap-y-0.5">
                         {[
                           { label: "Qué es IUL", to: "/seguro-de-vida-iul" },
-                          { label: "Protección y retiro", to: "/proteccion-familiar" },
+                          { label: "Retiro libre de impuestos", to: "/proteccion-familiar" },
                           { label: "IUL vs 401(k)", to: "/iul-vs-401k" },
                           { label: "Sin SSN — aplica con ITIN", to: "/seguro-vida-itin" },
-                          { label: "Plan hijos", to: "/iul-para-hijos" },
-                          { label: "Para emprendedores", to: "/iul-emprendedores" },
+                          { label: "Seguro para tus hijos", to: "/iul-para-hijos" },
+                          { label: "Beneficios en vida", to: "/beneficios-en-vida" },
                         ].map((item) => (
                           <Link
                             key={item.to}
