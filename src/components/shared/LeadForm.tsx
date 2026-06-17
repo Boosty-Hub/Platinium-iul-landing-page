@@ -172,7 +172,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
     <div className={`${t.card} border rounded-2xl p-4 sm:p-9 backdrop-blur-xl`} style={{ boxShadow: '0 0 60px rgba(29,159,169,0.25), 0 0 120px rgba(29,159,169,0.1)' }}>
       <div className="text-center mb-3 sm:mb-6">
         <h3 className="text-lg sm:text-2xl font-bold" style={{ color: textColor }}>
-          {cardTitle ? cardTitle : <>Responde 4 preguntas y recibe GRATIS tu proyección IUL en <span className="inline-flex items-center gap-0.5 align-middle"><svg className="inline w-[1em] h-[1em]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>PDF</span> por <span className="inline-flex items-center gap-0.5 align-middle"><WhatsAppIcon className="inline w-[1em] h-[1em]" />WhatsApp</span> y correo</>}
+          {cardTitle ? cardTitle : <>Responde 4 preguntas y recibe GRATIS tu proyección IUL en <span className="inline-flex items-center gap-0.5 align-middle"><svg className="inline w-[0.7em] h-[0.7em]" viewBox="0 0 24 24" fill="none" stroke="#E53E3E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>PDF</span> por <span className="inline-flex items-center gap-0.5 align-middle"><WhatsAppIcon className="inline w-[0.7em] h-[0.7em] text-[#25D366]" />WhatsApp</span> y correo</>}
         </h3>
       </div>
 
