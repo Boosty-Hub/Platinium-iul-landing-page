@@ -172,15 +172,8 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
     <div className={`${t.card} border rounded-2xl p-4 sm:p-9 backdrop-blur-xl`} style={{ boxShadow: '0 0 60px rgba(29,159,169,0.25), 0 0 120px rgba(29,159,169,0.1)' }}>
       <div className="text-center mb-3 sm:mb-6">
         <h3 className="text-lg sm:text-2xl font-bold" style={{ color: textColor }}>
-          {cardTitle ? cardTitle : <>¡Cotiza tu IUL <span style={{ color: "#1d9fa9" }}>GRATIS</span> ahora con Platinium!</>}
+          {cardTitle ? cardTitle : <>Responde 4 preguntas y recibe <span style={{ color: "#1d9fa9" }}>gratis</span> tu proyección IUL en PDF por WhatsApp y correo</>}
         </h3>
-        <p className="text-xs sm:text-sm mt-1" style={{ color: mutedColor }}>Completa el formulario</p>
-        <div className="flex items-center justify-center gap-2 mt-3 pt-3" style={{ borderTop: `1px solid ${dividerBorder}` }}>
-          <span className="text-[11px]" style={{ color: mutedColor }}>¿Prefieres hablar ya?</span>
-          <a href="tel:+16893082809" className="text-[11px] font-bold hover:underline" style={{ color: "#1d9fa9" }}>📞 Llamar</a>
-          <span className="text-[11px]" style={{ color: mutedColor }}>·</span>
-          <a href="https://wa.me/16893082809" target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold hover:underline" style={{ color: "#25D366" }}>WhatsApp</a>
-        </div>
       </div>
 
       {formState !== "success" ? (
@@ -223,7 +216,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 onClick={() => setStep(2)}
                 className="w-full mt-4 sm:mt-5 bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white py-3.5 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Continuar →
+                Continuar gratis →
               </button>
             </div>
 
@@ -478,7 +471,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                   disabled={formState === "loading"}
                   className="w-full bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base tracking-wide cursor-pointer hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {formState === "loading" ? "Enviando..." : formState === "error" ? "Reintentar →" : "Ver mis números personalizados →"}
+                  {formState === "loading" ? "Enviando..." : formState === "error" ? "Reintentar →" : "Recibir mi proyección IUL gratis en PDF →"}
                 </button>
                 {formState === "error" && (
                   <p className="text-xs text-red-500 mt-2 text-center">Hubo un problema al enviar. Por favor intenta de nuevo.</p>
