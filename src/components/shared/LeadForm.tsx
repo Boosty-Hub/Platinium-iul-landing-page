@@ -214,7 +214,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
                 type="button"
                 disabled={!form.interes}
                 onClick={() => setStep(2)}
-                className="w-full mt-4 sm:mt-5 bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white py-3.5 rounded-xl font-bold text-sm cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full mt-4 sm:mt-5 bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white py-3.5 rounded-xl font-bold text-base sm:text-lg cursor-pointer hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Continuar gratis →
               </button>
