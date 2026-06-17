@@ -111,44 +111,40 @@ export default function HomePage() {
                         Asesoría Financiera para Latinos en EE.UU.
                       </span>
                     </div>
-                    <h1 className="text-[56px] font-normal leading-[1.08] mb-6" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: textColor }}>
+                    <h1 className="text-[56px] font-normal leading-[1.08] mb-5" style={{ fontFamily: "'Playfair Display', Georgia, serif", color: textColor }}>
                       Protege a tu familia.{" "}
                       <span className="font-bold italic" style={{ background: "linear-gradient(135deg, #28C4CF, #1d9fa9, #177D85)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                         Construye tu retiro.
                       </span>
                       <br />
-                      <span className="text-[0.55em] font-normal" style={{ color: mutedColor }}>
+                      <span className="text-[0.42em] font-normal" style={{ color: mutedColor }}>
                         Con un Indexed Universal Life (IUL).
                       </span>
                     </h1>
-                    <p className="text-lg leading-relaxed max-w-xl mb-5" style={{ color: midColor }}>
+                    <p className="text-lg leading-relaxed max-w-xl mb-6" style={{ color: midColor }}>
                       Mientras tu dinero duerme en el banco ganando 0.05%, las familias con un{" "}
                       <strong style={{ color: textColor }}>IUL ganan hasta 12% anual</strong> vinculado al S&P 500,{" "}
                       <strong style={{ color: textColor }}>sin riesgo de pérdida</strong> cuando el mercado cae.
                     </p>
-                    <p className="text-base leading-relaxed max-w-xl mb-9" style={{ color: midColor }}>
-                      Protección permanente + plan de retiro + acceso a tu dinero sin penalidades.{" "}
-                      <strong style={{ color: "#1d9fa9" }}>Todo en un solo instrumento.</strong>
-                    </p>
-                    <div className="mb-9">
-                      <p className="text-[11px] font-bold tracking-[2px] uppercase mb-3" style={{ color: "#1d9fa9" }}>¿Con cuál te identificas?</p>
-                      <div className="space-y-0.5">
+                    <div className="mb-8">
+                      <p className="text-[11px] font-bold tracking-[2px] uppercase mb-2.5" style={{ color: "#1d9fa9" }}>¿Con cuál te identificas?</p>
+                      <div className="grid grid-cols-2 gap-x-1 gap-y-0.5">
                         {[
                           { label: "¿Cómo funciona el IUL?", to: "/seguro-de-vida-iul" },
-                          { label: "Protección permanente para tu familia", to: "/proteccion-familiar" },
-                          { label: "IUL vs 401(k) — ¿cuál te conviene más?", to: "/iul-vs-401k" },
-                          { label: "Sin SSN — aplicas con ITIN", to: "/seguro-vida-itin" },
-                          { label: "IUL para emprendedores y autónomos", to: "/iul-emprendedores" },
-                          { label: "Beneficios en vida — más que un seguro", to: "/beneficios-en-vida" },
+                          { label: "Protección familiar", to: "/proteccion-familiar" },
+                          { label: "IUL vs 401(k)", to: "/iul-vs-401k" },
+                          { label: "Sin SSN — aplica con ITIN", to: "/seguro-vida-itin" },
+                          { label: "Para emprendedores", to: "/iul-emprendedores" },
+                          { label: "Beneficios en vida", to: "/beneficios-en-vida" },
                         ].map((item) => (
                           <Link
                             key={item.to}
                             to={item.to}
-                            className="group flex items-center gap-2.5 py-1.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-[#1d9fa9]/10 -mx-3 no-underline"
+                            className="group flex items-center gap-2 py-1.5 px-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-[#1d9fa9]/10 no-underline"
                             style={{ color: midColor }}
                           >
-                            <span className="text-[#1d9fa9] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5">→</span>
-                            <span className="group-hover:text-[#1d9fa9] transition-colors duration-200">{item.label}</span>
+                            <span className="text-[#1d9fa9] text-xs shrink-0 transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+                            <span className="group-hover:text-[#1d9fa9] transition-colors duration-200 leading-snug">{item.label}</span>
                           </Link>
                         ))}
                       </div>
