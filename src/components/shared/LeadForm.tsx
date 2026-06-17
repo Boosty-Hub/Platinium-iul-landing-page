@@ -172,7 +172,7 @@ export function LeadForm({ t, dark, defaultInteres = "", showSidebar = true, inl
     <div className={`${t.card} border rounded-2xl p-4 sm:p-9 backdrop-blur-xl`} style={{ boxShadow: '0 0 60px rgba(29,159,169,0.25), 0 0 120px rgba(29,159,169,0.1)' }}>
       <div className="text-center mb-3 sm:mb-6">
         <h3 className="text-lg sm:text-2xl font-bold" style={{ color: textColor }}>
-          {cardTitle ? cardTitle : <>Responde 4 preguntas y recibe <span style={{ color: "#1d9fa9" }}>gratis</span> tu proyección IUL en PDF por WhatsApp y correo</>}
+          {cardTitle ? cardTitle : <>Responde 4 preguntas y recibe <span style={{ color: "#1d9fa9" }}>gratis</span> tu proyección IUL en <span style={{ color: "#E53E3E" }}>PDF</span> por <span style={{ color: "#25D366" }}>WhatsApp</span> y correo</>}
         </h3>
       </div>
 
