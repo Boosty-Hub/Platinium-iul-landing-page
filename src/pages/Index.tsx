@@ -121,7 +121,7 @@ export default function HomePage() {
                         Con un Indexed Universal Life (IUL).
                       </span>
                     </h1>
-                    <p className="text-lg leading-relaxed max-w-xl mb-6" style={{ color: midColor }}>
+                    <p className="text-base leading-relaxed max-w-xl mb-6" style={{ color: midColor }}>
                       Mientras tu dinero duerme en el banco ganando 0.05%, las familias con un{" "}
                       <strong style={{ color: textColor }}>IUL ganan hasta 12% anual</strong> vinculado al S&P 500,{" "}
                       <strong style={{ color: textColor }}>sin riesgo de pérdida</strong> cuando el mercado cae.
@@ -130,12 +130,12 @@ export default function HomePage() {
                       <p className="text-[11px] font-bold tracking-[2px] uppercase mb-2.5" style={{ color: "#1d9fa9" }}>¿Con cuál te identificas?</p>
                       <div className="grid grid-cols-2 gap-x-1 gap-y-0.5">
                         {[
-                          { label: "¿Cómo funciona el IUL?", to: "/seguro-de-vida-iul" },
-                          { label: "Protección familiar", to: "/proteccion-familiar" },
+                          { label: "Qué es IUL", to: "/seguro-de-vida-iul" },
+                          { label: "Protección y retiro", to: "/proteccion-familiar" },
                           { label: "IUL vs 401(k)", to: "/iul-vs-401k" },
                           { label: "Sin SSN — aplica con ITIN", to: "/seguro-vida-itin" },
+                          { label: "Plan hijos", to: "/iul-para-hijos" },
                           { label: "Para emprendedores", to: "/iul-emprendedores" },
-                          { label: "Beneficios en vida", to: "/beneficios-en-vida" },
                         ].map((item) => (
                           <Link
                             key={item.to}
@@ -148,16 +148,6 @@ export default function HomePage() {
                           </Link>
                         ))}
                       </div>
-                    </div>
-                    <div className="flex flex-wrap gap-6" aria-label="Garantías">
-                      {[["Aplicable con ", "ITIN"], ["Piso garantizado ", "0%"], ["Consulta ", "100% gratis"]].map(([pre, bold], i) => (
-                        <div key={i} className="flex items-center gap-2">
-                          <CheckIcon className="text-[#1d9fa9]" />
-                          <span className="text-sm" style={{ color: midColor }}>
-                            {pre}<strong style={{ color: textColor }}>{bold}</strong>
-                          </span>
-                        </div>
-                      ))}
                     </div>
                   </div>
                   <div>
