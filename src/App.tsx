@@ -10,7 +10,6 @@ import { CookieBanner } from "@/components/shared/CookieBanner";
 const Index = lazy(() => import("./pages/Index.tsx"));
 const SeguroVidaIUL = lazy(() => import("./pages/SeguroVidaIUL.tsx"));
 const IULParaIndocumentados = lazy(() => import("./pages/IULParaIndocumentados.tsx"));
-const CotizacionIUL = lazy(() => import("./pages/CotizacionIUL.tsx"));
 const IULParaHijos = lazy(() => import("./pages/IULParaHijos.tsx"));
 const IULvs401k = lazy(() => import("./pages/IULvs401k.tsx"));
 const Contacto = lazy(() => import("./pages/Contacto.tsx"));
@@ -52,7 +51,7 @@ const AppRoutes = () => {
         <Route path="/form-panel" element={<FormPanel />} />
         <Route path="/analytics" element={<AnalyticsPanel />} />
         <Route path="/cotiza" element={<Cotiza />} />
-        <Route path="/cotizacion-iul" element={<CotizacionIUL />} />
+        <Route path="/cotizacion-iul" element={<Navigate to="/cotiza" replace />} />
         <Route path="/iul-para-hijos" element={<IULParaHijos />} />
         {/* Redirects from old URLs */}
         <Route path="/iul-para-jubilacion" element={<Navigate to="/proteccion-familiar" replace />} />

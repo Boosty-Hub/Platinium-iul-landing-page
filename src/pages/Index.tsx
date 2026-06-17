@@ -130,13 +130,28 @@ export default function HomePage() {
                       Protección permanente + plan de retiro + acceso a tu dinero sin penalidades.{" "}
                       <strong style={{ color: "#1d9fa9" }}>Todo en un solo instrumento.</strong>
                     </p>
-                    <div className="flex gap-3.5 mb-10">
-                      <Link to="/contacto" className="bg-gradient-to-br from-[#1d9fa9] to-[#177D85] text-white px-9 py-4 rounded-lg font-bold text-base tracking-wide no-underline hover:shadow-xl hover:shadow-[#1d9fa9]/25 transition-all hover:-translate-y-0.5 text-center">
-                        Agenda tu Consulta Gratis →
-                      </Link>
-                      <Link to="/seguro-de-vida-iul" className="border-2 border-[#1d9fa9] text-[#1d9fa9] px-8 py-3.5 rounded-lg font-semibold text-[15px] no-underline hover:bg-[#1d9fa9]/10 transition-all text-center">
-                        ¿Cómo funciona el IUL?
-                      </Link>
+                    <div className="mb-9">
+                      <p className="text-[11px] font-bold tracking-[2px] uppercase mb-3" style={{ color: "#1d9fa9" }}>¿Con cuál te identificas?</p>
+                      <div className="space-y-0.5">
+                        {[
+                          { label: "¿Cómo funciona el IUL?", to: "/seguro-de-vida-iul" },
+                          { label: "Protección permanente para tu familia", to: "/proteccion-familiar" },
+                          { label: "IUL vs 401(k) — ¿cuál te conviene más?", to: "/iul-vs-401k" },
+                          { label: "Sin SSN — aplicas con ITIN", to: "/seguro-vida-itin" },
+                          { label: "IUL para emprendedores y autónomos", to: "/iul-emprendedores" },
+                          { label: "Beneficios en vida — más que un seguro", to: "/beneficios-en-vida" },
+                        ].map((item) => (
+                          <Link
+                            key={item.to}
+                            to={item.to}
+                            className="group flex items-center gap-2.5 py-1.5 px-3 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-[#1d9fa9]/10 -mx-3 no-underline"
+                            style={{ color: midColor }}
+                          >
+                            <span className="text-[#1d9fa9] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+                            <span className="group-hover:text-[#1d9fa9] transition-colors duration-200">{item.label}</span>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
                     <div className="flex flex-wrap gap-6" aria-label="Garantías">
                       {[["Aplicable con ", "ITIN"], ["Piso garantizado ", "0%"], ["Consulta ", "100% gratis"]].map(([pre, bold], i) => (
@@ -192,7 +207,7 @@ export default function HomePage() {
                     ))}
                   </ul>
                   <a
-                    href="#lead-form"
+                    href="#consulta"
                     className="inline-flex items-center justify-center px-8 py-3.5 rounded-full text-white font-semibold text-base shadow-lg bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:shadow-xl hover:scale-105 transition-all duration-200"
                     style={{ fontFamily: "'DM Sans', sans-serif" }}
                   >
