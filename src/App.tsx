@@ -22,6 +22,7 @@ const PoliticaPrivacidad = lazy(() => import("./pages/PoliticaPrivacidad.tsx"));
 const Links = lazy(() => import("./pages/Links.tsx"));
 const FormPanel = lazy(() => import("./pages/FormPanel.tsx"));
 const AnalyticsPanel = lazy(() => import("./pages/AnalyticsPanel.tsx"));
+const Admin = lazy(() => import("./pages/Admin.tsx"));
 const Cotiza = lazy(() => import("./pages/Cotiza.tsx"));
 const Login = lazy(() => import("./pages/Login.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
@@ -29,7 +30,7 @@ const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const queryClient = new QueryClient();
 
 // Routes that bypass GeoGate (accessible from anywhere)
-const BYPASS_GEO = ["/form-panel", "/analytics", "/login"];
+const BYPASS_GEO = ["/form-panel", "/analytics", "/login", "/admin"];
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -51,8 +52,9 @@ const AppRoutes = () => {
         <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
         <Route path="/links" element={<Links />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/form-panel" element={<AdminRoute><FormPanel /></AdminRoute>} />
-        <Route path="/analytics" element={<AdminRoute><AnalyticsPanel /></AdminRoute>} />
+        <Route path="/form-panel" element={<Navigate to="/admin/leads" replace />} />
+        <Route path="/analytics" element={<Navigate to="/admin/analytics" replace />} />
+        <Route path="/admin/*" element={<Admin />} />
         <Route path="/cotiza" element={<Cotiza />} />
         <Route path="/cotizacion-iul" element={<Navigate to="/cotiza" replace />} />
         <Route path="/iul-para-hijos" element={<IULParaHijos />} />
