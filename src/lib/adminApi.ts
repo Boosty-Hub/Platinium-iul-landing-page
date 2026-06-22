@@ -30,3 +30,13 @@ export async function upsertIntegracion(
   if (error) throw error;
   return data as { ok: boolean; clave: string };
 }
+
+export async function testIntegracion(
+  clave: string
+): Promise<{ ok: boolean; mensaje?: string; error?: string }> {
+  const { data, error } = await (supabase as any).functions.invoke("test-integracion", {
+    body: { clave },
+  });
+  if (error) return { ok: false, error: error.message ?? "No autorizado o error de red" };
+  return data as { ok: boolean; mensaje?: string; error?: string };
+}
