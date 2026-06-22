@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { lazy, Suspense } from "react";
 import { GeoGate } from "@/components/shared/GeoGate";
 import { CookieBanner } from "@/components/shared/CookieBanner";
+import { AdminRoute } from "@/components/auth/AdminRoute";
 
 const Index = lazy(() => import("./pages/Index.tsx"));
 const SeguroVidaIUL = lazy(() => import("./pages/SeguroVidaIUL.tsx"));
@@ -22,12 +23,13 @@ const Links = lazy(() => import("./pages/Links.tsx"));
 const FormPanel = lazy(() => import("./pages/FormPanel.tsx"));
 const AnalyticsPanel = lazy(() => import("./pages/AnalyticsPanel.tsx"));
 const Cotiza = lazy(() => import("./pages/Cotiza.tsx"));
+const Login = lazy(() => import("./pages/Login.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient();
 
 // Routes that bypass GeoGate (accessible from anywhere)
-const BYPASS_GEO = ["/form-panel", "/analytics"];
+const BYPASS_GEO = ["/form-panel", "/analytics", "/login"];
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -48,8 +50,9 @@ const AppRoutes = () => {
         <Route path="/beneficios-en-vida" element={<BeneficiosEnVida />} />
         <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
         <Route path="/links" element={<Links />} />
-        <Route path="/form-panel" element={<FormPanel />} />
-        <Route path="/analytics" element={<AnalyticsPanel />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/form-panel" element={<AdminRoute><FormPanel /></AdminRoute>} />
+        <Route path="/analytics" element={<AdminRoute><AnalyticsPanel /></AdminRoute>} />
         <Route path="/cotiza" element={<Cotiza />} />
         <Route path="/cotizacion-iul" element={<Navigate to="/cotiza" replace />} />
         <Route path="/iul-para-hijos" element={<IULParaHijos />} />

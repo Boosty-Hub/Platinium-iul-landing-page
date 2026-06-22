@@ -1,5 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import AnalyticsContent from "@/components/panel/AnalyticsContent";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AnalyticsPanel() {
   return (
@@ -14,7 +15,15 @@ export default function AnalyticsPanel() {
           <img src="/logo.png" alt="Platinum" className="h-8 w-auto" />
           <span className="text-sm font-bold text-[#1d9fa9] tracking-widest uppercase">Analytics</span>
         </div>
-        <span className="text-xs text-[#4A8A94]">Panel interno · No indexado</span>
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-[#4A8A94] hidden sm:inline">Panel interno · No indexado</span>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="text-xs text-[#94B3BB] hover:text-white border border-[#1d9fa9]/25 hover:border-[#1d9fa9]/60 rounded-lg px-3 py-2 transition-colors"
+          >
+            Salir
+          </button>
+        </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
