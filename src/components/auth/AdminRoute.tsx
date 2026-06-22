@@ -32,7 +32,11 @@ export function AdminRoute({ children }: { children: ReactNode }) {
     };
 
     supabase.auth.getSession().then(({ data }) => evaluate(data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => evaluate(session));
+    // OJO: no llamar rpc/await de supabase DENTRO del callback de onAuthStateChange
+    // (mantiene un lock y deadlockea al cliente). Lo diferimos con setTimeout(0).
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setTimeout(() => evaluate(session), 0);
+    });
 
     return () => {
       active = false;
