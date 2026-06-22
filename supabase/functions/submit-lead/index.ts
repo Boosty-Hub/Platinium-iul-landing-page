@@ -179,42 +179,6 @@ serve(async (req) => {
       );
     }
 
-    const created_at = new Date().toISOString();
-
-    // n8n webhook (fire-and-forget)
-    const N8N_WEBHOOK = Deno.env.get("N8N_WEBHOOK_URL");
-    if (N8N_WEBHOOK) {
-      const webhookPayload = {
-        lead_id: leadId,
-        nombre: leadData.nombre,
-        telefono: leadData.telefono,
-        email: leadData.email,
-        interes: leadData.interes,
-        anio_nacimiento: leadData.anio_nacimiento,
-        ahorro_semanal: leadData.ahorro_semanal,
-        genero: leadData.genero,
-        fuente: "landing-iul",
-        referrer: leadData.referrer,
-        utm_source: leadData.utm_source || null,
-        utm_medium: leadData.utm_medium || null,
-        utm_campaign: leadData.utm_campaign || null,
-        utm_content: leadData.utm_content || null,
-        utm_term: leadData.utm_term || null,
-        notas: leadData.notas,
-        gclid: leadData.gclid || null,
-        fbclid: leadData.fbclid || null,
-        created_at,
-      };
-
-      fetch(N8N_WEBHOOK, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(webhookPayload),
-      }).catch((err) => console.warn("n8n webhook failed:", err));
-    }
-
-    // Kommo sync is handled by n8n workflow, no need to send directly
-
     return new Response(
       JSON.stringify({ ok: true, lead_id: leadId }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
