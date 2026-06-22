@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Secrets / env (Boosty security standard — nunca commitear)
+.env
+.env.*
+!.env.example
+.supabase-token
+
+# Workspace / herramientas
+.atl
+.atl/
+.playwright-mcp/
+.lovable/
