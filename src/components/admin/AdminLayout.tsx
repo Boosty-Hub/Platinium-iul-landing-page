@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, BarChart2, Settings, LogOut, Menu, X } from "lucide-react";
+import { Users, BarChart2, Settings, LogOut, Menu, X, PhoneCall } from "lucide-react";
 
 const NAV_ITEMS = [
   { to: "leads", label: "Leads", icon: Users },
   { to: "analytics", label: "Analítica", icon: BarChart2 },
+  { to: "llamadas", label: "Llamadas", icon: PhoneCall },
   { to: "configuracion", label: "Configuración", icon: Settings },
 ] as const;
 

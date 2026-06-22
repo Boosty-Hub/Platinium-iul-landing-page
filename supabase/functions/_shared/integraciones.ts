@@ -105,22 +105,15 @@ export async function kommoCreateLead(cfg: KommoCfg, lead: LeadData) {
     { field_code: "EMAIL", values: [{ value: lead.email, enum_code: "WORK" }] },
   ];
   const leadCF: Record<string, unknown>[] = [];
-  const push = (target: Record<string, unknown>[], fid: string | undefined, val: unknown) => {
-    if (fid && val != null && String(val).trim() !== "") {
-      target.push({ field_id: Number(fid), values: [{ value: String(val) }] });
-    }
-  };
-  // mapeo keys: 'contact_<campo>' → custom field del contacto, 'lead_<campo>' → del lead
-  push(contactCF, mapeo.contact_anio_nacimiento, lead.anio_nacimiento);
-  push(contactCF, mapeo.contact_ahorro_semanal, lead.ahorro_semanal);
-  push(contactCF, mapeo.contact_genero, lead.genero);
-  push(contactCF, mapeo.contact_ciudad, lead.city);
-  push(leadCF, mapeo.lead_interes, lead.interes);
-  push(leadCF, mapeo.lead_utm_source, lead.utm_source);
-  push(leadCF, mapeo.lead_utm_campaign, lead.utm_campaign);
-  push(leadCF, mapeo.lead_utm_medium, lead.utm_medium);
-  push(leadCF, mapeo.lead_gclid, lead.gclid);
-  push(leadCF, mapeo.lead_fbclid, lead.fbclid);
+  // mapeo flexible: { "<nuestro_campo>": "<entity>:<field_id>" }  (entity = 'lead' | 'contact')
+  // El dashboard arma estas claves desde los dropdowns de Kommo (por nombre, sin IDs visibles).
+  for (const [ourField, target] of Object.entries(mapeo)) {
+    const [entity, fid] = String(target).split(":");
+    const val = (lead as unknown as Record<string, unknown>)[ourField];
+    if (!fid || val == null || String(val).trim() === "") continue;
+    const cf = { field_id: Number(fid), values: [{ value: String(val) }] };
+    if (entity === "contact") contactCF.push(cf); else leadCF.push(cf);
+  }
 
   const leadObj: Record<string, unknown> = {
     name: `IUL Lead - ${lead.nombre}`,

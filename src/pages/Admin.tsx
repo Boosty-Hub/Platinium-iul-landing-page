@@ -6,6 +6,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 const LeadsPage = lazy(() => import("./admin/LeadsPage"));
 const AnalyticsPage = lazy(() => import("./admin/AnalyticsPage"));
 const ConfiguracionPage = lazy(() => import("./admin/ConfiguracionPage"));
+const LlamadasPage = lazy(() => import("./admin/LlamadasPage"));
 
 export default function Admin() {
   return (
@@ -26,6 +27,14 @@ export default function Admin() {
             element={
               <Suspense fallback={<div className="h-48" />}>
                 <AnalyticsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="llamadas"
+            element={
+              <Suspense fallback={<div className="h-48" />}>
+                <LlamadasPage />
               </Suspense>
             }
           />

@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { Integracion, getIntegraciones, testIntegracion } from "@/lib/adminApi";
+import { Integracion, getIntegraciones, testIntegracion, getKommoMetadata, KommoMetadata } from "@/lib/adminApi";
 import KommoConfig from "@/components/admin/config/KommoConfig";
 import RingCentralConfig from "@/components/admin/config/RingCentralConfig";
+import AsesoresConfig from "@/components/admin/config/AsesoresConfig";
+import HorarioConfig from "@/components/admin/config/HorarioConfig";
 import { RefreshCw, Zap, Loader2, CheckCircle2, XCircle } from "lucide-react";
 
 function StatusBadge({ activo }: { activo: boolean }) {
@@ -29,8 +31,8 @@ function ConfigCard({
 }: {
   title: string;
   description: string;
-  clave: string;
-  activo: boolean;
+  clave?: string;
+  activo?: boolean;
   actualizado_en?: string;
   children: React.ReactNode;
 }) {
@@ -38,6 +40,7 @@ function ConfigCard({
   const [result, setResult] = useState<{ ok: boolean; msg: string } | null>(null);
 
   const probar = async () => {
+    if (!clave) return;
     setTesting(true);
     setResult(null);
     try {
@@ -56,33 +59,35 @@ function ConfigCard({
         <div className="min-w-0">
           <div className="flex items-center gap-2.5 flex-wrap">
             <h3 className="text-base font-semibold text-[#E4EEF0]">{title}</h3>
-            <StatusBadge activo={activo} />
+            {activo !== undefined && <StatusBadge activo={activo} />}
           </div>
           <p className="text-sm text-[#94B3BB] mt-0.5">{description}</p>
         </div>
-        <div className="flex flex-col items-end gap-2 flex-shrink-0">
-          <button
-            type="button"
-            onClick={probar}
-            disabled={testing}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[#1d9fa9]/30 text-[#1d9fa9] hover:bg-[#1d9fa9]/10 transition-colors disabled:opacity-50 whitespace-nowrap"
-          >
-            {testing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
-            Probar conexión
-          </button>
-          {actualizado_en && (
-            <div className="text-xs text-[#6A8E98] whitespace-nowrap">
-              Actualizado:{" "}
-              {new Date(actualizado_en).toLocaleDateString("es-US", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </div>
-          )}
-        </div>
+        {clave && (
+          <div className="flex flex-col items-end gap-2 flex-shrink-0">
+            <button
+              type="button"
+              onClick={probar}
+              disabled={testing}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[#1d9fa9]/30 text-[#1d9fa9] hover:bg-[#1d9fa9]/10 transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              {testing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+              Probar conexión
+            </button>
+            {actualizado_en && (
+              <div className="text-xs text-[#6A8E98] whitespace-nowrap">
+                Actualizado:{" "}
+                {new Date(actualizado_en).toLocaleDateString("es-US", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
       {result && (
         <div
@@ -110,12 +115,21 @@ export default function ConfiguracionPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Kommo metadata — shared between KommoConfig and AsesoresConfig
+  const [kommoMeta, setKommoMeta] = useState<KommoMetadata | null>(null);
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const data = await getIntegraciones();
       setIntegraciones(data);
+      // Load Kommo metadata in background (best-effort; individual components handle errors)
+      getKommoMetadata()
+        .then((m) => setKommoMeta(m))
+        .catch(() => {
+          // silently ignore — individual components handle their own error state
+        });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error cargando configuraciones");
     } finally {
@@ -152,7 +166,7 @@ export default function ConfiguracionPage() {
 
       {loading && (
         <div className="space-y-4">
-          {[1, 2].map((i) => (
+          {[1, 2, 3, 4].map((i) => (
             <div key={i} className="rounded-xl border border-[#1d9fa9]/20 bg-[#0F2229] h-48 animate-pulse" />
           ))}
         </div>
@@ -184,6 +198,20 @@ export default function ConfiguracionPage() {
             actualizado_en={ringcentral?.actualizado_en}
           >
             <RingCentralConfig data={ringcentral} onSaved={load} />
+          </ConfigCard>
+
+          <ConfigCard
+            title="Asesores"
+            description="Equipo de asesores disponibles para atender llamadas."
+          >
+            <AsesoresConfig kommoUsers={kommoMeta?.users ?? []} />
+          </ConfigCard>
+
+          <ConfigCard
+            title="Horario y reintentos"
+            description="Ventanas de atención y política de reintentos de llamada."
+          >
+            <HorarioConfig />
           </ConfigCard>
         </div>
       )}
