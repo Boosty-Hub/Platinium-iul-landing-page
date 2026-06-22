@@ -34,3 +34,7 @@ dist-ssr
 .atl/
 .playwright-mcp/
 .lovable/
+
+# Supabase CLI
+supabase/.temp
+supabase/.branches
