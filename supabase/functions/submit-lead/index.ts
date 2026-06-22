@@ -184,13 +184,8 @@ serve(async (req) => {
     try {
       // @ts-ignore EdgeRuntime existe en el runtime de Supabase Edge
       EdgeRuntime.waitUntil(
-        procesarLead(supabase, {
-          id: leadId,
-          nombre: String(leadData.nombre),
-          telefono: String(leadData.telefono),
-          email: String(leadData.email),
-          interes: leadData.interes ? String(leadData.interes) : undefined,
-        }),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        procesarLead(supabase, { id: leadId, ...leadData, city, region } as any),
       );
     } catch (e) {
       console.error("No se pudo agendar el procesamiento del lead:", e);

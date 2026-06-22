@@ -1,10 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import {
-  corsHeaders, adminClient, callerIsAdmin, procesarLead,
+  corsHeaders, adminClient, callerIsAdmin, getIntegracion, kommoMetadata, type KommoCfg,
 } from "../_shared/integraciones.ts";
 
-// Reprocesa un lead manualmente (admin): crear en Kommo y/o llamar por RingCentral.
-// Body: { lead_id: string, llamar?: boolean }
+// Devuelve pipelines+etapas, usuarios y custom fields de Kommo para poblar
+// los dropdowns del dashboard SIN que el usuario maneje IDs. Admin-gated.
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") {
@@ -13,25 +13,18 @@ serve(async (req) => {
   }
 
   const admin = adminClient();
-
   if (!(await callerIsAdmin(req, admin))) {
     return new Response(JSON.stringify({ ok: false, error: "No autorizado" }),
       { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 
   try {
-    const { lead_id, llamar } = await req.json();
-    if (!lead_id) throw new Error("Falta 'lead_id'.");
-
-    const { data: lead, error } = await admin
-      .from("leads")
-      .select("id, nombre, telefono, email, interes, anio_nacimiento, ahorro_semanal, genero, city, region, utm_source, utm_medium, utm_campaign, utm_content, utm_term, gclid, fbclid, referrer, fuente, created_at")
-      .eq("id", lead_id)
-      .maybeSingle();
-    if (error || !lead) throw new Error("Lead no encontrado.");
-
-    const result = await procesarLead(admin, lead as any, { llamar: llamar ?? true });
-    return new Response(JSON.stringify({ ok: true, lead_id, ...result }),
+    const row = await getIntegracion(admin, "kommo");
+    if (!row?.config?.access_token || !row?.config?.subdominio) {
+      throw new Error("Configurá primero el subdominio y el token de Kommo.");
+    }
+    const meta = await kommoMetadata(row.config as unknown as KommoCfg);
+    return new Response(JSON.stringify({ ok: true, ...meta }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err) {
     return new Response(JSON.stringify({ ok: false, error: (err as Error).message }),

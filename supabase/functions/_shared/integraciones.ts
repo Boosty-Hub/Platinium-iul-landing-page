@@ -46,7 +46,12 @@ export async function getIntegracion(admin: ReturnType<typeof adminClient>, clav
 }
 
 // ── Kommo (API v4) ───────────────────────────────────────────────────────────
-export interface KommoCfg { subdominio: string; access_token: string; pipeline_id?: string; status_id?: string; responsable_id?: string; }
+export interface KommoCfg {
+  subdominio: string; access_token: string;
+  pipeline_id?: string; status_id?: string; responsable_id?: string;
+  status_no_contactado_id?: string;          // etapa a la que mover tras 3 intentos fallidos
+  mapeo?: Record<string, string>;            // 'contact_<campo>'|'lead_<campo>' → id de custom field
+}
 
 function kommoBase(cfg: KommoCfg) { return `https://${cfg.subdominio}.kommo.com/api/v4`; }
 
@@ -61,19 +66,67 @@ export async function kommoTest(cfg: KommoCfg) {
   return { id: acc.id, name: acc.name, subdomain: acc.subdomain };
 }
 
-export async function kommoCreateLead(cfg: KommoCfg, lead: { nombre: string; telefono: string; email: string; interes?: string }) {
+// Nota formateada con TODA la data del lead (siempre funciona, no depende de custom fields).
+export function kommoBuildNote(lead: LeadData): string {
+  const L = (k: string, v: unknown) => (v != null && String(v).trim() !== "" ? `${k}: ${v}\n` : "");
+  let t = "📋 LEAD WEB — Platinium IUL\n──────────────────────\n";
+  t += L("👤 Nombre", lead.nombre);
+  t += L("📞 Teléfono", lead.telefono);
+  t += L("✉️ Email", lead.email);
+  t += L("💬 Interés", lead.interes);
+  t += L("🎂 Año nacimiento", lead.anio_nacimiento);
+  t += L("💵 Ahorro semanal", lead.ahorro_semanal);
+  t += L("⚧ Género", lead.genero);
+  t += L("📍 Ubicación", [lead.city, lead.region].filter(Boolean).join(", "));
+  const utms = [
+    L("Fuente", lead.fuente), L("UTM Source", lead.utm_source), L("UTM Medium", lead.utm_medium),
+    L("UTM Campaign", lead.utm_campaign), L("UTM Content", lead.utm_content), L("UTM Term", lead.utm_term),
+    L("gclid", lead.gclid), L("fbclid", lead.fbclid), L("Referrer", lead.referrer),
+  ].join("");
+  if (utms.trim()) t += "──── Atribución ────\n" + utms;
+  return t.trim();
+}
+
+export async function kommoAddNote(cfg: KommoCfg, leadId: string, text: string) {
+  const res = await fetch(`${kommoBase(cfg)}/leads/notes`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${cfg.access_token}`, "Content-Type": "application/json" },
+    body: JSON.stringify([{ entity_id: Number(leadId), note_type: "common", params: { text } }]),
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error(`Kommo note ${res.status}: ${t.slice(0, 200)}`); }
+  return true;
+}
+
+// Crea el lead + contacto con TODA la data: campos estándar + custom fields mapeados + nota.
+export async function kommoCreateLead(cfg: KommoCfg, lead: LeadData) {
+  const mapeo = cfg.mapeo ?? {};
+  const contactCF: Record<string, unknown>[] = [
+    { field_code: "PHONE", values: [{ value: lead.telefono, enum_code: "WORK" }] },
+    { field_code: "EMAIL", values: [{ value: lead.email, enum_code: "WORK" }] },
+  ];
+  const leadCF: Record<string, unknown>[] = [];
+  const push = (target: Record<string, unknown>[], fid: string | undefined, val: unknown) => {
+    if (fid && val != null && String(val).trim() !== "") {
+      target.push({ field_id: Number(fid), values: [{ value: String(val) }] });
+    }
+  };
+  // mapeo keys: 'contact_<campo>' → custom field del contacto, 'lead_<campo>' → del lead
+  push(contactCF, mapeo.contact_anio_nacimiento, lead.anio_nacimiento);
+  push(contactCF, mapeo.contact_ahorro_semanal, lead.ahorro_semanal);
+  push(contactCF, mapeo.contact_genero, lead.genero);
+  push(contactCF, mapeo.contact_ciudad, lead.city);
+  push(leadCF, mapeo.lead_interes, lead.interes);
+  push(leadCF, mapeo.lead_utm_source, lead.utm_source);
+  push(leadCF, mapeo.lead_utm_campaign, lead.utm_campaign);
+  push(leadCF, mapeo.lead_utm_medium, lead.utm_medium);
+  push(leadCF, mapeo.lead_gclid, lead.gclid);
+  push(leadCF, mapeo.lead_fbclid, lead.fbclid);
+
   const leadObj: Record<string, unknown> = {
     name: `IUL Lead - ${lead.nombre}`,
-    _embedded: {
-      contacts: [{
-        name: lead.nombre,
-        custom_fields_values: [
-          { field_code: "PHONE", values: [{ value: lead.telefono, enum_code: "WORK" }] },
-          { field_code: "EMAIL", values: [{ value: lead.email, enum_code: "WORK" }] },
-        ],
-      }],
-    },
+    _embedded: { contacts: [{ name: lead.nombre, custom_fields_values: contactCF }] },
   };
+  if (leadCF.length) leadObj.custom_fields_values = leadCF;
   if (cfg.pipeline_id) leadObj.pipeline_id = Number(cfg.pipeline_id);
   if (cfg.status_id) leadObj.status_id = Number(cfg.status_id);
   if (cfg.responsable_id) leadObj.responsible_user_id = Number(cfg.responsable_id);
@@ -87,7 +140,36 @@ export async function kommoCreateLead(cfg: KommoCfg, lead: { nombre: string; tel
   if (!res.ok) throw new Error(`Kommo create ${res.status}: ${txt.slice(0, 300)}`);
   const data = JSON.parse(txt);
   const kommoLeadId = data?.[0]?.id ?? data?._embedded?.leads?.[0]?.id ?? null;
+
+  // Nota con toda la data (best-effort, no rompe la creación si falla)
+  if (kommoLeadId) {
+    try { await kommoAddNote(cfg, String(kommoLeadId), kommoBuildNote(lead)); }
+    catch (e) { console.error("kommoCreateLead/note:", (e as Error).message); }
+  }
   return { kommoLeadId: kommoLeadId ? String(kommoLeadId) : null };
+}
+
+// Metadata para configuración SIN IDs (dropdowns por nombre en el dashboard).
+export async function kommoMetadata(cfg: KommoCfg) {
+  const h = { Authorization: `Bearer ${cfg.access_token}` };
+  const get = async (path: string) => {
+    const r = await fetch(`${kommoBase(cfg)}${path}`, { headers: h });
+    if (!r.ok) return null;
+    return await r.json();
+  };
+  const [pipe, users, leadCF, contactCF] = await Promise.all([
+    get("/leads/pipelines"), get("/users?limit=250"),
+    get("/leads/custom_fields?limit=250"), get("/contacts/custom_fields?limit=250"),
+  ]);
+  return {
+    pipelines: (pipe?._embedded?.pipelines ?? []).map((p: Record<string, any>) => ({
+      id: p.id, name: p.name,
+      statuses: (p._embedded?.statuses ?? []).map((s: Record<string, any>) => ({ id: s.id, name: s.name })),
+    })),
+    users: (users?._embedded?.users ?? []).map((u: Record<string, any>) => ({ id: u.id, name: u.name, email: u.email })),
+    leadFields: (leadCF?._embedded?.custom_fields ?? []).map((f: Record<string, any>) => ({ id: f.id, name: f.name, type: f.type })),
+    contactFields: (contactCF?._embedded?.custom_fields ?? []).map((f: Record<string, any>) => ({ id: f.id, name: f.name, type: f.type })),
+  };
 }
 
 // ── RingCentral ──────────────────────────────────────────────────────────────
@@ -124,7 +206,15 @@ export async function rcRingOut(cfg: RCCfg, toNumber: string) {
 }
 
 // ── Orquestador: lead → Kommo → RingCentral ──────────────────────────────────
-export interface LeadData { id: string; nombre: string; telefono: string; email: string; interes?: string }
+export interface LeadData {
+  id: string; nombre: string; telefono: string; email: string;
+  interes?: string | null; anio_nacimiento?: number | null; ahorro_semanal?: string | null;
+  genero?: string | null; city?: string | null; region?: string | null;
+  utm_source?: string | null; utm_medium?: string | null; utm_campaign?: string | null;
+  utm_content?: string | null; utm_term?: string | null;
+  gclid?: string | null; fbclid?: string | null; referrer?: string | null;
+  fuente?: string | null; created_at?: string | null;
+}
 
 export async function procesarLead(
   admin: ReturnType<typeof adminClient>,
