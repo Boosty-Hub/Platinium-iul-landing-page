@@ -179,8 +179,14 @@ export async function kommoMetadata(cfg: KommoCfg) {
       statuses: (p._embedded?.statuses ?? []).map((s: Record<string, any>) => ({ id: s.id, name: s.name })),
     })),
     users: (users?._embedded?.users ?? []).map((u: Record<string, any>) => ({ id: u.id, name: u.name, email: u.email })),
-    leadFields: (leadCF?._embedded?.custom_fields ?? []).map((f: Record<string, any>) => ({ id: f.id, name: f.name, type: f.type })),
-    contactFields: (contactCF?._embedded?.custom_fields ?? []).map((f: Record<string, any>) => ({ id: f.id, name: f.name, type: f.type })),
+    leadFields: (leadCF?._embedded?.custom_fields ?? []).map((f: Record<string, any>) => ({
+      id: f.id, name: f.name, type: f.type,
+      enums: (f.enums ?? []).map((e: Record<string, any>) => ({ id: e.id, value: e.value })),
+    })),
+    contactFields: (contactCF?._embedded?.custom_fields ?? []).map((f: Record<string, any>) => ({
+      id: f.id, name: f.name, type: f.type,
+      enums: (f.enums ?? []).map((e: Record<string, any>) => ({ id: e.id, value: e.value })),
+    })),
   };
 }
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PhoneCall, RefreshCw, ChevronDown, ChevronRight, Mic } from "lucide-react";
+import { listAsesores } from "@/lib/adminApi";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -209,6 +210,7 @@ function AttemptsPanel({ leadId }: { leadId: string }) {
 
 export default function LlamadasPage() {
   const [queue, setQueue] = useState<CallQueue[]>([]);
+  const [asesores, setAsesores] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -217,13 +219,17 @@ export default function LlamadasPage() {
     setLoading(true);
     setError(null);
     try {
-      const { data, error: err } = await (supabase as any)
-        .from("call_queue")
-        .select("*, leads(nombre,telefono,email,created_at)")
-        .order("updated_at", { ascending: false })
-        .limit(200);
+      const [{ data, error: err }, asesoresList] = await Promise.all([
+        (supabase as any)
+          .from("call_queue")
+          .select("*, leads(nombre,telefono,email,created_at)")
+          .order("updated_at", { ascending: false })
+          .limit(200),
+        listAsesores().catch(() => []),
+      ]);
       if (err) throw err;
       setQueue((data as CallQueue[]) ?? []);
+      setAsesores(Object.fromEntries(asesoresList.map((a) => [a.id, a.nombre])));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error cargando llamadas");
     } finally {
@@ -295,7 +301,7 @@ export default function LlamadasPage() {
           <div className="text-center">
             <p className="text-[#E4EEF0] font-medium">Aún no hay llamadas registradas</p>
             <p className="text-sm text-[#6A8E98] mt-1">
-              El motor de llamadas se activa con la Fase 2.
+              Las llamadas aparecerán acá automáticamente cuando llegue un lead en horario laboral.
             </p>
           </div>
         </div>
@@ -356,8 +362,12 @@ export default function LlamadasPage() {
                         <td className="px-4 py-3 text-[#94B3BB]">
                           {item.client_attempts ?? 0}
                         </td>
-                        <td className="px-4 py-3 text-[#94B3BB] text-xs font-mono">
-                          {item.asesor_id ?? <span className="text-[#6A8E98]">—</span>}
+                        <td className="px-4 py-3 text-[#94B3BB] text-sm">
+                          {item.asesor_id ? (
+                            asesores[item.asesor_id] ?? <span className="font-mono text-xs">{item.asesor_id.slice(0, 8)}</span>
+                          ) : (
+                            <span className="text-[#6A8E98]">—</span>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-[#6A8E98] text-xs whitespace-nowrap">
                           {fmt(item.updated_at)}

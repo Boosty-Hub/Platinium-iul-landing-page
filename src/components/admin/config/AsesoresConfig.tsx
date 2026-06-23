@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, Check, X, GripVertical } from "lucide-react";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -10,11 +9,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Asesor, KommoUser, listAsesores, upsertAsesor, deleteAsesor } from "@/lib/adminApi";
+import { Asesor, KommoEnum, listAsesores, upsertAsesor, deleteAsesor } from "@/lib/adminApi";
 import { toast } from "@/hooks/use-toast";
 
 interface Props {
-  kommoUsers: KommoUser[];
+  /** Opciones del campo SELECT "Responsable" de Kommo (coinciden por nombre con las extensiones RC). */
+  responsableEnums: KommoEnum[];
 }
 
 const EMPTY_ASESOR: Omit<Asesor, "id"> = {
@@ -22,20 +22,63 @@ const EMPTY_ASESOR: Omit<Asesor, "id"> = {
   rc_extension: "",
   telefono: "",
   kommo_user_id: "",
+  kommo_responsable_enum_id: "",
   activo: true,
   orden: 0,
 };
 
-const NO_USER = "__none__";
+const NONE = "__none__";
+
+function ResponsableSelect({
+  value,
+  enums,
+  onChange,
+}: {
+  value: string | null;
+  enums: KommoEnum[];
+  onChange: (v: string) => void;
+}) {
+  if (enums.length === 0) {
+    return (
+      <Input
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="enum_id"
+        className="bg-[#0B1A1E] border-[#1d9fa9]/20 text-[#E4EEF0] placeholder:text-[#6A8E98] focus:border-[#1d9fa9] h-8 text-sm"
+      />
+    );
+  }
+  return (
+    <Select value={value || NONE} onValueChange={(v) => onChange(v === NONE ? "" : v)}>
+      <SelectTrigger className="bg-[#0B1A1E] border-[#1d9fa9]/20 text-[#E4EEF0] focus:border-[#1d9fa9] h-8 text-xs">
+        <SelectValue placeholder="Responsable…" />
+      </SelectTrigger>
+      <SelectContent className="bg-[#0F2229] border-[#1d9fa9]/20">
+        <SelectItem value={NONE} className="text-[#6A8E98] focus:bg-[#1d9fa9]/20 focus:text-white text-xs">
+          — sin asignar —
+        </SelectItem>
+        {enums.map((e) => (
+          <SelectItem
+            key={e.id}
+            value={String(e.id)}
+            className="text-[#E4EEF0] focus:bg-[#1d9fa9]/20 focus:text-white text-xs"
+          >
+            {e.value}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
 
 function AsesorRow({
   asesor,
-  kommoUsers,
+  responsableEnums,
   onSaved,
   onDelete,
 }: {
   asesor: Asesor;
-  kommoUsers: KommoUser[];
+  responsableEnums: KommoEnum[];
   onSaved: () => void;
   onDelete: (id: string) => void;
 }) {
@@ -90,9 +133,8 @@ function AsesorRow({
     setConfirmDelete(false);
   };
 
-  const kommoUserValue = form.kommo_user_id ?? NO_USER;
-  const kommoUserLabel =
-    kommoUsers.find((u) => String(u.id) === form.kommo_user_id)?.name ?? null;
+  const responsableLabel =
+    responsableEnums.find((e) => String(e.id) === asesor.kommo_responsable_enum_id)?.value ?? null;
 
   if (!editing) {
     return (
@@ -107,11 +149,13 @@ function AsesorRow({
           {asesor.rc_extension || <span className="text-[#6A8E98]">—</span>}
         </td>
         <td className="px-4 py-3 text-[#94B3BB] text-sm">
-          {kommoUserLabel ?? (asesor.kommo_user_id ? (
-            <span className="font-mono text-xs">{asesor.kommo_user_id}</span>
+          {responsableLabel ? (
+            responsableLabel
+          ) : asesor.kommo_responsable_enum_id ? (
+            <span className="font-mono text-xs">{asesor.kommo_responsable_enum_id}</span>
           ) : (
-            <span className="text-[#6A8E98]">—</span>
-          ))}
+            <span className="text-yellow-400/80 text-xs">sin mapear</span>
+          )}
         </td>
         <td className="px-4 py-3 text-[#94B3BB] text-sm">
           {asesor.telefono || <span className="text-[#6A8E98]">—</span>}
@@ -186,42 +230,11 @@ function AsesorRow({
         />
       </td>
       <td className="px-4 py-2.5">
-        {kommoUsers.length > 0 ? (
-          <Select
-            value={kommoUserValue}
-            onValueChange={(v) =>
-              setForm((f) => ({ ...f, kommo_user_id: v === NO_USER ? "" : v }))
-            }
-          >
-            <SelectTrigger className="bg-[#0B1A1E] border-[#1d9fa9]/20 text-[#E4EEF0] focus:border-[#1d9fa9] h-8 text-xs">
-              <SelectValue placeholder="Usuario Kommo…" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#0F2229] border-[#1d9fa9]/20">
-              <SelectItem
-                value={NO_USER}
-                className="text-[#6A8E98] focus:bg-[#1d9fa9]/20 focus:text-white text-xs"
-              >
-                — sin asignar —
-              </SelectItem>
-              {kommoUsers.map((u) => (
-                <SelectItem
-                  key={u.id}
-                  value={String(u.id)}
-                  className="text-[#E4EEF0] focus:bg-[#1d9fa9]/20 focus:text-white text-xs"
-                >
-                  {u.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        ) : (
-          <Input
-            value={form.kommo_user_id ?? ""}
-            onChange={(e) => setForm((f) => ({ ...f, kommo_user_id: e.target.value }))}
-            placeholder="ID usuario"
-            className="bg-[#0B1A1E] border-[#1d9fa9]/20 text-[#E4EEF0] placeholder:text-[#6A8E98] focus:border-[#1d9fa9] h-8 text-sm"
-          />
-        )}
+        <ResponsableSelect
+          value={form.kommo_responsable_enum_id}
+          enums={responsableEnums}
+          onChange={(v) => setForm((f) => ({ ...f, kommo_responsable_enum_id: v }))}
+        />
       </td>
       <td className="px-4 py-2.5">
         <Input
@@ -263,12 +276,12 @@ function AsesorRow({
 }
 
 function AddRow({
-  kommoUsers,
+  responsableEnums,
   nextOrden,
   onSaved,
   onCancel,
 }: {
-  kommoUsers: KommoUser[];
+  responsableEnums: KommoEnum[];
   nextOrden: number;
   onSaved: () => void;
   onCancel: () => void;
@@ -300,8 +313,6 @@ function AddRow({
     }
   };
 
-  const kommoUserValue = form.kommo_user_id ? form.kommo_user_id : NO_USER;
-
   return (
     <tr className="border-b border-[#1d9fa9]/20 bg-[#1d9fa9]/8">
       <td className="px-4 py-2.5 text-[#6A8E98] w-6" />
@@ -323,42 +334,11 @@ function AddRow({
         />
       </td>
       <td className="px-4 py-2.5">
-        {kommoUsers.length > 0 ? (
-          <Select
-            value={kommoUserValue}
-            onValueChange={(v) =>
-              setForm((f) => ({ ...f, kommo_user_id: v === NO_USER ? "" : v }))
-            }
-          >
-            <SelectTrigger className="bg-[#0B1A1E] border-[#1d9fa9]/30 text-[#E4EEF0] focus:border-[#1d9fa9] h-8 text-xs">
-              <SelectValue placeholder="Usuario Kommo…" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#0F2229] border-[#1d9fa9]/20">
-              <SelectItem
-                value={NO_USER}
-                className="text-[#6A8E98] focus:bg-[#1d9fa9]/20 focus:text-white text-xs"
-              >
-                — sin asignar —
-              </SelectItem>
-              {kommoUsers.map((u) => (
-                <SelectItem
-                  key={u.id}
-                  value={String(u.id)}
-                  className="text-[#E4EEF0] focus:bg-[#1d9fa9]/20 focus:text-white text-xs"
-                >
-                  {u.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        ) : (
-          <Input
-            value={form.kommo_user_id ?? ""}
-            onChange={(e) => setForm((f) => ({ ...f, kommo_user_id: e.target.value }))}
-            placeholder="ID usuario"
-            className="bg-[#0B1A1E] border-[#1d9fa9]/30 text-[#E4EEF0] placeholder:text-[#6A8E98] focus:border-[#1d9fa9] h-8 text-sm"
-          />
-        )}
+        <ResponsableSelect
+          value={form.kommo_responsable_enum_id}
+          enums={responsableEnums}
+          onChange={(v) => setForm((f) => ({ ...f, kommo_responsable_enum_id: v }))}
+        />
       </td>
       <td className="px-4 py-2.5">
         <Input
@@ -399,7 +379,7 @@ function AddRow({
   );
 }
 
-export default function AsesoresConfig({ kommoUsers }: Props) {
+export default function AsesoresConfig({ responsableEnums }: Props) {
   const [asesores, setAsesores] = useState<Asesor[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -434,8 +414,9 @@ export default function AsesoresConfig({ kommoUsers }: Props) {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <p className="text-xs text-[#6A8E98]">
-          El asesor que conteste se asigna como Responsable en Kommo — mapeá cada extensión RC a su
-          usuario de Kommo.
+          El asesor que conteste se asigna automáticamente en el campo{" "}
+          <span className="text-[#94B3BB]">Responsable</span> de Kommo (match por nombre RC ↔ Kommo).
+          Ordená la lista por prioridad; se llama de arriba hacia abajo.
         </p>
         <button
           type="button"
@@ -463,7 +444,7 @@ export default function AsesoresConfig({ kommoUsers }: Props) {
                   <th className="w-6 px-4 py-2.5" />
                   <th className="text-left px-4 py-2.5 text-[#6A8E98] font-medium">Nombre</th>
                   <th className="text-left px-4 py-2.5 text-[#6A8E98] font-medium">Ext. RC</th>
-                  <th className="text-left px-4 py-2.5 text-[#6A8E98] font-medium">Usuario Kommo</th>
+                  <th className="text-left px-4 py-2.5 text-[#6A8E98] font-medium">Responsable (Kommo)</th>
                   <th className="text-left px-4 py-2.5 text-[#6A8E98] font-medium">Teléfono</th>
                   <th className="text-left px-4 py-2.5 text-[#6A8E98] font-medium">Estado</th>
                   <th className="w-20 px-4 py-2.5" />
@@ -472,7 +453,7 @@ export default function AsesoresConfig({ kommoUsers }: Props) {
               <tbody>
                 {adding && (
                   <AddRow
-                    kommoUsers={kommoUsers}
+                    responsableEnums={responsableEnums}
                     nextOrden={nextOrden}
                     onSaved={() => {
                       setAdding(false);
@@ -492,7 +473,7 @@ export default function AsesoresConfig({ kommoUsers }: Props) {
                     <AsesorRow
                       key={a.id}
                       asesor={a}
-                      kommoUsers={kommoUsers}
+                      responsableEnums={responsableEnums}
                       onSaved={load}
                       onDelete={handleDelete}
                     />

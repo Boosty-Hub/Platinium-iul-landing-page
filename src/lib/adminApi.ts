@@ -27,10 +27,16 @@ export interface KommoUser {
   email: string;
 }
 
+export interface KommoEnum {
+  id: number;
+  value: string;
+}
+
 export interface KommoField {
   id: number;
   name: string;
   type: string;
+  enums?: KommoEnum[];
 }
 
 export interface KommoMetadata {
@@ -48,6 +54,8 @@ export interface Asesor {
   rc_extension: string | null;
   telefono: string | null;
   kommo_user_id: string | null;
+  /** enum_id del campo SELECT "Responsable" de Kommo (asignación por nombre) */
+  kommo_responsable_enum_id: string | null;
   activo: boolean;
   orden: number;
 }

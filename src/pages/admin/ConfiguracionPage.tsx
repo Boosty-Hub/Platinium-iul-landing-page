@@ -204,7 +204,11 @@ export default function ConfiguracionPage() {
             title="Asesores"
             description="Equipo de asesores disponibles para atender llamadas."
           >
-            <AsesoresConfig kommoUsers={kommoMeta?.users ?? []} />
+            <AsesoresConfig
+              responsableEnums={
+                kommoMeta?.leadFields.find((f) => f.name.toLowerCase() === "responsable")?.enums ?? []
+              }
+            />
           </ConfigCard>
 
           <ConfigCard
