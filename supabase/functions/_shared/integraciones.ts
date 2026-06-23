@@ -50,7 +50,7 @@ export interface KommoCfg {
   subdominio: string; access_token: string;
   pipeline_id?: string; status_id?: string; responsable_id?: string;
   status_no_contactado_id?: string;          // etapa a la que mover tras 3 intentos fallidos
-  mapeo?: Record<string, string>;            // 'contact_<campo>'|'lead_<campo>' → id de custom field
+  mapeo?: Record<string, string> | string;   // objeto o string JSON: '<campo>' → '<entity>:<fieldId>'
 }
 
 function kommoBase(cfg: KommoCfg) { return `https://${cfg.subdominio}.kommo.com/api/v4`; }
@@ -66,15 +66,26 @@ export async function kommoTest(cfg: KommoCfg) {
   return { id: acc.id, name: acc.name, subdomain: acc.subdomain };
 }
 
+// Edad calculada a partir del año de nacimiento (el formulario solo pide el año).
+// Aproximada (sin mes/día): edad ≈ año actual − año de nacimiento.
+export function computeEdad(anio?: number | null): number | null {
+  if (anio == null) return null;
+  const y = Number(anio);
+  if (!Number.isFinite(y) || y < 1900) return null;
+  const edad = new Date().getFullYear() - y;
+  return edad > 0 && edad < 130 ? edad : null;
+}
+
 // Nota formateada con TODA la data del lead (siempre funciona, no depende de custom fields).
 export function kommoBuildNote(lead: LeadData): string {
   const L = (k: string, v: unknown) => (v != null && String(v).trim() !== "" ? `${k}: ${v}\n` : "");
+  const edad = lead.edad ?? computeEdad(lead.anio_nacimiento);
   let t = "📋 LEAD WEB — Platinium IUL\n──────────────────────\n";
   t += L("👤 Nombre", lead.nombre);
   t += L("📞 Teléfono", lead.telefono);
   t += L("✉️ Email", lead.email);
   t += L("💬 Interés", lead.interes);
-  t += L("🎂 Año nacimiento", lead.anio_nacimiento);
+  t += L("🎂 Edad", edad != null ? `${edad} años${lead.anio_nacimiento ? ` (nac. ${lead.anio_nacimiento})` : ""}` : null);
   t += L("💵 Ahorro semanal", lead.ahorro_semanal);
   t += L("⚧ Género", lead.genero);
   t += L("📍 Ubicación", [lead.city, lead.region].filter(Boolean).join(", "));
@@ -99,7 +110,15 @@ export async function kommoAddNote(cfg: KommoCfg, leadId: string, text: string) 
 
 // Crea el lead + contacto con TODA la data: campos estándar + custom fields mapeados + nota.
 export async function kommoCreateLead(cfg: KommoCfg, lead: LeadData) {
-  const mapeo = cfg.mapeo ?? {};
+  // El dashboard guarda `mapeo` como string JSON; aceptamos string u objeto.
+  let mapeo: Record<string, string> = {};
+  if (typeof cfg.mapeo === "string") {
+    try { mapeo = JSON.parse(cfg.mapeo) || {}; } catch { mapeo = {}; }
+  } else if (cfg.mapeo && typeof cfg.mapeo === "object") {
+    mapeo = cfg.mapeo as Record<string, string>;
+  }
+  // Enriquecemos con la edad calculada para que sea mapeable y aparezca en la nota.
+  const enriched: LeadData = { ...lead, edad: lead.edad ?? computeEdad(lead.anio_nacimiento) };
   const contactCF: Record<string, unknown>[] = [
     { field_code: "PHONE", values: [{ value: lead.telefono, enum_code: "WORK" }] },
     { field_code: "EMAIL", values: [{ value: lead.email, enum_code: "WORK" }] },
@@ -109,7 +128,7 @@ export async function kommoCreateLead(cfg: KommoCfg, lead: LeadData) {
   // El dashboard arma estas claves desde los dropdowns de Kommo (por nombre, sin IDs visibles).
   for (const [ourField, target] of Object.entries(mapeo)) {
     const [entity, fid] = String(target).split(":");
-    const val = (lead as unknown as Record<string, unknown>)[ourField];
+    const val = (enriched as unknown as Record<string, unknown>)[ourField];
     if (!fid || val == null || String(val).trim() === "") continue;
     const cf = { field_id: Number(fid), values: [{ value: String(val) }] };
     if (entity === "contact") contactCF.push(cf); else leadCF.push(cf);
@@ -136,7 +155,7 @@ export async function kommoCreateLead(cfg: KommoCfg, lead: LeadData) {
 
   // Nota con toda la data (best-effort, no rompe la creación si falla)
   if (kommoLeadId) {
-    try { await kommoAddNote(cfg, String(kommoLeadId), kommoBuildNote(lead)); }
+    try { await kommoAddNote(cfg, String(kommoLeadId), kommoBuildNote(enriched)); }
     catch (e) { console.error("kommoCreateLead/note:", (e as Error).message); }
   }
   return { kommoLeadId: kommoLeadId ? String(kommoLeadId) : null };
@@ -201,7 +220,7 @@ export async function rcRingOut(cfg: RCCfg, toNumber: string) {
 // ── Orquestador: lead → Kommo → RingCentral ──────────────────────────────────
 export interface LeadData {
   id: string; nombre: string; telefono: string; email: string;
-  interes?: string | null; anio_nacimiento?: number | null; ahorro_semanal?: string | null;
+  interes?: string | null; anio_nacimiento?: number | null; edad?: number | null; ahorro_semanal?: string | null;
   genero?: string | null; city?: string | null; region?: string | null;
   utm_source?: string | null; utm_medium?: string | null; utm_campaign?: string | null;
   utm_content?: string | null; utm_term?: string | null;

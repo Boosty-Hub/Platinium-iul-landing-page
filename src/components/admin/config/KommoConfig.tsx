@@ -27,6 +27,7 @@ interface Props {
 // Our fields to map → Kommo fields
 const OUR_FIELDS: { label: string; key: string }[] = [
   { label: "Interés", key: "interes" },
+  { label: "Edad (calculada)", key: "edad" },
   { label: "Año nacimiento", key: "anio_nacimiento" },
   { label: "Ahorro semanal", key: "ahorro_semanal" },
   { label: "Género", key: "genero" },
