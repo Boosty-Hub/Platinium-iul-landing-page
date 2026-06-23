@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { procesarLead } from "../_shared/integraciones.ts";
+import { enqueueLead, processCallQueueTick } from "../_shared/call_engine.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -180,12 +180,18 @@ serve(async (req) => {
       );
     }
 
-    // Procesar en background: crear en Kommo + llamada RingOut. No bloquea la respuesta.
+    // Background: crear en Kommo + encolar la llamada, y disparar el motor de una
+    // (si está en horario llama ya; si no, queda agendado). No bloquea la respuesta.
     try {
       // @ts-ignore EdgeRuntime existe en el runtime de Supabase Edge
       EdgeRuntime.waitUntil(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        procesarLead(supabase, { id: leadId, ...leadData, city, region } as any),
+        (async () => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await enqueueLead(supabase, { id: leadId, ...leadData, city, region } as any);
+          await processCallQueueTick(supabase, { maxItems: 1 }).catch((e) =>
+            console.error("motor de llamadas:", e),
+          );
+        })(),
       );
     } catch (e) {
       console.error("No se pudo agendar el procesamiento del lead:", e);
