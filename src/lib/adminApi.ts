@@ -212,3 +212,64 @@ export async function saveHorario(cfg: Horario): Promise<void> {
     true
   );
 }
+
+// ── Asesor user management (via manage-users edge fn) ───────────────────────
+
+export interface AsesorUser {
+  user_id: string;
+  email: string;
+  rol: string;
+  activo: boolean;
+  creado_en: string;
+  asesor_id: string | null;
+  asesores: {
+    id: string;
+    nombre: string;
+    rc_extension: string | null;
+  } | null;
+}
+
+export async function listAsesorUsers(): Promise<AsesorUser[]> {
+  const { data, error } = await (supabase as any).functions.invoke("manage-users", {
+    body: { action: "list" },
+  });
+  if (error) throw new Error(error.message ?? "Error invocando manage-users");
+  const result = data as { ok: boolean; data?: AsesorUser[]; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "manage-users devolvió error");
+  return result.data ?? [];
+}
+
+export async function createAsesorUser(
+  email: string,
+  password: string,
+  asesor_id: string
+): Promise<{ user_id: string }> {
+  const { data, error } = await (supabase as any).functions.invoke("manage-users", {
+    body: { action: "create", email, password, asesor_id },
+  });
+  if (error) throw new Error(error.message ?? "Error invocando manage-users");
+  const result = data as { ok: boolean; user_id?: string; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "manage-users devolvió error");
+  return { user_id: result.user_id! };
+}
+
+export async function updateAsesorUser(
+  user_id: string,
+  updates: { asesor_id?: string; activo?: boolean }
+): Promise<void> {
+  const { data, error } = await (supabase as any).functions.invoke("manage-users", {
+    body: { action: "update", user_id, ...updates },
+  });
+  if (error) throw new Error(error.message ?? "Error invocando manage-users");
+  const result = data as { ok: boolean; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "manage-users devolvió error");
+}
+
+export async function deactivateAsesorUser(user_id: string): Promise<void> {
+  const { data, error } = await (supabase as any).functions.invoke("manage-users", {
+    body: { action: "deactivate", user_id },
+  });
+  if (error) throw new Error(error.message ?? "Error invocando manage-users");
+  const result = data as { ok: boolean; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "manage-users devolvió error");
+}

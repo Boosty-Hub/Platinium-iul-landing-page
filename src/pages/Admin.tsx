@@ -7,6 +7,7 @@ const LeadsPage = lazy(() => import("./admin/LeadsPage"));
 const AnalyticsPage = lazy(() => import("./admin/AnalyticsPage"));
 const ConfiguracionPage = lazy(() => import("./admin/ConfiguracionPage"));
 const LlamadasPage = lazy(() => import("./admin/LlamadasPage"));
+const UsuariosPage = lazy(() => import("./admin/UsuariosPage"));
 
 export default function Admin() {
   return (
@@ -35,6 +36,14 @@ export default function Admin() {
             element={
               <Suspense fallback={<div className="h-48" />}>
                 <LlamadasPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="usuarios"
+            element={
+              <Suspense fallback={<div className="h-48" />}>
+                <UsuariosPage />
               </Suspense>
             }
           />

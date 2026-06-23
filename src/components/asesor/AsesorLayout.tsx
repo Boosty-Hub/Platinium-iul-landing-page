@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, BarChart2, Settings, LogOut, Menu, X, PhoneCall, UserCog } from "lucide-react";
+import { Monitor, Users, Clock, LogOut, Menu, X } from "lucide-react";
 
 const NAV_ITEMS = [
-  { to: "leads", label: "Leads", icon: Users },
-  { to: "analytics", label: "Analítica", icon: BarChart2 },
-  { to: "llamadas", label: "Llamadas", icon: PhoneCall },
-  { to: "usuarios", label: "Usuarios", icon: UserCog },
-  { to: "configuracion", label: "Configuración", icon: Settings },
+  { to: "cockpit", label: "Cockpit", icon: Monitor },
+  { to: "mis-leads", label: "Mis Leads", icon: Users },
+  { to: "historial", label: "Historial", icon: Clock },
 ] as const;
 
-export default function AdminLayout() {
+export default function AsesorLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -27,7 +25,7 @@ export default function AdminLayout() {
         <img src="/logo.png" alt="Platinium" className="h-9 w-9 object-contain flex-shrink-0" />
         <div className="min-w-0">
           <div className="font-bold text-[#E4EEF0] text-sm leading-tight truncate">Platinium IUL</div>
-          <div className="text-[11px] text-[#6A8E98] truncate">Panel de administración</div>
+          <div className="text-[11px] text-[#6A8E98] truncate">Panel de asesor</div>
         </div>
       </div>
 
@@ -82,7 +80,7 @@ export default function AdminLayout() {
           <Menu className="w-5 h-5" />
         </button>
         <img src="/logo.png" alt="Platinium" className="h-7 w-7 object-contain" />
-        <span className="font-bold text-[#E4EEF0] text-sm">Admin</span>
+        <span className="font-bold text-[#E4EEF0] text-sm">Asesor</span>
       </div>
 
       {/* Mobile drawer overlay */}
