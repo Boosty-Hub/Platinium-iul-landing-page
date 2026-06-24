@@ -10,7 +10,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Radio, WifiOff, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getCurrentAsesorId, updatePresence } from "@/lib/asesorApi";
+import { getCurrentAsesorId, updatePresence, getMyNombre } from "@/lib/asesorApi";
 import IncomingCallPopup from "@/components/asesor/IncomingCallPopup";
 import type { IncomingCallPayload } from "@/components/asesor/IncomingCallPopup";
 import SeguimientoReminder from "@/components/asesor/SeguimientoReminder";
@@ -39,6 +39,13 @@ export default function CockpitPage() {
 
   // T1: null = aún no sabemos / true = con sesión / false = sin sesión
   const [softphoneReady, setSoftphoneReady] = useState<boolean | null>(null);
+
+  // Nombre de la asesora — para saludarla y que vea que es SU panel.
+  const [nombre, setNombre] = useState<string | null>(null);
+  useEffect(() => {
+    getMyNombre().then(setNombre).catch(() => {});
+  }, []);
+  const primerNombre = nombre?.split(" ")[0] ?? null;
 
   // T3: onboarding
   const [mostrarOnboarding, setMostrarOnboarding] = useState<boolean>(
@@ -175,7 +182,9 @@ export default function CockpitPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-[#E4EEF0]">Mi Cockpit</h1>
+        <h1 className="text-2xl font-bold text-[#E4EEF0]">
+          {primerNombre ? `Hola, ${primerNombre} 👋` : "Mi Cockpit"}
+        </h1>
         <p className="text-sm text-[#94B3BB] mt-1">Tu centro de llamadas</p>
       </div>
 

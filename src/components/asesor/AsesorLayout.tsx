@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { getMyNombre } from "@/lib/asesorApi";
 import { Monitor, Users, Clock, LogOut, Menu, X } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -11,7 +12,14 @@ const NAV_ITEMS = [
 
 export default function AsesorLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [nombre, setNombre] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // Nombre de la asesora — para que vea que es SU panel.
+  useEffect(() => {
+    getMyNombre().then(setNombre).catch(() => {});
+  }, []);
+  const primerNombre = nombre?.split(" ")[0] ?? null;
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -25,7 +33,7 @@ export default function AsesorLayout() {
         <img src="/logo.png" alt="Platinium" className="h-9 w-9 object-contain flex-shrink-0" />
         <div className="min-w-0">
           <div className="font-bold text-[#E4EEF0] text-sm leading-tight truncate">Platinium IUL</div>
-          <div className="text-[11px] text-[#6A8E98] truncate">Panel de asesor</div>
+          <div className="text-[11px] text-[#1d9fa9] truncate font-medium">{nombre ?? "Panel de asesor"}</div>
         </div>
       </div>
 
@@ -80,7 +88,7 @@ export default function AsesorLayout() {
           <Menu className="w-5 h-5" />
         </button>
         <img src="/logo.png" alt="Platinium" className="h-7 w-7 object-contain" />
-        <span className="font-bold text-[#E4EEF0] text-sm">Asesor</span>
+        <span className="font-bold text-[#E4EEF0] text-sm">{primerNombre ?? "Asesor"}</span>
       </div>
 
       {/* Mobile drawer overlay */}

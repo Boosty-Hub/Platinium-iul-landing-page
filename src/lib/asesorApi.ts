@@ -14,6 +14,22 @@ export async function getCurrentAsesorId(): Promise<string | null> {
   return data as string | null;
 }
 
+/** Nombre de la asesora autenticada (lee su propia fila vía RLS asesores_asesor_select). */
+export async function getMyNombre(): Promise<string | null> {
+  const id = await getCurrentAsesorId();
+  if (!id) return null;
+  const { data, error } = await (supabase as any)
+    .from("asesores")
+    .select("nombre")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) {
+    console.error("getMyNombre:", error.message);
+    return null;
+  }
+  return (data?.nombre as string) ?? null;
+}
+
 /**
  * Updates advisor presence.
  * @param disponible - true = available, false = unavailable. Omit to just refresh heartbeat.
