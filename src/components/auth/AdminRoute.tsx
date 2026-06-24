@@ -3,7 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-type Status = "loading" | "anon" | "denied" | "ok";
+type Status = "loading" | "anon" | "denied" | "asesor" | "ok";
 
 /**
  * Gate para los paneles internos (/form-panel, /analytics).
@@ -26,9 +26,14 @@ export function AdminRoute({ children }: { children: ReactNode }) {
         if (active) setStatus("anon");
         return;
       }
-      const { data, error } = await (supabase as any).rpc("is_sistema_user");
+      // Solo ADMIN entra al panel de administración. Los asesores tienen su
+      // propio espacio en /asesor/* (gate AsesorRoute con is_asesor()).
+      const { data: isAdmin } = await (supabase as any).rpc("is_admin");
       if (!active) return;
-      setStatus(!error && data === true ? "ok" : "denied");
+      if (isAdmin === true) { setStatus("ok"); return; }
+      const { data: isAsesor } = await (supabase as any).rpc("is_asesor");
+      if (!active) return;
+      setStatus(isAsesor === true ? "asesor" : "denied");
     };
 
     supabase.auth.getSession().then(({ data }) => evaluate(data.session));
@@ -50,6 +55,10 @@ export function AdminRoute({ children }: { children: ReactNode }) {
 
   if (status === "anon") {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  if (status === "asesor") {
+    return <Navigate to="/asesor/cockpit" replace />;
   }
 
   if (status === "denied") {

@@ -1,7 +1,16 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Helmet } from "react-helmet-async";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+
+// Resuelve la pantalla de inicio según el rol del usuario.
+async function resolveLanding(): Promise<string | null> {
+  const { data: isAdmin } = await (supabase as any).rpc("is_admin");
+  if (isAdmin === true) return "/admin/leads";
+  const { data: isAsesor } = await (supabase as any).rpc("is_asesor");
+  if (isAsesor === true) return "/asesor/cockpit";
+  return null; // sin rol del sistema
+}
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -9,15 +18,16 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = (location.state as { from?: string } | null)?.from ?? "/form-panel";
 
-  // Si ya hay sesión, no mostrar el login.
+  // Si ya hay sesión, redirigir según rol (admin → /admin, asesor → /asesor).
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate(from, { replace: true });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      const dest = await resolveLanding();
+      if (dest) navigate(dest, { replace: true });
     });
-  }, [from, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -27,12 +37,19 @@ export default function Login() {
       email: email.trim(),
       password,
     });
-    setLoading(false);
     if (signInError) {
+      setLoading(false);
       setError("Credenciales inválidas. Verificá email y contraseña.");
       return;
     }
-    navigate(from, { replace: true });
+    const dest = await resolveLanding();
+    setLoading(false);
+    if (dest) {
+      navigate(dest, { replace: true });
+    } else {
+      await supabase.auth.signOut();
+      setError("Tu cuenta no tiene acceso al sistema.");
+    }
   };
 
   return (
