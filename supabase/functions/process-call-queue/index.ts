@@ -2,7 +2,7 @@
 // x-internal-secret) y también submit-lead al llegar un lead. Gate: secreto
 // interno HMAC-like O admin (JWT sub → usuarios_sistema rol=admin).
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { corsHeaders, adminClient, callerIsAdmin } from "../_shared/integraciones.ts";
+import { corsHeaders, adminClient } from "../_shared/integraciones.ts";
 import { processCallQueueTick } from "../_shared/call_engine.ts";
 
 const json = (body: unknown, status = 200) =>
@@ -14,7 +14,9 @@ serve(async (req) => {
   const admin = adminClient();
   const secret = req.headers.get("x-internal-secret");
   const internalOk = !!secret && secret === Deno.env.get("INTERNAL_TASK_SECRET");
-  if (!internalOk && !(await callerIsAdmin(req, admin))) {
+  // Solo-interno: lo dispara pg_cron (y submit-lead llama a la lógica directo).
+  // Sin path de usuario para no confiar en un JWT sin verificar firma.
+  if (!internalOk) {
     return json({ error: "No autorizado" }, 403);
   }
 
