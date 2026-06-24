@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { PhoneCall, RefreshCw, ChevronDown, ChevronRight, Mic } from "lucide-react";
-import { listAsesores } from "@/lib/adminApi";
+import { PhoneCall, RefreshCw, ChevronDown, ChevronRight, Mic, PhoneIncoming, PhoneOutgoing, Check } from "lucide-react";
+import { listAsesores, getRecordingUrl } from "@/lib/adminApi";
 import { humanUltimoResultado, TIPO_LABELS, fmtDuration } from "@/lib/labels";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -48,17 +48,16 @@ interface CallQueue {
 
 interface CallAttempt {
   id: string;
-  call_queue_id: string | null;
-  lead_id: string | null;
   asesor_id: string | null;
   tipo: string | null;
-  rc_session_id: string | null;
   estado: AttemptEstado;
+  outcome: string | null;
   inicio_at: string | null;
-  fin_at: string | null;
+  ring_time_sec: number | null;
+  talk_time_sec: number | null;
   duracion_seg: number | null;
   recording_url: string | null;
-  kommo_call_id: string | null;
+  recording_storage_path: string | null;
   notas: string | null;
   created_at: string;
 }
@@ -106,7 +105,65 @@ function AttemptBadge({ estado }: { estado: AttemptEstado }) {
 
 // ─── Attempt list ──────────────────────────────────────────────────────────────
 
-function AttemptsPanel({ leadId }: { leadId: string }) {
+// Resultado humano y claro de cada intento (qué pasó exactamente).
+function attemptResult(a: CallAttempt): { label: string; cls: string } {
+  switch (a.outcome) {
+    case "contactado": return { label: "Contactado", cls: "text-emerald-400" };
+    case "advisor_no_answer": return { label: "El asesor no contestó", cls: "text-yellow-400" };
+    case "client_no_answer": return { label: "Atendió el asesor — el cliente no contestó", cls: "text-orange-400" };
+    case "voicemail": return { label: "Buzón de voz del cliente", cls: "text-[#94B3BB]" };
+    case "failed": return { label: "Falló la llamada", cls: "text-red-400" };
+    case "cancelled": return { label: "Cancelada", cls: "text-[#6A8E98]" };
+  }
+  switch (a.estado) {
+    case "completed":
+    case "client_answered": return { label: "Contactado", cls: "text-emerald-400" };
+    case "advisor_answered": return { label: "Asesor contestó", cls: "text-[#1d9fa9]" };
+    case "no_answer": return { label: "El asesor no contestó", cls: "text-yellow-400" };
+    case "voicemail": return { label: "Buzón de voz", cls: "text-[#94B3BB]" };
+    case "busy": return { label: "Ocupado", cls: "text-orange-400" };
+    case "failed": return { label: "Falló", cls: "text-red-400" };
+    case "initiated": return { label: "Llamando…", cls: "text-blue-400" };
+  }
+  return { label: a.notas ?? "—", cls: "text-[#94B3BB]" };
+}
+
+// ¿El asesor atendió ese intento?
+function asesorAtendio(a: CallAttempt): boolean {
+  return a.outcome === "contactado" || a.outcome === "client_no_answer" || a.outcome === "voicemail" ||
+    a.estado === "advisor_answered" || a.estado === "client_answered" || a.estado === "completed";
+}
+
+// Dirección: entrante = el sistema le marca al asesor (automática); saliente = el asesor llama.
+function tipoInfo(tipo: string | null): { label: string; entrante: boolean } {
+  return tipo === "direct" ? { label: "Saliente", entrante: false } : { label: "Entrante", entrante: true };
+}
+
+const mmss = (s: number | null) => (s == null ? "—" : fmtDuration(s));
+
+// Reproductor de grabación bajo demanda (firma la URL al tocar "Escuchar").
+function RecordingCell({ attemptId, hasRecording }: { attemptId: string; hasRecording: boolean }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [rloading, setRloading] = useState(false);
+  if (!hasRecording) return <span className="text-[#6A8E98]">—</span>;
+  if (url) {
+    // eslint-disable-next-line jsx-a11y/media-has-caption
+    return <audio controls src={url} className="h-6 w-36 min-w-0" preload="none" />;
+  }
+  return (
+    <button
+      onClick={async () => {
+        setRloading(true);
+        try { setUrl(await getRecordingUrl(attemptId)); } catch { /* ignore */ } finally { setRloading(false); }
+      }}
+      className="inline-flex items-center gap-1 text-[#1d9fa9] hover:underline"
+    >
+      <Mic className="w-3 h-3" /> {rloading ? "Cargando…" : "Escuchar"}
+    </button>
+  );
+}
+
+function AttemptsPanel({ leadId, asesores }: { leadId: string; asesores: Record<string, string> }) {
   const [attempts, setAttempts] = useState<CallAttempt[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -114,9 +171,9 @@ function AttemptsPanel({ leadId }: { leadId: string }) {
     let cancelled = false;
     (supabase as any)
       .from("call_attempts")
-      .select("*")
+      .select("id,asesor_id,tipo,estado,outcome,inicio_at,ring_time_sec,talk_time_sec,duracion_seg,recording_url,recording_storage_path,notas,created_at")
       .eq("lead_id", leadId)
-      .order("created_at")
+      .order("inicio_at", { ascending: true })
       .then(({ data, error }: { data: CallAttempt[] | null; error: Error | null }) => {
         if (cancelled) return;
         if (!error && data) setAttempts(data);
@@ -126,80 +183,85 @@ function AttemptsPanel({ leadId }: { leadId: string }) {
   }, [leadId]);
 
   if (loading) {
-    return (
-      <div className="px-6 py-4 text-[#6A8E98] text-sm animate-pulse">Cargando intentos…</div>
-    );
+    return <div className="px-6 py-4 text-[#6A8E98] text-sm animate-pulse">Cargando trazabilidad…</div>;
+  }
+  if (attempts.length === 0) {
+    return <div className="px-6 py-4 text-[#6A8E98] text-sm">Todavía no se marcó a este lead.</div>;
   }
 
-  if (attempts.length === 0) {
-    return (
-      <div className="px-6 py-4 text-[#6A8E98] text-sm">No hay intentos registrados aún.</div>
-    );
+  // ── Resumen de trazabilidad del lead ──
+  const dialCounts = new Map<string, number>();
+  let answeredBy: string | null = null;
+  let contactado = false;
+  let talkSec = 0;
+  for (const a of attempts) {
+    if (a.asesor_id) dialCounts.set(a.asesor_id, (dialCounts.get(a.asesor_id) ?? 0) + 1);
+    if (asesorAtendio(a)) answeredBy = a.asesor_id ? (asesores[a.asesor_id] ?? "un asesor") : "un asesor";
+    if (a.outcome === "contactado") { contactado = true; talkSec += a.talk_time_sec ?? 0; }
   }
+  const dialSummary = [...dialCounts.entries()].map(([id, n]) => `${asesores[id] ?? "—"} ×${n}`).join("  ·  ");
 
   return (
     <div className="px-4 pb-4 pt-2">
+      {/* Resumen: a quién sonó, cuántas veces, quién atendió */}
+      <div className="mb-3 rounded-lg border border-[#1d9fa9]/15 bg-[#0B1A1E]/50 px-4 py-3 text-xs flex flex-wrap items-center gap-x-5 gap-y-1.5">
+        <span className="text-[#94B3BB]"><b className="text-[#E4EEF0]">{attempts.length}</b> marcación(es)</span>
+        {dialSummary && (
+          <span className="text-[#94B3BB]">Sonó a: <span className="text-[#E4EEF0]">{dialSummary}</span></span>
+        )}
+        {answeredBy ? (
+          <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">
+            <Check className="w-3.5 h-3.5" /> Atendió {answeredBy}
+            {contactado ? ` · habló ${fmtDuration(talkSec)}` : " (el cliente no contestó)"}
+          </span>
+        ) : (
+          <span className="text-yellow-400/80">Ningún asesor atendió todavía</span>
+        )}
+      </div>
+
       <div className="rounded-lg border border-[#1d9fa9]/10 overflow-hidden">
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-[#1d9fa9]/10 bg-[#0B1A1E]/60">
               <th className="text-left px-3 py-2 text-[#6A8E98] font-medium">Fecha</th>
               <th className="text-left px-3 py-2 text-[#6A8E98] font-medium">Tipo</th>
-              <th className="text-left px-3 py-2 text-[#6A8E98] font-medium">Estado</th>
-              <th className="text-left px-3 py-2 text-[#6A8E98] font-medium">Duración</th>
+              <th className="text-left px-3 py-2 text-[#6A8E98] font-medium">Asesor</th>
+              <th className="text-left px-3 py-2 text-[#6A8E98] font-medium">Resultado</th>
+              <th className="text-left px-3 py-2 text-[#6A8E98] font-medium">Timbró</th>
+              <th className="text-left px-3 py-2 text-[#6A8E98] font-medium">Conversación</th>
               <th className="text-left px-3 py-2 text-[#6A8E98] font-medium">Grabación</th>
-              <th className="text-left px-3 py-2 text-[#6A8E98] font-medium">Notas</th>
+              <th className="text-left px-3 py-2 text-[#6A8E98] font-medium">Nota</th>
             </tr>
           </thead>
           <tbody>
-            {attempts.map((a, idx) => (
-              <tr
-                key={a.id}
-                className={`border-b border-[#1d9fa9]/10 last:border-0 ${idx % 2 === 0 ? "" : "bg-[#0B1A1E]/20"}`}
-              >
-                <td className="px-3 py-2.5 text-[#94B3BB] whitespace-nowrap">
-                  {a.inicio_at
-                    ? new Date(a.inicio_at).toLocaleString("es-US", {
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    : new Date(a.created_at).toLocaleString("es-US", {
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                </td>
-                <td className="px-3 py-2.5 text-[#94B3BB] capitalize">{TIPO_LABELS[a.tipo ?? ""] ?? a.tipo ?? "—"}</td>
-                <td className="px-3 py-2.5">
-                  <AttemptBadge estado={a.estado} />
-                </td>
-                <td className="px-3 py-2.5 text-[#94B3BB] whitespace-nowrap">
-                  {fmtDuration(a.duracion_seg)}
-                </td>
-                <td className="px-3 py-2.5">
-                  {a.recording_url ? (
-                    <div className="flex items-center gap-1.5">
-                      <Mic className="w-3 h-3 text-[#1d9fa9] flex-shrink-0" />
-                      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-                      <audio
-                        controls
-                        src={a.recording_url}
-                        className="h-6 w-36 min-w-0"
-                        preload="none"
-                      />
-                    </div>
-                  ) : (
-                    <span className="text-[#6A8E98]">—</span>
-                  )}
-                </td>
-                <td className="px-3 py-2.5 text-[#94B3BB] max-w-[160px] truncate">
-                  {a.notas ?? "—"}
-                </td>
-              </tr>
-            ))}
+            {attempts.map((a, idx) => {
+              const r = attemptResult(a);
+              const t = tipoInfo(a.tipo);
+              return (
+                <tr
+                  key={a.id}
+                  className={`border-b border-[#1d9fa9]/10 last:border-0 ${idx % 2 === 0 ? "" : "bg-[#0B1A1E]/20"}`}
+                >
+                  <td className="px-3 py-2.5 text-[#94B3BB] whitespace-nowrap">
+                    {new Date(a.inicio_at ?? a.created_at).toLocaleString("es-US", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                  </td>
+                  <td className="px-3 py-2.5">
+                    <span className="inline-flex items-center gap-1 text-[#94B3BB]" title={t.entrante ? "Marcada por el sistema" : "Marcada por el asesor"}>
+                      {t.entrante ? <PhoneIncoming className="w-3 h-3 text-[#1d9fa9]" /> : <PhoneOutgoing className="w-3 h-3 text-blue-400" />}
+                      {t.label}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2.5 text-[#E4EEF0] whitespace-nowrap">{a.asesor_id ? (asesores[a.asesor_id] ?? "—") : "—"}</td>
+                  <td className={`px-3 py-2.5 font-medium ${r.cls}`}>{r.label}</td>
+                  <td className="px-3 py-2.5 text-[#94B3BB] whitespace-nowrap">{mmss(a.ring_time_sec)}</td>
+                  <td className="px-3 py-2.5 text-[#94B3BB] whitespace-nowrap">{mmss(a.talk_time_sec)}</td>
+                  <td className="px-3 py-2.5">
+                    <RecordingCell attemptId={a.id} hasRecording={!!a.recording_storage_path || !!a.recording_url} />
+                  </td>
+                  <td className="px-3 py-2.5 text-[#94B3BB] max-w-[160px] truncate">{a.notas ?? "—"}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -377,7 +439,7 @@ export default function LlamadasPage() {
                       {isOpen && item.lead_id && (
                         <tr key={`${item.id}-attempts`} className="border-b border-[#1d9fa9]/10 bg-[#0B1A1E]/40">
                           <td colSpan={6} className="p-0">
-                            <AttemptsPanel leadId={item.lead_id} />
+                            <AttemptsPanel leadId={item.lead_id} asesores={asesores} />
                           </td>
                         </tr>
                       )}
@@ -424,7 +486,7 @@ export default function LlamadasPage() {
                   </button>
                   {isOpen && item.lead_id && (
                     <div className="border-t border-[#1d9fa9]/10">
-                      <AttemptsPanel leadId={item.lead_id} />
+                      <AttemptsPanel leadId={item.lead_id} asesores={asesores} />
                     </div>
                   )}
                 </div>
