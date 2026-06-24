@@ -54,18 +54,23 @@ Una app de RingCentral solo puede tener **un** método de autenticación (JWT **
 
 **La app del softphone (SPA) necesita:**
 - Tipo: *Client-side web app (SPA, JavaScript)* + *3-legged OAuth (authorization code)*
-- **Redirect URIs** (agregar TODAS las que se usen — first-party, en NUESTRO dominio):
-  - `https://platiniuminsuranceusa.com/rc-redirect.html`  ← producción
-  - `http://localhost:8080/rc-redirect.html`  ← pruebas locales
-  - `https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/redirect.html`  ← dejar también (fallback)
+- **Redirect URI**: `https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/redirect.html`
+  (config ESTÁNDAR soportada: la librería del Embeddable y el redirect deben estar en el
+  MISMO dominio — el de RingCentral. Usar un redirect propio exige self-hostear toda la
+  librería en nuestro dominio, que RC marca como *"not recommended"*.)
 - Scopes: **Read Accounts, RingOut, VoIP Calling, Read Call Log, Read Presence**
 - *Interactive Messages* y demás features de App Features: **dejar apagados** (no se usan).
 
-> ⚠️ **"Login failed due to internal errors" al hacer Sign In**: pasa cuando el redirect
-> es el de RingCentral (tercero) y el popup no logra devolverle la sesión al widget
-> (cookies/ventanas de terceros). **Fix (ya aplicado en código)**: el app usa un redirect
-> en NUESTRO dominio (`/rc-redirect.html`, servido desde `public/`). Solo falta **registrar
-> esas Redirect URIs de arriba en el app de RC** para que funcione.
+> ⚠️ **"Login failed due to internal errors" al hacer Sign In** (con la config estándar):
+> el login completo funciona (probado: pasa credenciales + 2FA + Emergency Calling), pero
+> el widget (iframe de `apps.ringcentral.com`, *tercero* respecto a nuestra app) **no puede
+> guardar la sesión** porque el navegador **bloquea el almacenamiento de terceros** (Chrome
+> lo hace por default). **Soluciones**:
+> 1. **Navegador**: permitir cookies de terceros (o excepción para `[*.]ringcentral.com`).
+> 2. **Robusta**: self-hostear el Embeddable completo en nuestro dominio (first-party).
+> 3. **Interina**: atender el audio en la app de escritorio/móvil de RingCentral; el resto
+>    (contexto del lead, disposición, Kommo, cotización) ya está en nuestra app.
+> Nota: el archivo `public/rc-redirect.html` queda para el día que se self-hostee.
 
 ---
 

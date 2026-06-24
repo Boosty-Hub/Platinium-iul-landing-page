@@ -131,12 +131,11 @@ export default function CockpitPage() {
     if (!RC_CLIENT_ID) return;
     if (document.querySelector(`script[data-rc-embeddable]`)) return;
 
-    // Redirect de OAuth en NUESTRO dominio (first-party) → evita el "Login failed
-    // due to internal errors" (handoff del popup al widget con cookies de terceros).
-    // Hay que registrar esta URL como Redirect URI en el app de RC.
-    const redirectUri = `${window.location.origin}/rc-redirect.html`;
+    // Config ESTÁNDAR soportada por RingCentral: librería + redirect ambos en
+    // apps.ringcentral.com (mismo dominio, requisito de RC). El redirect propio solo
+    // funciona si se self-hostea TODA la librería — ver docs/CONFIGURACION-RINGCENTRAL.md.
     const script = document.createElement("script");
-    script.src = `${RC_ADAPTER_SCRIPT}?clientId=${encodeURIComponent(RC_CLIENT_ID)}&appServer=https://platform.ringcentral.com&redirectUri=${encodeURIComponent(redirectUri)}`;
+    script.src = `${RC_ADAPTER_SCRIPT}?clientId=${encodeURIComponent(RC_CLIENT_ID)}&appServer=https://platform.ringcentral.com`;
     script.async = true;
     script.setAttribute("data-rc-embeddable", "true");
     document.body.appendChild(script);
