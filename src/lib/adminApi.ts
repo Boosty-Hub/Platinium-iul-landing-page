@@ -395,6 +395,8 @@ export type AdminOverview = {
   asesores: Array<{
     id: string;
     nombre: string;
+    cartera: number;
+    cartera_activa: number;
     dials: number;
     contactados: number;
     cotizaciones: number;

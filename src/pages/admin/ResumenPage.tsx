@@ -317,6 +317,9 @@ export default function ResumenPage() {
                         Asesor
                       </th>
                       <th className="text-right px-4 py-3 text-xs text-[#6A8E98] font-medium uppercase tracking-wider">
+                        Cartera
+                      </th>
+                      <th className="text-right px-4 py-3 text-xs text-[#6A8E98] font-medium uppercase tracking-wider">
                         Marcaciones
                       </th>
                       <th className="text-right px-4 py-3 text-xs text-[#6A8E98] font-medium uppercase tracking-wider">
@@ -343,6 +346,12 @@ export default function ResumenPage() {
                         className="hover:bg-[#1d9fa9]/5 transition-colors"
                       >
                         <td className="px-6 py-3.5 text-[#E4EEF0] font-medium">{a.nombre}</td>
+                        <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                          <span className="text-[#E4EEF0] font-semibold">{a.cartera.toLocaleString()}</span>
+                          {a.cartera_activa > 0 && (
+                            <span className="text-[#6A8E98] text-xs"> · {a.cartera_activa} activos</span>
+                          )}
+                        </td>
                         <td className="px-4 py-3.5 text-right text-[#94B3BB]">
                           {a.dials.toLocaleString()}
                         </td>
