@@ -188,6 +188,20 @@ async function updAttempt(admin: Admin, id: string | null, patch: Record<string,
   await admin.from("call_attempts").update(patch).eq("id", id);
 }
 
+// Avisa al asesor que SU pop-up de llamada ya no aplica (no contestó → pasó al
+// siguiente, o el intento terminó). El Cockpit lo escucha y cierra el pop-up.
+// Fire-and-forget: nunca bloquea el loop.
+function broadcastCancel(admin: Admin, asesorId: string, attemptId: string | null, leadId: string) {
+  void (async () => {
+    try {
+      const ch = admin.channel("advisor:" + asesorId);
+      await ch.subscribe();
+      await ch.send({ type: "broadcast", event: "call_cancelled", payload: { attempt_id: attemptId, lead_id: leadId } });
+      await admin.removeChannel(ch);
+    } catch (e) { console.error("broadcast call_cancelled", e); }
+  })();
+}
+
 // ── Dial de un item de la cola ────────────────────────────────────────────────
 interface QueueItem {
   id: string; lead_id: string; kommo_lead_id: string | null;
@@ -353,6 +367,8 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
         outcome: "advisor_no_answer",
         ring_time_sec: ringTimeSec,
       });
+      // Cerrale el pop-up a ESTE asesor (no contestó); el motor pasa al siguiente.
+      broadcastCancel(admin, asesor.id, attemptId, item.lead_id);
       continue; // siguiente asesor
     }
 
@@ -393,8 +409,9 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
       return { lead: item.lead_id, action: "contactado", asesor: asesor.nombre };
     }
 
-    // asesor contestó pero el cliente no
+    // asesor contestó pero el cliente no → el intento terminó, cerrale su pop-up
     await rcRingOutCancel(rc, token, ringoutId);
+    broadcastCancel(admin, asesor.id, attemptId, item.lead_id);
     const voicemail = cli === "Voicemail";
     await updAttempt(admin, attemptId, {
       estado: voicemail ? "voicemail" : "no_answer",

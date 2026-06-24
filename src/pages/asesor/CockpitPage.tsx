@@ -100,6 +100,15 @@ export default function CockpitPage() {
       setIncomingCall(payload as IncomingCallPayload);
     });
 
+    // El motor avisa que esta llamada ya no es para este asesor (no contestó →
+    // pasó al siguiente, o el intento terminó): cerramos su pop-up.
+    channel.on("broadcast", { event: "call_cancelled" }, ({ payload }) => {
+      const p = payload as { attempt_id: string | null; lead_id: string | null };
+      setIncomingCall((cur) =>
+        cur && (cur.attempt_id === p.attempt_id || cur.lead_id === p.lead_id) ? null : cur,
+      );
+    });
+
     channel.on("broadcast", { event: "seguimiento_reminder" }, ({ payload }) => {
       setSeguimientoReminder(payload as SeguimientoReminderPayload);
     });
