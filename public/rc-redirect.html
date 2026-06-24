@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RingCentral</title>
+  </head>
+  <body>
+    <!--
+      Redirect de OAuth del softphone RingCentral Embeddable, servido desde NUESTRO
+      dominio (first-party). Esto evita el "Login failed due to internal errors":
+      el popup de login vuelve a esta página (mismo dominio que la app) y redirect.js
+      le pasa la sesión al widget sin problemas de cookies/ventanas de terceros.
+      Hay que registrar esta URL como Redirect URI en el app de RC (XAECTYxr...).
+    -->
+    <script src="https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/redirect.js"></script>
+  </body>
+</html>

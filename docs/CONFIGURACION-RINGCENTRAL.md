@@ -54,9 +54,18 @@ Una app de RingCentral solo puede tener **un** método de autenticación (JWT **
 
 **La app del softphone (SPA) necesita:**
 - Tipo: *Client-side web app (SPA, JavaScript)* + *3-legged OAuth (authorization code)*
-- Redirect URI: `https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/redirect.html`
+- **Redirect URIs** (agregar TODAS las que se usen — first-party, en NUESTRO dominio):
+  - `https://platiniuminsuranceusa.com/rc-redirect.html`  ← producción
+  - `http://localhost:8080/rc-redirect.html`  ← pruebas locales
+  - `https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/redirect.html`  ← dejar también (fallback)
 - Scopes: **Read Accounts, RingOut, VoIP Calling, Read Call Log, Read Presence**
 - *Interactive Messages* y demás features de App Features: **dejar apagados** (no se usan).
+
+> ⚠️ **"Login failed due to internal errors" al hacer Sign In**: pasa cuando el redirect
+> es el de RingCentral (tercero) y el popup no logra devolverle la sesión al widget
+> (cookies/ventanas de terceros). **Fix (ya aplicado en código)**: el app usa un redirect
+> en NUESTRO dominio (`/rc-redirect.html`, servido desde `public/`). Solo falta **registrar
+> esas Redirect URIs de arriba en el app de RC** para que funcione.
 
 ---
 
