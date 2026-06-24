@@ -333,6 +333,54 @@ export async function getAdvisorScorecard(
   return data as AdvisorScorecard;
 }
 
+// ── Cotizaciones ─────────────────────────────────────────────────────────────
+
+export type CotizacionGenero = "MASCULINO" | "FEMENINO";
+
+export interface Cotizacion {
+  id: number;
+  genero: CotizacionGenero;
+  edad: number;
+  monto: number;
+  acum_10: number;
+  acum_20: number;
+  critica: number;
+  cronica: number;
+  terminal: number;
+  alzheimer: number;
+  beneficio_fallecimiento: number;
+  db_65: number;
+}
+
+export async function listCotizaciones(
+  genero: CotizacionGenero,
+  edad: number
+): Promise<Cotizacion[]> {
+  const { data, error } = await (supabase as any)
+    .from("cotizaciones")
+    .select("*")
+    .eq("genero", genero)
+    .eq("edad", edad)
+    .order("monto");
+  if (error) throw new Error(error.message ?? "Error cargando cotizaciones");
+  return (data as Cotizacion[]) ?? [];
+}
+
+export async function updateCotizacion(
+  genero: CotizacionGenero,
+  edad: number,
+  monto: number,
+  patch: Partial<Omit<Cotizacion, "id" | "genero" | "edad" | "monto">>
+): Promise<void> {
+  const { error } = await (supabase as any)
+    .from("cotizaciones")
+    .update(patch)
+    .eq("genero", genero)
+    .eq("edad", edad)
+    .eq("monto", monto);
+  if (error) throw new Error(error.message ?? "Error actualizando cotización");
+}
+
 // ── Recording URL (admin path) (Slice 3) ──────────────────────────────────────
 
 export async function getRecordingUrl(attempt_id: string): Promise<string> {

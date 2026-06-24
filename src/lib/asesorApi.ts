@@ -161,6 +161,34 @@ export async function updateLeadStage(lead_id: string, status_id: number): Promi
   if (!result.ok) throw new Error(result.error ?? "asesor-update-stage devolvió error");
 }
 
+// ── Cotización helpers ────────────────────────────────────────────────────────
+
+export async function previewCotizacion(
+  lead_id: string,
+  monto?: number
+): Promise<{ html: string; monto: number }> {
+  const body: Record<string, unknown> = { lead_id };
+  if (monto !== undefined) body.monto = monto;
+  const { data, error } = await (supabase as any).functions.invoke("preview-cotizacion", { body });
+  if (error) throw new Error(error.message ?? "Error invocando preview-cotizacion");
+  const result = data as { ok: boolean; html?: string; monto?: number; genero?: string; edad?: number; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "preview-cotizacion devolvió error");
+  return { html: result.html!, monto: result.monto! };
+}
+
+export async function sendCotizacion(
+  lead_id: string,
+  monto?: number
+): Promise<{ monto: number; to: string }> {
+  const body: Record<string, unknown> = { lead_id };
+  if (monto !== undefined) body.monto = monto;
+  const { data, error } = await (supabase as any).functions.invoke("send-cotizacion", { body });
+  if (error) throw new Error(error.message ?? "Error invocando send-cotizacion");
+  const result = data as { ok: boolean; monto?: number; to?: string; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "send-cotizacion devolvió error");
+  return { monto: result.monto!, to: result.to! };
+}
+
 export async function getKommoStages(): Promise<KommoStage[]> {
   const { data, error } = await (supabase as any).functions.invoke("kommo-stages", {
     body: {},
