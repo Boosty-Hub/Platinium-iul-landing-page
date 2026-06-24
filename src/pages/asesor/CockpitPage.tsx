@@ -1,8 +1,14 @@
 // CockpitPage — Slice 2 (presence, heartbeat, Realtime) + Slice 3 (RC Embeddable).
 // Slice 3: RC Embeddable softphone injected via useEffect when VITE_RC_CLIENT_ID is set.
 // Graceful gating: if clientId is missing, renders a friendly config card instead.
+//
+// Tareas adicionales:
+//   T1: detecta si el softphone tiene sesión iniciada vía window.postMessage (rc-login-status-notify)
+//   T2: tarjeta "¿Listo para recibir llamadas?" con 3 chequeos visuales
+//   T3: onboarding cálido de primera vez (PrimerosPasos)
+//   T4: errores en cristiano — nunca se muestra el mensaje crudo al asesor
 import { useEffect, useRef, useState } from "react";
-import { Radio, WifiOff, PhoneOff, ExternalLink } from "lucide-react";
+import { Radio, WifiOff, CheckCircle2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentAsesorId, updatePresence } from "@/lib/asesorApi";
 import IncomingCallPopup from "@/components/asesor/IncomingCallPopup";
@@ -11,10 +17,15 @@ import SeguimientoReminder from "@/components/asesor/SeguimientoReminder";
 import type { SeguimientoReminderPayload } from "@/components/asesor/SeguimientoReminder";
 import LeadDetailSheet from "@/components/asesor/LeadDetailSheet";
 import DispositionSheet from "@/components/asesor/DispositionSheet";
+import PrimerosPasos, { haVistoPrimerosPasos } from "@/components/asesor/PrimerosPasos";
 
 const HEARTBEAT_INTERVAL_MS = 30_000;
 const RC_CLIENT_ID = import.meta.env.VITE_RC_CLIENT_ID as string | undefined;
 const RC_ADAPTER_SCRIPT = "https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/adapter.js";
+
+// Mensaje amigable para el asesor cuando algo falla (nunca el texto técnico)
+const ERROR_DISPONIBILIDAD =
+  "No pudimos actualizar tu disponibilidad. Probá de nuevo en un momento.";
 
 export default function CockpitPage() {
   const [asesorId, setAsesorId] = useState<string | null>(null);
@@ -25,6 +36,15 @@ export default function CockpitPage() {
   const [seguimientoReminder, setSeguimientoReminder] = useState<SeguimientoReminderPayload | null>(null);
   const [openLeadId, setOpenLeadId] = useState<string | null>(null);
   const [dispositionLead, setDispositionLead] = useState<{ id: string; nombre: string } | null>(null);
+
+  // T1: null = aún no sabemos / true = con sesión / false = sin sesión
+  const [softphoneReady, setSoftphoneReady] = useState<boolean | null>(null);
+
+  // T3: onboarding
+  const [mostrarOnboarding, setMostrarOnboarding] = useState<boolean>(
+    !haVistoPrimerosPasos()
+  );
+
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
@@ -106,6 +126,20 @@ export default function CockpitPage() {
     };
   }, []);
 
+  // ── T1: Detectar si el softphone tiene sesión vía postMessage ────────────
+  useEffect(() => {
+    if (!RC_CLIENT_ID) return; // RC no configurado → no escuchamos
+
+    function onMsg(e: MessageEvent) {
+      const d = e.data;
+      if (d && typeof d === "object" && d.type === "rc-login-status-notify") {
+        setSoftphoneReady(!!d.loggedIn);
+      }
+    }
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
+  }, []);
+
   // ── Toggle availability ───────────────────────────────────────────────────
   const handleToggle = async () => {
     const next = !disponible;
@@ -115,11 +149,27 @@ export default function CockpitPage() {
       await updatePresence(next);
       setDisponible(next);
     } catch (e) {
-      setPresenceError((e as Error).message);
+      // T4: log técnico en consola, mensaje humano en UI
+      console.error("toggle presencia:", e);
+      setPresenceError(ERROR_DISPONIBILIDAD);
     } finally {
       setToggling(false);
     }
   };
+
+  // ── T2: Determinar estado de cada chequeo ────────────────────────────────
+  const sistemaOk = !!asesorId;
+
+  // El teléfono aplica solo cuando RC está configurado
+  const rcConfigurado = !!RC_CLIENT_ID;
+  // softphoneOk: true cuando RC está configurado Y el asesor inició sesión
+  const softphoneOk = rcConfigurado && softphoneReady === true;
+
+  const disponibilidadOk = disponible;
+
+  // Banner global: todo OK cuando sistema + disponibilidad están OK
+  // (si RC no está configurado, no bloqueamos el estado "todo listo")
+  const todoListo = sistemaOk && disponibilidadOk && (!rcConfigurado || softphoneOk);
 
   return (
     <div className="space-y-6">
@@ -129,92 +179,133 @@ export default function CockpitPage() {
         <p className="text-sm text-[#94B3BB] mt-1">Tu centro de llamadas</p>
       </div>
 
-      {/* Presence card */}
-      <div className="bg-[#0F2229] border border-[#1d9fa9]/20 rounded-2xl p-6">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="space-y-1">
-            <p className="text-sm font-semibold text-[#E4EEF0]">Disponibilidad</p>
-            <p className="text-xs text-[#6A8E98]">
-              {disponible
-                ? "Te llegarán las llamadas entrantes."
-                : "No recibirás llamadas en este momento."}
+      {/* T3: Onboarding de primera vez */}
+      {mostrarOnboarding && (
+        <PrimerosPasos onCerrar={() => setMostrarOnboarding(false)} />
+      )}
+
+      {/* T2: Tarjeta "¿Listo para recibir llamadas?" */}
+      <div className="bg-[#0F2229] border border-[#1d9fa9]/20 rounded-2xl p-6 space-y-5">
+        {/* Banner de estado global */}
+        {todoListo ? (
+          <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3">
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+            <p className="text-sm font-semibold text-emerald-300">
+              Todo listo. Las llamadas van a sonar acá y en tu teléfono.
             </p>
           </div>
-          <button
-            onClick={handleToggle}
-            disabled={toggling || !asesorId}
-            className={`flex items-center gap-2.5 px-6 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-              disponible
-                ? "bg-[#1d9fa9] hover:bg-[#1d9fa9]/80 text-white"
-                : "bg-[#0B1A1E] border border-[#1d9fa9]/40 text-[#94B3BB] hover:border-[#1d9fa9]/70 hover:text-[#E4EEF0]"
-            }`}
-          >
-            {disponible ? (
-              <><Radio className="w-4 h-4 animate-pulse" /> Disponible</>
-            ) : (
-              <><WifiOff className="w-4 h-4" /> No disponible</>
-            )}
-          </button>
-        </div>
-
-        {presenceError && (
-          <p className="mt-3 text-xs text-red-400">{presenceError}</p>
+        ) : (
+          <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3">
+            <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
+            <p className="text-sm font-semibold text-amber-300">
+              Te falta un paso para recibir llamadas
+            </p>
+          </div>
         )}
 
-        {/* Connection indicator */}
-        <div className="mt-4 flex items-center gap-2">
-          <span className={`inline-block w-2 h-2 rounded-full ${asesorId ? "bg-emerald-400 animate-pulse" : "bg-[#6A8E98]"}`} />
+        {/* Chequeo 1: Sistema */}
+        <div className="flex items-start gap-3">
+          {sistemaOk ? (
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+          ) : (
+            <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+          )}
+          <div>
+            <p className="text-sm font-semibold text-[#E4EEF0]">Sistema</p>
+            <p className="text-xs text-[#94B3BB] mt-0.5">
+              {sistemaOk
+                ? "Estás conectado."
+                : "Conectando con el sistema…"}
+            </p>
+          </div>
+        </div>
+
+        {/* Chequeo 2: Teléfono */}
+        <div className="flex items-start gap-3">
+          {!rcConfigurado ? (
+            <CheckCircle2 className="w-5 h-5 text-[#6A8E98] flex-shrink-0 mt-0.5" />
+          ) : softphoneOk ? (
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+          ) : (
+            <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+          )}
+          <div>
+            <p className="text-sm font-semibold text-[#E4EEF0]">Tu teléfono</p>
+            {!rcConfigurado ? (
+              <p className="text-xs text-[#6A8E98] mt-0.5">
+                Lo activa un administrador.
+              </p>
+            ) : softphoneOk ? (
+              <p className="text-xs text-[#94B3BB] mt-0.5">
+                Sesión iniciada. Tu teléfono está listo para recibir llamadas.
+              </p>
+            ) : (
+              <p className="text-xs text-amber-300/80 mt-0.5 leading-relaxed">
+                Iniciá sesión en tu teléfono: buscá el botón redondo abajo a la derecha de la pantalla, tocalo e ingresá una sola vez. Después queda listo siempre.
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Chequeo 3: Disponibilidad — integrado con el toggle */}
+        <div className="flex items-start gap-3">
+          {disponibilidadOk ? (
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+          ) : (
+            <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+          )}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-[#E4EEF0]">Disponibilidad</p>
+            {!disponibilidadOk && (
+              <p className="text-xs text-amber-300/80 mt-0.5">
+                Activá "Disponible" para empezar a recibir llamadas.
+              </p>
+            )}
+
+            {/* Toggle inline */}
+            <div className="mt-3">
+              <button
+                onClick={handleToggle}
+                disabled={toggling || !asesorId}
+                className={`flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                  disponible
+                    ? "bg-[#1d9fa9] hover:bg-[#1d9fa9]/80 text-white"
+                    : "bg-[#0B1A1E] border border-[#1d9fa9]/40 text-[#94B3BB] hover:border-[#1d9fa9]/70 hover:text-[#E4EEF0]"
+                }`}
+              >
+                {disponible ? (
+                  <><Radio className="w-4 h-4 animate-pulse" /> Disponible</>
+                ) : (
+                  <><WifiOff className="w-4 h-4" /> No disponible</>
+                )}
+              </button>
+            </div>
+
+            {/* T4: mensaje de error amigable (nunca el texto crudo) */}
+            {presenceError && (
+              <p className="mt-2 text-xs text-amber-300/80">{presenceError}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Indicador de conexión al sistema */}
+        <div className="flex items-center gap-2 pt-1">
+          <span
+            className={`inline-block w-2 h-2 rounded-full ${
+              asesorId ? "bg-emerald-400 animate-pulse" : "bg-[#6A8E98]"
+            }`}
+          />
           <span className="text-[11px] text-[#6A8E98]">
-            {asesorId ? "Conectado" : "Conectando…"}
+            {asesorId ? "Conectado al sistema" : "Conectando…"}
           </span>
         </div>
       </div>
-
-      {/* Softphone card */}
-      {RC_CLIENT_ID ? (
-        <div className="bg-[#0F2229] border border-[#1d9fa9]/20 rounded-2xl p-6">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1d9fa9]/15 flex items-center justify-center">
-              <Radio className="w-4 h-4 text-[#1d9fa9]" />
-            </div>
-            <div className="space-y-1 min-w-0">
-              <p className="text-sm font-semibold text-[#E4EEF0]">Teléfono integrado</p>
-              <p className="text-xs text-[#6A8E98]">
-                El softphone está activo. Buscá el icono flotante en la esquina de la pantalla para atender llamadas.
-              </p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-[#0F2229] border border-[#1d9fa9]/10 rounded-2xl p-6">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center">
-              <PhoneOff className="w-4 h-4 text-orange-400" />
-            </div>
-            <div className="space-y-1 min-w-0">
-              <p className="text-sm font-semibold text-[#94B3BB]">Teléfono no configurado</p>
-              <p className="text-xs text-[#6A8E98]">
-                Para activar el softphone, un administrador debe habilitarlo.
-              </p>
-              <a
-                href="/admin/configuracion"
-                className="inline-flex items-center gap-1 text-xs text-[#1d9fa9]/70 hover:text-[#1d9fa9] transition-colors mt-1"
-              >
-                <ExternalLink className="w-3 h-3" />
-                Ir a Configuración
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Incoming call pop-up */}
       {incomingCall && (
         <IncomingCallPopup
           payload={incomingCall}
           onClose={() => {
-            // Al colgar/cerrar la llamada entrante pedimos el resultado en el acto:
-            // así el asesor actualiza todo (etapa Kommo + nota + recontacto) sin olvidos.
             const lid = incomingCall.lead_id;
             const nombre = incomingCall.nombre ?? "este lead";
             setIncomingCall(null);
