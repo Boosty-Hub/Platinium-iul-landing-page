@@ -134,3 +134,39 @@ export async function submitCallNote(
   const result = data as { ok: boolean; error?: string };
   if (!result.ok) throw new Error(result.error ?? "kommo-note devolvió error");
 }
+
+// ── Direct call + stage management ───────────────────────────────────────────
+
+export interface KommoStage {
+  id: number;
+  name: string;
+}
+
+export async function callLead(lead_id: string): Promise<{ ok: boolean; status?: string }> {
+  const { data, error } = await (supabase as any).functions.invoke("asesor-call-lead", {
+    body: { lead_id },
+  });
+  if (error) throw new Error(error.message ?? "Error invocando asesor-call-lead");
+  const result = data as { ok: boolean; status?: string; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "asesor-call-lead devolvió error");
+  return result;
+}
+
+export async function updateLeadStage(lead_id: string, status_id: number): Promise<void> {
+  const { data, error } = await (supabase as any).functions.invoke("asesor-update-stage", {
+    body: { lead_id, status_id },
+  });
+  if (error) throw new Error(error.message ?? "Error invocando asesor-update-stage");
+  const result = data as { ok: boolean; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "asesor-update-stage devolvió error");
+}
+
+export async function getKommoStages(): Promise<KommoStage[]> {
+  const { data, error } = await (supabase as any).functions.invoke("kommo-stages", {
+    body: {},
+  });
+  if (error) throw new Error(error.message ?? "Error invocando kommo-stages");
+  const result = data as { ok: boolean; stages?: KommoStage[]; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "kommo-stages devolvió error");
+  return result.stages ?? [];
+}
