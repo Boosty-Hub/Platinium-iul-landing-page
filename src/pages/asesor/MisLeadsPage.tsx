@@ -1,6 +1,7 @@
 // MisLeadsPage — advisor's CRM list. Clean, no jargon, shadcn Select for stage.
+// Now includes: seguimiento filter chips, recontact pills, DispositionSheet, LeadDetailSheet.
 import { useEffect, useState, useMemo, useRef } from "react";
-import { RefreshCw, Phone, PhoneCall, Search, Users, Send, Eye, X } from "lucide-react";
+import { RefreshCw, Phone, PhoneCall, Search, Users, Send, Eye, X, Clock, AlertCircle, FileText } from "lucide-react";
 import { toast } from "sonner";
 import {
   Select,
@@ -16,9 +17,12 @@ import {
   getKommoStages,
   previewCotizacion,
   sendCotizacion,
+  getMisSeguimientos,
 } from "@/lib/asesorApi";
-import type { MyLead, KommoStage } from "@/lib/asesorApi";
-import { fmtRelative } from "@/lib/labels";
+import type { MyLead, KommoStage, MiSeguimiento } from "@/lib/asesorApi";
+import { fmtRelative, fmtRelativeAny } from "@/lib/labels";
+import DispositionSheet from "@/components/asesor/DispositionSheet";
+import LeadDetailSheet from "@/components/asesor/LeadDetailSheet";
 
 // ── Status config ────────────────────────────────────────────────────────────
 const ESTADO_CONFIG: Record<string, { label: string; color: string; dot: string }> = {
@@ -31,9 +35,10 @@ const ESTADO_CONFIG: Record<string, { label: string; color: string; dot: string 
   cancelled:    { label: "Cancelada",     color: "bg-[#6A8E98]/15 text-[#6A8E98] border-[#6A8E98]/25",     dot: "bg-[#6A8E98]" },
 };
 
-// ── Filter buckets ────────────────────────────────────────────────────────────
+// ── Filter types ─────────────────────────────────────────────────────────────
 type StatusFilter = "todos" | "por_contactar" | "contactados" | "no_contactados";
 type TimeFilter = "hoy" | "7d" | "30d" | "todo";
+type SeguimientoFilter = "todos" | "hoy" | "vencidos" | "semana";
 
 const STATUS_BUCKETS: Record<StatusFilter, string[]> = {
   todos: [],
@@ -42,6 +47,24 @@ const STATUS_BUCKETS: Record<StatusFilter, string[]> = {
   no_contactados:  ["no_contactado", "failed", "cancelled"],
 };
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function startOfDay(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+function endOfDay(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+}
+function startOfWeek(d: Date): Date {
+  const day = d.getDay(); // 0=Sun
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Mon
+  return new Date(d.getFullYear(), d.getMonth(), diff);
+}
+function endOfWeek(d: Date): Date {
+  const s = startOfWeek(d);
+  return new Date(s.getFullYear(), s.getMonth(), s.getDate() + 6, 23, 59, 59, 999);
+}
+
+// ── Sub-components ────────────────────────────────────────────────────────────
 function StatusPill({ estado }: { estado: string }) {
   const cfg = ESTADO_CONFIG[estado] ?? { label: estado, color: "bg-[#6A8E98]/15 text-[#6A8E98] border-[#6A8E98]/25", dot: "bg-[#6A8E98]" };
   return (
@@ -52,9 +75,53 @@ function StatusPill({ estado }: { estado: string }) {
   );
 }
 
+function RecontactoPill({ seg }: { seg: MiSeguimiento }) {
+  const isVencido = seg.estado === "pendiente" || seg.estado === "avisado"
+    ? seg.programado_para != null && new Date(seg.programado_para) < new Date()
+    : false;
+
+  return (
+    <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full border ${
+      isVencido
+        ? "bg-red-500/10 border-red-500/25 text-red-400"
+        : "bg-blue-500/10 border-blue-500/25 text-blue-400"
+    }`}>
+      {isVencido ? <AlertCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+      {isVencido ? "Vencido" : `Recontacto ${fmtRelativeAny(seg.programado_para)}`}
+    </span>
+  );
+}
+
+function Chip<T extends string>({
+  value, current, label, badge, onClick,
+}: { value: T; current: T; label: string; badge?: number; onClick: (v: T) => void }) {
+  const active = value === current;
+  return (
+    <button
+      onClick={() => onClick(value)}
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+        active
+          ? "bg-[#1d9fa9] text-white"
+          : "bg-[#0F2229] border border-[#1d9fa9]/20 text-[#94B3BB] hover:border-[#1d9fa9]/50 hover:text-[#E4EEF0]"
+      }`}
+    >
+      {label}
+      {badge != null && badge > 0 && (
+        <span className={`rounded-full px-1.5 py-px text-[10px] font-bold leading-none ${
+          active ? "bg-white/25 text-white" : "bg-red-500/20 text-red-400"
+        }`}>
+          {badge}
+        </span>
+      )}
+    </button>
+  );
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
 export default function MisLeadsPage() {
   const [leads, setLeads] = useState<MyLead[]>([]);
   const [stages, setStages] = useState<KommoStage[]>([]);
+  const [seguimientos, setSeguimientos] = useState<MiSeguimiento[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [callingId, setCallingId] = useState<string | null>(null);
@@ -65,18 +132,26 @@ export default function MisLeadsPage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("todos");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("todo");
+  const [segFilter, setSegFilter] = useState<SeguimientoFilter>("todos");
   const [search, setSearch] = useState("");
+
+  // Sheets
+  const [dispositionLeadId, setDispositionLeadId] = useState<string | null>(null);
+  const [dispositionNombre, setDispositionNombre] = useState<string>("");
+  const [detailLeadId, setDetailLeadId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
     setError(null);
     try {
-      const [leadsData, stagesData] = await Promise.all([
+      const [leadsData, stagesData, segsData] = await Promise.all([
         getMyLeads(),
         getKommoStages().catch(() => [] as KommoStage[]),
+        getMisSeguimientos().catch(() => [] as MiSeguimiento[]),
       ]);
       setLeads(leadsData);
       setStages(stagesData);
+      setSeguimientos(segsData);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -86,21 +161,64 @@ export default function MisLeadsPage() {
 
   useEffect(() => { load(); }, []);
 
+  // ── Seguimiento index: lead_id → MiSeguimiento ────────────────────────────
+  const segByLeadId = useMemo(() => {
+    const map = new Map<string, MiSeguimiento>();
+    for (const s of seguimientos) {
+      if (!map.has(s.lead_id)) map.set(s.lead_id, s); // latest first (already sorted)
+    }
+    return map;
+  }, [seguimientos]);
+
+  // ── Seguimiento counts for badges ─────────────────────────────────────────
+  const segCounts = useMemo(() => {
+    const now = new Date();
+    const todayStart = startOfDay(now).getTime();
+    const todayEnd = endOfDay(now).getTime();
+    const weekEnd = endOfWeek(now).getTime();
+    const weekStart = startOfWeek(now).getTime();
+
+    let hoy = 0, vencidos = 0, semana = 0;
+    for (const s of seguimientos) {
+      if (!s.programado_para) continue;
+      const t = new Date(s.programado_para).getTime();
+      if (t < now.getTime()) vencidos++;
+      else if (t >= todayStart && t <= todayEnd) hoy++;
+      if (t >= weekStart && t <= weekEnd) semana++;
+    }
+    return { hoy, vencidos, semana };
+  }, [seguimientos]);
+
   // ── Filters ──────────────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
-    const now = Date.now();
+    const now = new Date();
+    const todayStart = startOfDay(now).getTime();
+    const todayEnd = endOfDay(now).getTime();
+    const weekStart = startOfWeek(now).getTime();
+    const weekEnd = endOfWeek(now).getTime();
+
     return leads.filter((row) => {
       // Status filter
       const bucket = STATUS_BUCKETS[statusFilter];
       if (bucket.length > 0 && !bucket.includes(row.estado)) return false;
 
-      // Time filter
+      // Time filter (based on scheduled_at)
       if (timeFilter !== "todo") {
         const ref = row.scheduled_at ? new Date(row.scheduled_at).getTime() : 0;
-        const diff = now - ref;
+        const diff = now.getTime() - ref;
         if (timeFilter === "hoy" && diff > 86400000) return false;
         if (timeFilter === "7d"  && diff > 7 * 86400000) return false;
         if (timeFilter === "30d" && diff > 30 * 86400000) return false;
+      }
+
+      // Seguimiento filter
+      if (segFilter !== "todos") {
+        const seg = segByLeadId.get(row.lead_id);
+        if (!seg || !seg.programado_para) return false;
+        const t = new Date(seg.programado_para).getTime();
+        if (segFilter === "hoy" && !(t >= todayStart && t <= todayEnd)) return false;
+        if (segFilter === "vencidos" && !(t < now.getTime())) return false;
+        if (segFilter === "semana" && !(t >= weekStart && t <= weekEnd)) return false;
       }
 
       // Search
@@ -113,7 +231,7 @@ export default function MisLeadsPage() {
 
       return true;
     });
-  }, [leads, statusFilter, timeFilter, search]);
+  }, [leads, statusFilter, timeFilter, segFilter, segByLeadId, search]);
 
   // ── Actions ──────────────────────────────────────────────────────────────────
   const handleCall = async (row: MyLead) => {
@@ -170,25 +288,6 @@ export default function MisLeadsPage() {
       setPreviewingId(null);
     }
   };
-
-  // ── Chip helper ───────────────────────────────────────────────────────────────
-  function Chip<T extends string>({
-    value, current, label, onClick,
-  }: { value: T; current: T; label: string; onClick: (v: T) => void }) {
-    const active = value === current;
-    return (
-      <button
-        onClick={() => onClick(value)}
-        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-          active
-            ? "bg-[#1d9fa9] text-white"
-            : "bg-[#0F2229] border border-[#1d9fa9]/20 text-[#94B3BB] hover:border-[#1d9fa9]/50 hover:text-[#E4EEF0]"
-        }`}
-      >
-        {label}
-      </button>
-    );
-  }
 
   // ── Preview modal ─────────────────────────────────────────────────────────────
   const PreviewModal = previewHtml ? (
@@ -253,8 +352,18 @@ export default function MisLeadsPage() {
           <Chip value="contactados" current={statusFilter} label="Contactados" onClick={(v) => setStatusFilter(v)} />
           <Chip value="no_contactados" current={statusFilter} label="No contactados" onClick={(v) => setStatusFilter(v)} />
         </div>
+
+        {/* Seguimiento filter chips */}
+        <div className="flex flex-wrap gap-2 items-center border-t border-[#1d9fa9]/10 pt-3">
+          <span className="text-[10px] text-[#6A8E98] uppercase tracking-wider font-semibold">Seguimientos:</span>
+          <Chip value="todos" current={segFilter} label="Todos" onClick={(v) => setSegFilter(v)} />
+          <Chip value="hoy" current={segFilter} label="Hoy" badge={segCounts.hoy} onClick={(v) => setSegFilter(v)} />
+          <Chip value="vencidos" current={segFilter} label="Vencidos" badge={segCounts.vencidos} onClick={(v) => setSegFilter(v)} />
+          <Chip value="semana" current={segFilter} label="Esta semana" badge={segCounts.semana} onClick={(v) => setSegFilter(v)} />
+        </div>
+
         {/* Time + search */}
-        <div className="flex flex-wrap gap-2 items-center">
+        <div className="flex flex-wrap gap-2 items-center border-t border-[#1d9fa9]/10 pt-3">
           <div className="flex gap-1.5">
             <Chip value="hoy" current={timeFilter} label="Hoy" onClick={(v) => setTimeFilter(v)} />
             <Chip value="7d" current={timeFilter} label="7 días" onClick={(v) => setTimeFilter(v)} />
@@ -312,120 +421,172 @@ export default function MisLeadsPage() {
       {/* Lead cards */}
       {!loading && filtered.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((row) => (
-            <div
-              key={row.id}
-              className="bg-[#0F2229] border border-[#1d9fa9]/20 rounded-2xl p-4 space-y-3 hover:border-[#1d9fa9]/40 transition-colors"
-            >
-              {/* Lead info */}
-              <div className="space-y-1">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-base font-semibold text-[#E4EEF0] leading-tight">
-                    {row.lead?.nombre ?? "Sin nombre"}
-                  </p>
-                  <StatusPill estado={row.estado} />
+          {filtered.map((row) => {
+            const seg = segByLeadId.get(row.lead_id);
+            return (
+              <div
+                key={row.id}
+                className="bg-[#0F2229] border border-[#1d9fa9]/20 rounded-2xl p-4 space-y-3 hover:border-[#1d9fa9]/40 transition-colors"
+              >
+                {/* Lead info */}
+                <div className="space-y-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <button
+                      onClick={() => setDetailLeadId(row.lead_id)}
+                      className="text-base font-semibold text-[#E4EEF0] leading-tight text-left hover:text-[#1d9fa9] transition-colors"
+                    >
+                      {row.lead?.nombre ?? "Sin nombre"}
+                    </button>
+                    <StatusPill estado={row.estado} />
+                  </div>
+                  {row.lead?.telefono && (
+                    <a
+                      href={`tel:${row.lead.telefono}`}
+                      className="flex items-center gap-1.5 text-sm text-[#94B3BB] hover:text-[#1d9fa9] transition-colors"
+                    >
+                      <Phone className="w-3 h-3 flex-shrink-0" />
+                      {row.lead.telefono}
+                    </a>
+                  )}
+                  {row.lead?.interes && (
+                    <p className="text-xs text-[#6A8E98]">{row.lead.interes}</p>
+                  )}
+                  {/* Seguimiento pill */}
+                  {seg && (
+                    <div className="pt-0.5">
+                      <RecontactoPill seg={seg} />
+                    </div>
+                  )}
                 </div>
-                {row.lead?.telefono && (
-                  <a
-                    href={`tel:${row.lead.telefono}`}
-                    className="flex items-center gap-1.5 text-sm text-[#94B3BB] hover:text-[#1d9fa9] transition-colors"
-                  >
-                    <Phone className="w-3 h-3 flex-shrink-0" />
-                    {row.lead.telefono}
-                  </a>
-                )}
-                {row.lead?.interes && (
-                  <p className="text-xs text-[#6A8E98]">{row.lead.interes}</p>
-                )}
-              </div>
 
-              {/* Meta row */}
-              <div className="flex items-center gap-3 text-xs text-[#6A8E98]">
-                <span>{fmtRelative(row.scheduled_at)}</span>
-                {row.client_attempts > 0 && (
-                  <>
-                    <span className="w-px h-3 bg-[#1d9fa9]/20" />
-                    <span>{row.client_attempts} intento{row.client_attempts !== 1 ? "s" : ""}</span>
-                  </>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-2 pt-1 border-t border-[#1d9fa9]/10">
-                <button
-                  onClick={() => handleCall(row)}
-                  disabled={callingId === row.id}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1d9fa9]/10 border border-[#1d9fa9]/30 text-[#1d9fa9] text-xs font-medium hover:bg-[#1d9fa9]/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-1 justify-center"
-                >
-                  {callingId === row.id ? (
-                    <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Llamando…</>
-                  ) : (
-                    <><PhoneCall className="w-3.5 h-3.5" /> Llamar</>
+                {/* Meta row */}
+                <div className="flex items-center gap-3 text-xs text-[#6A8E98]">
+                  <span>{fmtRelative(row.scheduled_at)}</span>
+                  {row.client_attempts > 0 && (
+                    <>
+                      <span className="w-px h-3 bg-[#1d9fa9]/20" />
+                      <span>{row.client_attempts} intento{row.client_attempts !== 1 ? "s" : ""}</span>
+                    </>
                   )}
-                </button>
+                </div>
 
-                {stages.length > 0 && (
-                  <Select
-                    disabled={stagingId === row.id}
-                    onValueChange={(val) => {
-                      const stage = stages.find((s) => String(s.id) === val);
-                      if (stage) handleStageSelect(row, stage);
+                {/* Primary actions */}
+                <div className="flex items-center gap-2 pt-1 border-t border-[#1d9fa9]/10">
+                  <button
+                    onClick={() => handleCall(row)}
+                    disabled={callingId === row.id}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1d9fa9]/10 border border-[#1d9fa9]/30 text-[#1d9fa9] text-xs font-medium hover:bg-[#1d9fa9]/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-1 justify-center"
+                  >
+                    {callingId === row.id ? (
+                      <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Llamando…</>
+                    ) : (
+                      <><PhoneCall className="w-3.5 h-3.5" /> Llamar</>
+                    )}
+                  </button>
+
+                  {stages.length > 0 && (
+                    <Select
+                      disabled={stagingId === row.id}
+                      onValueChange={(val) => {
+                        const stage = stages.find((s) => String(s.id) === val);
+                        if (stage) handleStageSelect(row, stage);
+                      }}
+                    >
+                      <SelectTrigger className="h-auto px-3 py-1.5 text-xs border-[#1d9fa9]/30 bg-[#0B1A1E] text-[#94B3BB] hover:border-[#1d9fa9]/60 hover:text-[#E4EEF0] rounded-lg focus:ring-0 focus:ring-offset-0 w-auto flex-1">
+                        {stagingId === row.id ? (
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#1d9fa9]" />
+                        ) : (
+                          <SelectValue placeholder="Mover etapa" />
+                        )}
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0B1A1E] border-[#1d9fa9]/30 text-[#E4EEF0]">
+                        {stages.map((stage) => (
+                          <SelectItem
+                            key={stage.id}
+                            value={String(stage.id)}
+                            className="text-xs text-[#94B3BB] focus:bg-[#1d9fa9]/15 focus:text-[#E4EEF0]"
+                          >
+                            {stage.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+
+                {/* Disposition + history actions */}
+                <div className="flex items-center gap-2 border-t border-[#1d9fa9]/10 pt-2">
+                  <button
+                    onClick={() => {
+                      setDispositionLeadId(row.lead_id);
+                      setDispositionNombre(row.lead?.nombre ?? "este lead");
                     }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0B1A1E] border border-[#1d9fa9]/20 text-[#94B3BB] text-xs font-medium hover:text-[#E4EEF0] hover:border-[#1d9fa9]/40 transition-colors flex-1 justify-center"
                   >
-                    <SelectTrigger className="h-auto px-3 py-1.5 text-xs border-[#1d9fa9]/30 bg-[#0B1A1E] text-[#94B3BB] hover:border-[#1d9fa9]/60 hover:text-[#E4EEF0] rounded-lg focus:ring-0 focus:ring-offset-0 w-auto flex-1">
-                      {stagingId === row.id ? (
-                        <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#1d9fa9]" />
-                      ) : (
-                        <SelectValue placeholder="Mover etapa" />
-                      )}
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#0B1A1E] border-[#1d9fa9]/30 text-[#E4EEF0]">
-                      {stages.map((stage) => (
-                        <SelectItem
-                          key={stage.id}
-                          value={String(stage.id)}
-                          className="text-xs text-[#94B3BB] focus:bg-[#1d9fa9]/15 focus:text-[#E4EEF0]"
-                        >
-                          {stage.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
+                    <FileText className="w-3.5 h-3.5" />
+                    Registrar resultado
+                  </button>
+                  <button
+                    onClick={() => setDetailLeadId(row.lead_id)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0B1A1E] border border-[#1d9fa9]/20 text-[#94B3BB] text-xs font-medium hover:text-[#E4EEF0] hover:border-[#1d9fa9]/40 transition-colors flex-1 justify-center"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    Ver historial
+                  </button>
+                </div>
 
-              {/* Cotización actions */}
-              <div className="flex items-center gap-2 border-t border-[#1d9fa9]/10 pt-2">
-                <button
-                  onClick={() => handlePreviewCotizacion(row)}
-                  disabled={previewingId === row.id}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#1d9fa9]/20 text-[#6A8E98] text-xs font-medium hover:text-[#94B3BB] hover:border-[#1d9fa9]/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-1 justify-center"
-                >
-                  {previewingId === row.id ? (
-                    <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Cargando…</>
-                  ) : (
-                    <><Eye className="w-3.5 h-3.5" /> Vista previa</>
-                  )}
-                </button>
-                <button
-                  onClick={() => handleSendCotizacion(row)}
-                  disabled={sendingCotizId === row.id}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium hover:bg-emerald-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-1 justify-center"
-                >
-                  {sendingCotizId === row.id ? (
-                    <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Enviando…</>
-                  ) : (
-                    <><Send className="w-3.5 h-3.5" /> Enviar cotización</>
-                  )}
-                </button>
+                {/* Cotización actions */}
+                <div className="flex items-center gap-2 border-t border-[#1d9fa9]/10 pt-2">
+                  <button
+                    onClick={() => handlePreviewCotizacion(row)}
+                    disabled={previewingId === row.id}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#1d9fa9]/20 text-[#6A8E98] text-xs font-medium hover:text-[#94B3BB] hover:border-[#1d9fa9]/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-1 justify-center"
+                  >
+                    {previewingId === row.id ? (
+                      <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Cargando…</>
+                    ) : (
+                      <><Eye className="w-3.5 h-3.5" /> Vista previa</>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => handleSendCotizacion(row)}
+                    disabled={sendingCotizId === row.id}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium hover:bg-emerald-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-1 justify-center"
+                  >
+                    {sendingCotizId === row.id ? (
+                      <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Enviando…</>
+                    ) : (
+                      <><Send className="w-3.5 h-3.5" /> Enviar cotización</>
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      {/* Preview modal (portal-like, rendered at bottom of component tree) */}
+      {/* Preview modal */}
       {PreviewModal}
+
+      {/* DispositionSheet */}
+      {dispositionLeadId && (
+        <DispositionSheet
+          leadId={dispositionLeadId}
+          nombre={dispositionNombre}
+          onClose={() => setDispositionLeadId(null)}
+          onSuccess={load}
+        />
+      )}
+
+      {/* LeadDetailSheet */}
+      {detailLeadId && (
+        <LeadDetailSheet
+          leadId={detailLeadId}
+          onClose={() => setDetailLeadId(null)}
+          onRefresh={load}
+        />
+      )}
     </div>
   );
 }
