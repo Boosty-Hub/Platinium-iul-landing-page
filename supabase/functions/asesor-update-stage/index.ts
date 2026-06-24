@@ -95,10 +95,11 @@ serve(async (req: Request) => {
     .maybeSingle();
 
   if (queueErr || !queueRow) {
+    // 200 + {ok:false} para que el front muestre el mensaje (no el genérico non-2xx).
     return new Response(
-      JSON.stringify({ ok: false, error: "Ese lead no es tuyo" }),
+      JSON.stringify({ ok: false, error: "Este lead ya no está en tu lista." }),
       {
-        status: 403,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },
     );
@@ -123,7 +124,7 @@ serve(async (req: Request) => {
     return new Response(
       JSON.stringify({ ok: false, error: "Kommo no está activo" }),
       {
-        status: 503,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },
     );
@@ -150,13 +151,13 @@ serve(async (req: Request) => {
 
     if (!patchRes.ok) {
       const txt = await patchRes.text();
-      throw new Error(`Kommo PATCH ${patchRes.status}: ${txt.slice(0, 300)}`);
+      throw new Error(`Kommo respondió ${patchRes.status}: ${txt.slice(0, 200)}`);
     }
   } catch (e) {
     return new Response(
-      JSON.stringify({ ok: false, error: (e as Error).message }),
+      JSON.stringify({ ok: false, error: `No se pudo cambiar la etapa: ${(e as Error).message}` }),
       {
-        status: 500,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },
     );

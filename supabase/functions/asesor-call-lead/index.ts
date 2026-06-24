@@ -97,9 +97,9 @@ serve(async (req: Request) => {
 
   if (queueErr || !queueRow) {
     return new Response(
-      JSON.stringify({ ok: false, error: "Ese lead no es tuyo" }),
+      JSON.stringify({ ok: false, error: "Este lead ya no está en tu lista." }),
       {
-        status: 403,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },
     );
@@ -114,9 +114,9 @@ serve(async (req: Request) => {
 
   if (asesorErr || !asesor?.telefono) {
     return new Response(
-      JSON.stringify({ ok: false, error: "El asesor no tiene teléfono configurado" }),
+      JSON.stringify({ ok: false, error: "Tu extensión no tiene un número configurado. Avisá al administrador." }),
       {
-        status: 422,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },
     );
@@ -131,9 +131,9 @@ serve(async (req: Request) => {
 
   if (leadErr || !lead?.telefono) {
     return new Response(
-      JSON.stringify({ ok: false, error: "El lead no tiene teléfono" }),
+      JSON.stringify({ ok: false, error: "El lead no tiene teléfono." }),
       {
-        status: 422,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },
     );
@@ -145,7 +145,7 @@ serve(async (req: Request) => {
     return new Response(
       JSON.stringify({ ok: false, error: "RingCentral no está activo" }),
       {
-        status: 503,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },
     );
@@ -188,9 +188,9 @@ serve(async (req: Request) => {
     callStatus = ringoutData?.status?.callStatus ?? "Unknown";
   } catch (e) {
     return new Response(
-      JSON.stringify({ ok: false, error: (e as Error).message }),
+      JSON.stringify({ ok: false, error: `No se pudo iniciar la llamada: ${(e as Error).message}` }),
       {
-        status: 500,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       },
     );
