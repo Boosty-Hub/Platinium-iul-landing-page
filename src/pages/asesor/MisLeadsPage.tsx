@@ -1,25 +1,18 @@
-// MisLeadsPage — advisor's CRM list. Clean, no jargon, shadcn Select for stage.
+// MisLeadsPage — advisor's CRM list. Clean, no jargon.
+// La etapa de Kommo NO se cambia a mano: se actualiza sola al "Registrar resultado"
+// (la disposición sincroniza etapa + Status Call + Próxima cita + nota).
 // Now includes: seguimiento filter chips, recontact pills, DispositionSheet, LeadDetailSheet.
 import { useEffect, useState, useMemo, useRef } from "react";
 import { RefreshCw, Phone, PhoneCall, Search, Users, Send, Eye, X, Clock, AlertCircle, FileText } from "lucide-react";
 import { toast } from "sonner";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   getMyLeads,
   callLead,
-  updateLeadStage,
-  getKommoStages,
   previewCotizacion,
   sendCotizacion,
   getMisSeguimientos,
 } from "@/lib/asesorApi";
-import type { MyLead, KommoStage, MiSeguimiento } from "@/lib/asesorApi";
+import type { MyLead, MiSeguimiento } from "@/lib/asesorApi";
 import { fmtRelative, fmtRelativeAny } from "@/lib/labels";
 import DispositionSheet from "@/components/asesor/DispositionSheet";
 import LeadDetailSheet from "@/components/asesor/LeadDetailSheet";
@@ -120,12 +113,10 @@ function Chip<T extends string>({
 // ── Main component ────────────────────────────────────────────────────────────
 export default function MisLeadsPage() {
   const [leads, setLeads] = useState<MyLead[]>([]);
-  const [stages, setStages] = useState<KommoStage[]>([]);
   const [seguimientos, setSeguimientos] = useState<MiSeguimiento[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [callingId, setCallingId] = useState<string | null>(null);
-  const [stagingId, setStagingId] = useState<string | null>(null);
   const [sendingCotizId, setSendingCotizId] = useState<string | null>(null);
   const [previewingId, setPreviewingId] = useState<string | null>(null);
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
@@ -144,13 +135,11 @@ export default function MisLeadsPage() {
     setLoading(true);
     setError(null);
     try {
-      const [leadsData, stagesData, segsData] = await Promise.all([
+      const [leadsData, segsData] = await Promise.all([
         getMyLeads(),
-        getKommoStages().catch(() => [] as KommoStage[]),
         getMisSeguimientos().catch(() => [] as MiSeguimiento[]),
       ]);
       setLeads(leadsData);
-      setStages(stagesData);
       setSeguimientos(segsData);
     } catch (e) {
       setError((e as Error).message);
@@ -245,23 +234,15 @@ export default function MisLeadsPage() {
     try {
       await callLead(row.lead_id);
       toast.success(`Llamando a ${nombre}…`);
+      // Apenas se coloca la llamada abrimos "Registrar resultado": así el asesor
+      // actualiza TODO (etapa Kommo + Status Call + nota + recontacto) durante o
+      // al terminar la llamada, sin tener que acordarse de un paso extra.
+      setDispositionLeadId(row.lead_id);
+      setDispositionNombre(nombre);
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setCallingId(null);
-    }
-  };
-
-  const handleStageSelect = async (row: MyLead, stage: KommoStage) => {
-    setStagingId(row.id);
-    setError(null);
-    try {
-      await updateLeadStage(row.lead_id, stage.id);
-      toast.success("Etapa actualizada");
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setStagingId(null);
     }
   };
 
@@ -470,7 +451,7 @@ export default function MisLeadsPage() {
                   )}
                 </div>
 
-                {/* Primary actions */}
+                {/* Primary action — la etapa de Kommo se actualiza sola al Registrar resultado */}
                 <div className="flex items-center gap-2 pt-1 border-t border-[#1d9fa9]/10">
                   <button
                     onClick={() => handleCall(row)}
@@ -483,35 +464,6 @@ export default function MisLeadsPage() {
                       <><PhoneCall className="w-3.5 h-3.5" /> Llamar</>
                     )}
                   </button>
-
-                  {stages.length > 0 && (
-                    <Select
-                      disabled={stagingId === row.id}
-                      onValueChange={(val) => {
-                        const stage = stages.find((s) => String(s.id) === val);
-                        if (stage) handleStageSelect(row, stage);
-                      }}
-                    >
-                      <SelectTrigger className="h-auto px-3 py-1.5 text-xs border-[#1d9fa9]/30 bg-[#0B1A1E] text-[#94B3BB] hover:border-[#1d9fa9]/60 hover:text-[#E4EEF0] rounded-lg focus:ring-0 focus:ring-offset-0 w-auto flex-1">
-                        {stagingId === row.id ? (
-                          <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#1d9fa9]" />
-                        ) : (
-                          <SelectValue placeholder="Mover etapa" />
-                        )}
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0B1A1E] border-[#1d9fa9]/30 text-[#E4EEF0]">
-                        {stages.map((stage) => (
-                          <SelectItem
-                            key={stage.id}
-                            value={String(stage.id)}
-                            className="text-xs text-[#94B3BB] focus:bg-[#1d9fa9]/15 focus:text-[#E4EEF0]"
-                          >
-                            {stage.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
                 </div>
 
                 {/* Disposition + history actions */}

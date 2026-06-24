@@ -10,6 +10,7 @@ import type { IncomingCallPayload } from "@/components/asesor/IncomingCallPopup"
 import SeguimientoReminder from "@/components/asesor/SeguimientoReminder";
 import type { SeguimientoReminderPayload } from "@/components/asesor/SeguimientoReminder";
 import LeadDetailSheet from "@/components/asesor/LeadDetailSheet";
+import DispositionSheet from "@/components/asesor/DispositionSheet";
 
 const HEARTBEAT_INTERVAL_MS = 30_000;
 const RC_CLIENT_ID = import.meta.env.VITE_RC_CLIENT_ID as string | undefined;
@@ -23,6 +24,7 @@ export default function CockpitPage() {
   const [presenceError, setPresenceError] = useState<string | null>(null);
   const [seguimientoReminder, setSeguimientoReminder] = useState<SeguimientoReminderPayload | null>(null);
   const [openLeadId, setOpenLeadId] = useState<string | null>(null);
+  const [dispositionLead, setDispositionLead] = useState<{ id: string; nombre: string } | null>(null);
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
@@ -210,7 +212,14 @@ export default function CockpitPage() {
       {incomingCall && (
         <IncomingCallPopup
           payload={incomingCall}
-          onClose={() => setIncomingCall(null)}
+          onClose={() => {
+            // Al colgar/cerrar la llamada entrante pedimos el resultado en el acto:
+            // así el asesor actualiza todo (etapa Kommo + nota + recontacto) sin olvidos.
+            const lid = incomingCall.lead_id;
+            const nombre = incomingCall.nombre ?? "este lead";
+            setIncomingCall(null);
+            if (lid) setDispositionLead({ id: lid, nombre });
+          }}
           onVerHistorial={(lead_id) => {
             setIncomingCall(null);
             setOpenLeadId(lead_id);
@@ -233,6 +242,16 @@ export default function CockpitPage() {
           leadId={openLeadId}
           onClose={() => setOpenLeadId(null)}
           onRefresh={() => {}}
+        />
+      )}
+
+      {/* Registrar resultado — se abre al terminar la llamada entrante */}
+      {dispositionLead && (
+        <DispositionSheet
+          leadId={dispositionLead.id}
+          nombre={dispositionLead.nombre}
+          onClose={() => setDispositionLead(null)}
+          onSuccess={() => setDispositionLead(null)}
         />
       )}
     </div>

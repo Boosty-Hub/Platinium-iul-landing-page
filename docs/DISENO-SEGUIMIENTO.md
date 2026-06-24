@@ -57,7 +57,7 @@ RLS: el asesor ve/gestiona **solo lo suyo**; el admin ve todo.
 
 ## 5. UI (dentro de Mis Leads)
 - **Filtros nuevos**: *Para hoy · Vencidos · Esta semana · Todos* (seguimientos), junto a los de estado.
-- **Detalle del lead** (drawer): el **timeline** + selector de **disposición** + "agendar recontacto" (fecha/hora) + las acciones que ya hay (Llamar, Nota, Mover etapa, Cotización).
+- **Detalle del lead** (drawer): el **timeline** + selector de **disposición** + "agendar recontacto" (fecha/hora) + las acciones que ya hay (Llamar, Nota, Cotización). *Nota: "Mover etapa" se quitó — la etapa de Kommo se actualiza sola al Registrar resultado, así que el botón manual era redundante.*
 - **Badge** con la cantidad de seguimientos de hoy/vencidos.
 - **Recordatorio**: pop-up en vivo 5 min antes (reusa el Realtime de llamadas entrantes).
 - **Admin**: tablero de seguimientos (pendientes / vencidos / por asesor) + métricas en el Scorecard.
