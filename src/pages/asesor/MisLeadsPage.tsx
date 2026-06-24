@@ -7,7 +7,6 @@ import { RefreshCw, Phone, PhoneCall, Search, Users, Send, Eye, X, Clock, AlertC
 import { toast } from "sonner";
 import {
   getMyLeads,
-  callLead,
   previewCotizacion,
   sendCotizacion,
   getMisSeguimientos,
@@ -131,6 +130,25 @@ export default function MisLeadsPage() {
   const [dispositionNombre, setDispositionNombre] = useState<string>("");
   const [detailLeadId, setDetailLeadId] = useState<string | null>(null);
 
+  // Lead que se está llamando desde el softphone (para abrir la disposición al colgar).
+  const pendingCallRef = useRef<{ id: string; nombre: string } | null>(null);
+
+  // Cuando el asesor cuelga en el softphone (rc-call-end-notify), abrimos
+  // "¿Cómo fue la llamada?" para el lead que llamó.
+  useEffect(() => {
+    function onCallEnd(e: MessageEvent) {
+      const d = e.data;
+      if (d && typeof d === "object" && d.type === "rc-call-end-notify" && pendingCallRef.current) {
+        const p = pendingCallRef.current;
+        pendingCallRef.current = null;
+        setDispositionLeadId(p.id);
+        setDispositionNombre(p.nombre);
+      }
+    }
+    window.addEventListener("message", onCallEnd);
+    return () => window.removeEventListener("message", onCallEnd);
+  }, []);
+
   const load = async () => {
     setLoading(true);
     setError(null);
@@ -225,25 +243,26 @@ export default function MisLeadsPage() {
   // ── Actions ──────────────────────────────────────────────────────────────────
   const handleCall = async (row: MyLead) => {
     const nombre = row.lead?.nombre ?? "este lead";
-    const confirmed = window.confirm(
-      `¿Llamar a ${nombre}? Tu teléfono sonará primero, luego el del cliente.`,
-    );
-    if (!confirmed) return;
-    setCallingId(row.id);
-    setError(null);
-    try {
-      await callLead(row.lead_id);
-      toast.success(`Llamando a ${nombre}…`);
-      // Apenas se coloca la llamada abrimos "Registrar resultado": así el asesor
-      // actualiza TODO (etapa Kommo + Status Call + nota + recontacto) durante o
-      // al terminar la llamada, sin tener que acordarse de un paso extra.
-      setDispositionLeadId(row.lead_id);
-      setDispositionNombre(nombre);
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setCallingId(null);
+    const tel = row.lead?.telefono;
+    if (!tel) {
+      toast.error("El lead no tiene teléfono.");
+      return;
     }
+    // Marca DESDE el softphone del asesor (su extensión RC), nunca un número personal.
+    // El asesor habla en el navegador. Requiere el softphone con sesión iniciada.
+    const frame = document.querySelector("#rc-widget-adapter-frame") as HTMLIFrameElement | null;
+    if (!frame?.contentWindow) {
+      toast.error("Tu teléfono no está listo. Iniciá sesión en el softphone (abajo a la derecha) e intentá de nuevo.");
+      return;
+    }
+    frame.contentWindow.postMessage(
+      { type: "rc-adapter-new-call", phoneNumber: tel, toCall: true },
+      "*",
+    );
+    // "Registrar resultado" se abre solo al COLGAR (evento rc-call-end-notify),
+    // para no tapar el softphone mientras hablan.
+    pendingCallRef.current = { id: row.lead_id, nombre };
+    toast.success(`Llamando a ${nombre} desde tu teléfono…`);
   };
 
   const handleSendCotizacion = async (row: MyLead) => {
