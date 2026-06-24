@@ -239,18 +239,30 @@ export async function listAsesorUsers(): Promise<AsesorUser[]> {
   return result.data ?? [];
 }
 
-export async function createAsesorUser(
+export type Rol = "admin" | "asesor";
+
+export async function createUser(
   email: string,
   password: string,
-  asesor_id: string
+  rol: Rol,
+  asesor_id?: string | null
 ): Promise<{ user_id: string }> {
   const { data, error } = await (supabase as any).functions.invoke("manage-users", {
-    body: { action: "create", email, password, asesor_id },
+    body: { action: "create", email, password, rol, asesor_id: asesor_id ?? null },
   });
   if (error) throw new Error(error.message ?? "Error invocando manage-users");
   const result = data as { ok: boolean; user_id?: string; error?: string };
   if (!result.ok) throw new Error(result.error ?? "manage-users devolvió error");
   return { user_id: result.user_id! };
+}
+
+export async function reactivateAsesorUser(user_id: string): Promise<void> {
+  const { data, error } = await (supabase as any).functions.invoke("manage-users", {
+    body: { action: "reactivate", user_id },
+  });
+  if (error) throw new Error(error.message ?? "Error invocando manage-users");
+  const result = data as { ok: boolean; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "manage-users devolvió error");
 }
 
 export async function updateAsesorUser(
