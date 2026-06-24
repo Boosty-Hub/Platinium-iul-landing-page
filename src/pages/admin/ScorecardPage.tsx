@@ -104,7 +104,7 @@ function QualityScore({ score }: { score: number }) {
         />
       </div>
       <p className="text-[11px] text-[#6A8E98]">
-        contacto × 0.6 + notas × 0.4
+        Índice de efectividad
       </p>
     </div>
   );
@@ -273,7 +273,7 @@ export default function ScorecardPage() {
             <MetricCard
               label="Tasa respuesta asesor"
               value={pct(scorecard.advisor_answer_rate)}
-              sub={`${Math.round(scorecard.advisor_answer_rate * scorecard.dials)} / ${scorecard.dials} dials`}
+              sub={`${Math.round(scorecard.advisor_answer_rate * scorecard.dials)} de ${scorecard.dials} marcaciones`}
               icon={TrendingUp}
             />
             <MetricCard
@@ -284,13 +284,13 @@ export default function ScorecardPage() {
               accent="text-emerald-400"
             />
             <MetricCard
-              label="T. timbre promedio"
+              label="Timbrado promedio"
               value={fmtSec(scorecard.avg_ring_sec)}
               icon={Clock}
               accent="text-orange-400"
             />
             <MetricCard
-              label="T. conversación prom."
+              label="Conversación promedio"
               value={fmtSec(scorecard.avg_talk_sec)}
               icon={Clock}
               accent="text-blue-400"

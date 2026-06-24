@@ -1,16 +1,14 @@
-// MisLeadsPage — advisor's own call_queue rows with direct call + stage management.
-// RLS already restricts to own asesor_id rows only.
-import { useEffect, useState } from "react";
+// MisLeadsPage — advisor's CRM list. Clean, no jargon, shadcn Select for stage.
+import { useEffect, useState, useMemo } from "react";
+import { RefreshCw, Phone, PhoneCall, Search, Users } from "lucide-react";
+import { toast } from "sonner";
 import {
-  RefreshCw,
-  Phone,
-  Clock,
-  AlertCircle,
-  CheckCircle,
-  XCircle,
-  PhoneCall,
-  ChevronDown,
-} from "lucide-react";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   getMyLeads,
   callLead,
@@ -18,22 +16,35 @@ import {
   getKommoStages,
 } from "@/lib/asesorApi";
 import type { MyLead, KommoStage } from "@/lib/asesorApi";
+import { fmtRelative } from "@/lib/labels";
 
-const ESTADO_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string }> = {
-  pending: { label: "Pendiente", icon: Clock, color: "text-yellow-400" },
-  scheduled: { label: "Programado", icon: Clock, color: "text-blue-400" },
-  in_progress: { label: "En proceso", icon: Phone, color: "text-[#1d9fa9]" },
-  contactado: { label: "Contactado", icon: CheckCircle, color: "text-emerald-400" },
-  no_contactado: { label: "No contactado", icon: XCircle, color: "text-red-400" },
-  failed: { label: "Fallido", icon: AlertCircle, color: "text-red-400" },
+// ── Status config ────────────────────────────────────────────────────────────
+const ESTADO_CONFIG: Record<string, { label: string; color: string; dot: string }> = {
+  pending:      { label: "Por contactar", color: "bg-yellow-500/15 text-yellow-400 border-yellow-500/25",   dot: "bg-yellow-400" },
+  scheduled:    { label: "Programado",    color: "bg-blue-500/15 text-blue-400 border-blue-500/25",         dot: "bg-blue-400" },
+  in_progress:  { label: "En llamada",    color: "bg-[#1d9fa9]/15 text-[#1d9fa9] border-[#1d9fa9]/25",     dot: "bg-[#1d9fa9]" },
+  contactado:   { label: "Contactado",    color: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25", dot: "bg-emerald-400" },
+  no_contactado:{ label: "Sin contacto",  color: "bg-orange-500/15 text-orange-400 border-orange-500/25",   dot: "bg-orange-400" },
+  failed:       { label: "No disponible", color: "bg-red-500/15 text-red-400 border-red-500/25",            dot: "bg-red-400" },
+  cancelled:    { label: "Cancelada",     color: "bg-[#6A8E98]/15 text-[#6A8E98] border-[#6A8E98]/25",     dot: "bg-[#6A8E98]" },
 };
 
-function EstadoBadge({ estado }: { estado: string }) {
-  const cfg = ESTADO_CONFIG[estado] ?? { label: estado, icon: AlertCircle, color: "text-[#94B3BB]" };
-  const Icon = cfg.icon;
+// ── Filter buckets ────────────────────────────────────────────────────────────
+type StatusFilter = "todos" | "por_contactar" | "contactados" | "no_contactados";
+type TimeFilter = "hoy" | "7d" | "30d" | "todo";
+
+const STATUS_BUCKETS: Record<StatusFilter, string[]> = {
+  todos: [],
+  por_contactar:   ["pending", "scheduled", "in_progress"],
+  contactados:     ["contactado"],
+  no_contactados:  ["no_contactado", "failed", "cancelled"],
+};
+
+function StatusPill({ estado }: { estado: string }) {
+  const cfg = ESTADO_CONFIG[estado] ?? { label: estado, color: "bg-[#6A8E98]/15 text-[#6A8E98] border-[#6A8E98]/25", dot: "bg-[#6A8E98]" };
   return (
-    <span className={`flex items-center gap-1 text-xs font-semibold ${cfg.color}`}>
-      <Icon className="w-3 h-3" />
+    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border ${cfg.color}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
       {cfg.label}
     </span>
   );
@@ -44,19 +55,19 @@ export default function MisLeadsPage() {
   const [stages, setStages] = useState<KommoStage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [callingId, setCallingId] = useState<string | null>(null);
   const [stagingId, setStagingId] = useState<string | null>(null);
-  const [stageDropdownOpen, setStageDropdownOpen] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("todos");
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("todo");
+  const [search, setSearch] = useState("");
 
   const load = async () => {
     setLoading(true);
     setError(null);
-    setSuccessMsg(null);
     try {
       const [leadsData, stagesData] = await Promise.all([
         getMyLeads(),
-        getKommoStages().catch(() => [] as KommoStage[]), // Kommo may not be configured
+        getKommoStages().catch(() => [] as KommoStage[]),
       ]);
       setLeads(leadsData);
       setStages(stagesData);
@@ -67,23 +78,49 @@ export default function MisLeadsPage() {
     }
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
+  // ── Filters ──────────────────────────────────────────────────────────────────
+  const filtered = useMemo(() => {
+    const now = Date.now();
+    return leads.filter((row) => {
+      // Status filter
+      const bucket = STATUS_BUCKETS[statusFilter];
+      if (bucket.length > 0 && !bucket.includes(row.estado)) return false;
+
+      // Time filter
+      if (timeFilter !== "todo") {
+        const ref = row.scheduled_at ? new Date(row.scheduled_at).getTime() : 0;
+        const diff = now - ref;
+        if (timeFilter === "hoy" && diff > 86400000) return false;
+        if (timeFilter === "7d"  && diff > 7 * 86400000) return false;
+        if (timeFilter === "30d" && diff > 30 * 86400000) return false;
+      }
+
+      // Search
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        const nombre = (row.lead?.nombre ?? "").toLowerCase();
+        const tel = (row.lead?.telefono ?? "").toLowerCase();
+        if (!nombre.includes(q) && !tel.includes(q)) return false;
+      }
+
+      return true;
+    });
+  }, [leads, statusFilter, timeFilter, search]);
+
+  // ── Actions ──────────────────────────────────────────────────────────────────
   const handleCall = async (row: MyLead) => {
     const nombre = row.lead?.nombre ?? "este lead";
     const confirmed = window.confirm(
       `¿Llamar a ${nombre}? Tu teléfono sonará primero, luego el del cliente.`,
     );
     if (!confirmed) return;
-
     setCallingId(row.id);
     setError(null);
-    setSuccessMsg(null);
     try {
       await callLead(row.lead_id);
-      setSuccessMsg(`Llamando a ${nombre}...`);
+      toast.success(`Llamando a ${nombre}…`);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -92,13 +129,11 @@ export default function MisLeadsPage() {
   };
 
   const handleStageSelect = async (row: MyLead, stage: KommoStage) => {
-    setStageDropdownOpen(null);
     setStagingId(row.id);
     setError(null);
-    setSuccessMsg(null);
     try {
       await updateLeadStage(row.lead_id, stage.id);
-      setSuccessMsg("Etapa actualizada");
+      toast.success("Etapa actualizada");
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -106,17 +141,35 @@ export default function MisLeadsPage() {
     }
   };
 
-  const toggleDropdown = (rowId: string) => {
-    setStageDropdownOpen((prev) => (prev === rowId ? null : rowId));
-  };
+  // ── Chip helper ───────────────────────────────────────────────────────────────
+  function Chip<T extends string>({
+    value, current, label, onClick,
+  }: { value: T; current: T; label: string; onClick: (v: T) => void }) {
+    const active = value === current;
+    return (
+      <button
+        onClick={() => onClick(value)}
+        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+          active
+            ? "bg-[#1d9fa9] text-white"
+            : "bg-[#0F2229] border border-[#1d9fa9]/20 text-[#94B3BB] hover:border-[#1d9fa9]/50 hover:text-[#E4EEF0]"
+        }`}
+      >
+        {label}
+      </button>
+    );
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-[#E4EEF0]">Mis Leads</h1>
-          <p className="text-sm text-[#94B3BB] mt-1">Leads asignados a tu cola de llamadas</p>
+          <p className="text-sm text-[#94B3BB] mt-0.5">
+            {filtered.length} lead{filtered.length !== 1 ? "s" : ""}
+            {leads.length !== filtered.length ? ` de ${leads.length}` : ""}
+          </p>
         </div>
         <button
           onClick={load}
@@ -128,144 +181,159 @@ export default function MisLeadsPage() {
         </button>
       </div>
 
-      {/* Success banner */}
-      {successMsg && (
-        <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-xl px-4 py-3 text-sm text-emerald-400">
-          {successMsg}
+      {/* Filters */}
+      <div className="bg-[#0F2229] border border-[#1d9fa9]/15 rounded-2xl p-4 space-y-3">
+        {/* Status chips */}
+        <div className="flex flex-wrap gap-2">
+          <Chip value="todos" current={statusFilter} label="Todos" onClick={(v) => setStatusFilter(v)} />
+          <Chip value="por_contactar" current={statusFilter} label="Por contactar" onClick={(v) => setStatusFilter(v)} />
+          <Chip value="contactados" current={statusFilter} label="Contactados" onClick={(v) => setStatusFilter(v)} />
+          <Chip value="no_contactados" current={statusFilter} label="No contactados" onClick={(v) => setStatusFilter(v)} />
         </div>
-      )}
+        {/* Time + search */}
+        <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex gap-1.5">
+            <Chip value="hoy" current={timeFilter} label="Hoy" onClick={(v) => setTimeFilter(v)} />
+            <Chip value="7d" current={timeFilter} label="7 días" onClick={(v) => setTimeFilter(v)} />
+            <Chip value="30d" current={timeFilter} label="30 días" onClick={(v) => setTimeFilter(v)} />
+            <Chip value="todo" current={timeFilter} label="Todo" onClick={(v) => setTimeFilter(v)} />
+          </div>
+          <div className="relative flex-1 min-w-[180px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#6A8E98]" />
+            <input
+              type="text"
+              placeholder="Buscar por nombre o teléfono…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-[#0B1A1E] border border-[#1d9fa9]/20 text-sm text-[#E4EEF0] placeholder:text-[#6A8E98] focus:outline-none focus:border-[#1d9fa9]/50 transition-colors"
+            />
+          </div>
+        </div>
+      </div>
 
-      {/* Error banner */}
+      {/* Error */}
       {error && (
         <div className="bg-red-900/20 border border-red-500/30 rounded-xl px-4 py-3 text-sm text-red-400">
           {error}
         </div>
       )}
 
-      {/* Table */}
-      <div className="bg-[#0F2229] border border-[#1d9fa9]/20 rounded-2xl overflow-hidden">
-        {loading && leads.length === 0 ? (
-          <div className="flex items-center justify-center py-16 text-[#6A8E98] text-sm">
-            Cargando leads...
+      {/* Loading skeleton */}
+      {loading && leads.length === 0 && (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-24 rounded-2xl bg-[#0F2229] border border-[#1d9fa9]/10 animate-pulse" />
+          ))}
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loading && filtered.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 gap-4 rounded-2xl border border-[#1d9fa9]/15 bg-[#0F2229]">
+          <div className="w-12 h-12 rounded-full bg-[#1d9fa9]/10 flex items-center justify-center">
+            <Users className="w-6 h-6 text-[#1d9fa9]/60" />
           </div>
-        ) : leads.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 space-y-2 text-center">
-            <Phone className="w-10 h-10 text-[#1d9fa9]/40" />
-            <p className="text-[#94B3BB] text-sm">No tienes leads asignados aún.</p>
+          <div className="text-center">
+            <p className="text-[#E4EEF0] font-medium">
+              {leads.length === 0 ? "Todavía no tenés leads asignados" : "Sin resultados para este filtro"}
+            </p>
+            <p className="text-sm text-[#6A8E98] mt-1">
+              {leads.length === 0
+                ? "Cuando te asignen uno, aparecerá acá."
+                : "Probá cambiando los filtros o buscando con otras palabras."}
+            </p>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[#1d9fa9]/20 text-[10px] text-[#6A8E98] uppercase tracking-wider">
-                  <th className="text-left px-4 py-3 font-semibold">Nombre</th>
-                  <th className="text-left px-4 py-3 font-semibold">Teléfono</th>
-                  <th className="text-left px-4 py-3 font-semibold">Interés</th>
-                  <th className="text-left px-4 py-3 font-semibold">Estado</th>
-                  <th className="text-left px-4 py-3 font-semibold">Intentos</th>
-                  <th className="text-left px-4 py-3 font-semibold">Próximo intento</th>
-                  <th className="text-left px-4 py-3 font-semibold">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#1d9fa9]/10">
-                {leads.map((row) => (
-                  <tr key={row.id} className="hover:bg-[#1d9fa9]/5 transition-colors">
-                    <td className="px-4 py-3 text-[#E4EEF0] font-medium">
-                      {row.lead?.nombre ?? "—"}
-                    </td>
-                    <td className="px-4 py-3 text-[#94B3BB] font-mono">
-                      {row.lead?.telefono ?? "—"}
-                    </td>
-                    <td className="px-4 py-3 text-[#94B3BB]">
-                      {row.lead?.interes ?? "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <EstadoBadge estado={row.estado} />
-                    </td>
-                    <td className="px-4 py-3 text-[#94B3BB]">
-                      {row.client_attempts}
-                    </td>
-                    <td className="px-4 py-3 text-[#6A8E98] text-xs">
-                      {row.scheduled_at
-                        ? new Date(row.scheduled_at).toLocaleString("es", {
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })
-                        : "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        {/* Call button */}
-                        <button
-                          onClick={() => handleCall(row)}
-                          disabled={callingId === row.id}
-                          title="Llamar"
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1d9fa9]/10 border border-[#1d9fa9]/30 text-[#1d9fa9] text-xs font-medium hover:bg-[#1d9fa9]/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        </div>
+      )}
+
+      {/* Lead cards */}
+      {!loading && filtered.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.map((row) => (
+            <div
+              key={row.id}
+              className="bg-[#0F2229] border border-[#1d9fa9]/20 rounded-2xl p-4 space-y-3 hover:border-[#1d9fa9]/40 transition-colors"
+            >
+              {/* Lead info */}
+              <div className="space-y-1">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-base font-semibold text-[#E4EEF0] leading-tight">
+                    {row.lead?.nombre ?? "Sin nombre"}
+                  </p>
+                  <StatusPill estado={row.estado} />
+                </div>
+                {row.lead?.telefono && (
+                  <a
+                    href={`tel:${row.lead.telefono}`}
+                    className="flex items-center gap-1.5 text-sm text-[#94B3BB] hover:text-[#1d9fa9] transition-colors"
+                  >
+                    <Phone className="w-3 h-3 flex-shrink-0" />
+                    {row.lead.telefono}
+                  </a>
+                )}
+                {row.lead?.interes && (
+                  <p className="text-xs text-[#6A8E98]">{row.lead.interes}</p>
+                )}
+              </div>
+
+              {/* Meta row */}
+              <div className="flex items-center gap-3 text-xs text-[#6A8E98]">
+                <span>{fmtRelative(row.scheduled_at)}</span>
+                {row.client_attempts > 0 && (
+                  <>
+                    <span className="w-px h-3 bg-[#1d9fa9]/20" />
+                    <span>{row.client_attempts} intento{row.client_attempts !== 1 ? "s" : ""}</span>
+                  </>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2 pt-1 border-t border-[#1d9fa9]/10">
+                <button
+                  onClick={() => handleCall(row)}
+                  disabled={callingId === row.id}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1d9fa9]/10 border border-[#1d9fa9]/30 text-[#1d9fa9] text-xs font-medium hover:bg-[#1d9fa9]/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-1 justify-center"
+                >
+                  {callingId === row.id ? (
+                    <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Llamando…</>
+                  ) : (
+                    <><PhoneCall className="w-3.5 h-3.5" /> Llamar</>
+                  )}
+                </button>
+
+                {stages.length > 0 && (
+                  <Select
+                    disabled={stagingId === row.id}
+                    onValueChange={(val) => {
+                      const stage = stages.find((s) => String(s.id) === val);
+                      if (stage) handleStageSelect(row, stage);
+                    }}
+                  >
+                    <SelectTrigger className="h-auto px-3 py-1.5 text-xs border-[#1d9fa9]/30 bg-[#0B1A1E] text-[#94B3BB] hover:border-[#1d9fa9]/60 hover:text-[#E4EEF0] rounded-lg focus:ring-0 focus:ring-offset-0 w-auto flex-1">
+                      {stagingId === row.id ? (
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#1d9fa9]" />
+                      ) : (
+                        <SelectValue placeholder="Mover etapa" />
+                      )}
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#0B1A1E] border-[#1d9fa9]/30 text-[#E4EEF0]">
+                      {stages.map((stage) => (
+                        <SelectItem
+                          key={stage.id}
+                          value={String(stage.id)}
+                          className="text-xs text-[#94B3BB] focus:bg-[#1d9fa9]/15 focus:text-[#E4EEF0]"
                         >
-                          {callingId === row.id ? (
-                            <>
-                              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                              Llamando...
-                            </>
-                          ) : (
-                            <>
-                              <PhoneCall className="w-3.5 h-3.5" />
-                              Llamar
-                            </>
-                          )}
-                        </button>
-
-                        {/* Stage dropdown — hidden if Kommo not configured */}
-                        {stages.length > 0 && (
-                          <div className="relative">
-                            <button
-                              onClick={() => toggleDropdown(row.id)}
-                              onBlur={() =>
-                                setTimeout(() => setStageDropdownOpen(null), 150)
-                              }
-                              disabled={stagingId === row.id}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F2229] border border-[#1d9fa9]/30 text-[#94B3BB] text-xs font-medium hover:border-[#1d9fa9]/60 hover:text-[#E4EEF0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {stagingId === row.id ? (
-                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                              ) : (
-                                <>
-                                  Etapa
-                                  <ChevronDown className="w-3 h-3" />
-                                </>
-                              )}
-                            </button>
-
-                            {stageDropdownOpen === row.id && (
-                              <div className="absolute z-50 top-full left-0 mt-1 w-48 bg-[#0B1A1E] border border-[#1d9fa9]/30 rounded-xl shadow-xl py-1 max-h-48 overflow-y-auto">
-                                {stages.map((stage) => (
-                                  <button
-                                    key={stage.id}
-                                    onMouseDown={() => handleStageSelect(row, stage)}
-                                    className="w-full text-left px-3 py-2 text-xs text-[#94B3BB] hover:bg-[#1d9fa9]/10 hover:text-[#E4EEF0] transition-colors"
-                                  >
-                                    {stage.name}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      <p className="text-xs text-[#6A8E98]">
-        {leads.length} lead{leads.length !== 1 ? "s" : ""} en tu cola.
-      </p>
+                          {stage.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -4,14 +4,15 @@ import { useEffect, useState } from "react";
 import { RefreshCw, CheckCircle, XCircle, Voicemail, AlertCircle, Clock, Play, X } from "lucide-react";
 import { getMyHistory, getMyRecordingUrl } from "@/lib/asesorApi";
 import type { MyCallAttempt } from "@/lib/asesorApi";
+import { OUTCOME_LABELS, fmtDuration, fmtRelative } from "@/lib/labels";
 
 const OUTCOME_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string }> = {
-  contactado: { label: "Contactado", icon: CheckCircle, color: "text-emerald-400" },
-  advisor_no_answer: { label: "Asesor no contestó", icon: XCircle, color: "text-orange-400" },
-  client_no_answer: { label: "Cliente no contestó", icon: XCircle, color: "text-yellow-400" },
-  voicemail: { label: "Voicemail", icon: Voicemail, color: "text-blue-400" },
-  failed: { label: "Error", icon: AlertCircle, color: "text-red-400" },
-  cancelled: { label: "Cancelado", icon: XCircle, color: "text-[#94B3BB]" },
+  contactado: { label: OUTCOME_LABELS.contactado, icon: CheckCircle, color: "text-emerald-400" },
+  advisor_no_answer: { label: OUTCOME_LABELS.advisor_no_answer, icon: XCircle, color: "text-orange-400" },
+  client_no_answer: { label: OUTCOME_LABELS.client_no_answer, icon: XCircle, color: "text-yellow-400" },
+  voicemail: { label: OUTCOME_LABELS.voicemail, icon: Voicemail, color: "text-blue-400" },
+  failed: { label: OUTCOME_LABELS.failed, icon: AlertCircle, color: "text-red-400" },
+  cancelled: { label: OUTCOME_LABELS.cancelled, icon: XCircle, color: "text-[#94B3BB]" },
 };
 
 function OutcomeBadge({ outcome, estado }: { outcome: string | null; estado: string }) {
@@ -26,13 +27,6 @@ function OutcomeBadge({ outcome, estado }: { outcome: string | null; estado: str
   );
 }
 
-function fmtSec(sec: number | null): string {
-  if (sec == null) return "—";
-  if (sec < 60) return `${sec}s`;
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${m}m ${s}s`;
-}
 
 // ── Recording player modal ────────────────────────────────────────────────────
 interface RecordingModalProps {
@@ -156,8 +150,8 @@ export default function HistorialPage() {
                   <th className="text-left px-4 py-3 font-semibold">Fecha</th>
                   <th className="text-left px-4 py-3 font-semibold">Lead</th>
                   <th className="text-left px-4 py-3 font-semibold">Resultado</th>
-                  <th className="text-left px-4 py-3 font-semibold">T. timbre</th>
-                  <th className="text-left px-4 py-3 font-semibold">T. conversación</th>
+                  <th className="text-left px-4 py-3 font-semibold">Timbró</th>
+                  <th className="text-left px-4 py-3 font-semibold">Conversación</th>
                   <th className="text-left px-4 py-3 font-semibold">Nota</th>
                   <th className="text-left px-4 py-3 font-semibold">Grabación</th>
                 </tr>
@@ -166,12 +160,7 @@ export default function HistorialPage() {
                 {history.map((attempt) => (
                   <tr key={attempt.id} className="hover:bg-[#1d9fa9]/5 transition-colors">
                     <td className="px-4 py-3 text-[#6A8E98] text-xs whitespace-nowrap">
-                      {attempt.inicio_at
-                        ? new Date(attempt.inicio_at).toLocaleString("es", {
-                            month: "short", day: "numeric",
-                            hour: "2-digit", minute: "2-digit",
-                          })
-                        : "—"}
+                      {fmtRelative(attempt.inicio_at)}
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-[#E4EEF0] font-medium">
@@ -185,10 +174,10 @@ export default function HistorialPage() {
                       <OutcomeBadge outcome={attempt.outcome} estado={attempt.estado} />
                     </td>
                     <td className="px-4 py-3 text-[#94B3BB] text-xs font-mono">
-                      {fmtSec(attempt.ring_time_sec)}
+                      {fmtDuration(attempt.ring_time_sec)}
                     </td>
                     <td className="px-4 py-3 text-[#94B3BB] text-xs font-mono">
-                      {fmtSec(attempt.talk_time_sec)}
+                      {fmtDuration(attempt.talk_time_sec)}
                     </td>
                     <td className="px-4 py-3">
                       {attempt.notas ? (

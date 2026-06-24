@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PhoneCall, RefreshCw, ChevronDown, ChevronRight, Mic } from "lucide-react";
 import { listAsesores } from "@/lib/adminApi";
+import { humanUltimoResultado, TIPO_LABELS, fmtDuration } from "@/lib/labels";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -171,12 +172,12 @@ function AttemptsPanel({ leadId }: { leadId: string }) {
                         minute: "2-digit",
                       })}
                 </td>
-                <td className="px-3 py-2.5 text-[#94B3BB] capitalize">{a.tipo ?? "—"}</td>
+                <td className="px-3 py-2.5 text-[#94B3BB] capitalize">{TIPO_LABELS[a.tipo ?? ""] ?? a.tipo ?? "—"}</td>
                 <td className="px-3 py-2.5">
                   <AttemptBadge estado={a.estado} />
                 </td>
                 <td className="px-3 py-2.5 text-[#94B3BB] whitespace-nowrap">
-                  {a.duracion_seg != null ? `${a.duracion_seg}s` : "—"}
+                  {fmtDuration(a.duracion_seg)}
                 </td>
                 <td className="px-3 py-2.5">
                   {a.recording_url ? (
@@ -355,7 +356,7 @@ export default function LlamadasPage() {
                           <QueueBadge estado={item.estado} />
                           {item.ultimo_resultado && (
                             <div className="text-xs text-[#6A8E98] mt-1 max-w-[180px] truncate">
-                              {item.ultimo_resultado}
+                              {humanUltimoResultado(item.ultimo_resultado)}
                             </div>
                           )}
                         </td>
@@ -364,7 +365,7 @@ export default function LlamadasPage() {
                         </td>
                         <td className="px-4 py-3 text-[#94B3BB] text-sm">
                           {item.asesor_id ? (
-                            asesores[item.asesor_id] ?? <span className="font-mono text-xs">{item.asesor_id.slice(0, 8)}</span>
+                            asesores[item.asesor_id] ?? <span className="text-[#6A8E98] text-xs">—</span>
                           ) : (
                             <span className="text-[#6A8E98]">—</span>
                           )}
