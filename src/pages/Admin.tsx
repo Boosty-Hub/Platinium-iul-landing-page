@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { AdminRoute } from "@/components/auth/AdminRoute";
 import AdminLayout from "@/components/admin/AdminLayout";
 
+const ResumenPage = lazy(() => import("./admin/ResumenPage"));
 const LeadsPage = lazy(() => import("./admin/LeadsPage"));
 const AnalyticsPage = lazy(() => import("./admin/AnalyticsPage"));
 const ConfiguracionPage = lazy(() => import("./admin/ConfiguracionPage"));
@@ -16,7 +17,15 @@ export default function Admin() {
     <AdminRoute>
       <Routes>
         <Route element={<AdminLayout />}>
-          <Route index element={<Navigate to="leads" replace />} />
+          <Route index element={<Navigate to="resumen" replace />} />
+          <Route
+            path="resumen"
+            element={
+              <Suspense fallback={<div className="h-48" />}>
+                <ResumenPage />
+              </Suspense>
+            }
+          />
           <Route
             path="leads"
             element={

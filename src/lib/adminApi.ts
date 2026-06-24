@@ -381,6 +381,44 @@ export async function updateCotizacion(
   if (error) throw new Error(error.message ?? "Error actualizando cotización");
 }
 
+// ── Admin Overview (Resumen ejecutivo) ───────────────────────────────────────
+
+export type AdminOverview = {
+  funnel: {
+    leads: number;
+    contactados: number;
+    cotizaciones: number;
+    ganados: number;
+    perdidos: number;
+    monto_prom: number;
+  };
+  asesores: Array<{
+    id: string;
+    nombre: string;
+    dials: number;
+    contactados: number;
+    cotizaciones: number;
+    ganados: number;
+    avg_talk_sec: number;
+    seg_pendientes: number;
+    seg_vencidos: number;
+  }>;
+  seguimientos: {
+    pendientes: number;
+    vencidos: number;
+    hoy: number;
+  };
+};
+
+export async function getAdminOverview(from: string, to: string): Promise<AdminOverview> {
+  const { data, error } = await (supabase as any).rpc("admin_overview", {
+    p_from: from,
+    p_to: to,
+  });
+  if (error) throw new Error(error.message ?? "Error en admin_overview");
+  return data as AdminOverview;
+}
+
 // ── Recording URL (admin path) (Slice 3) ──────────────────────────────────────
 
 export async function getRecordingUrl(attempt_id: string): Promise<string> {

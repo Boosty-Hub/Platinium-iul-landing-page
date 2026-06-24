@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 // Resuelve la pantalla de inicio según el rol del usuario.
 async function resolveLanding(): Promise<string | null> {
   const { data: isAdmin } = await (supabase as any).rpc("is_admin");
-  if (isAdmin === true) return "/admin/leads";
+  if (isAdmin === true) return "/admin/resumen";
   const { data: isAsesor } = await (supabase as any).rpc("is_asesor");
   if (isAsesor === true) return "/asesor/cockpit";
   return null; // sin rol del sistema
