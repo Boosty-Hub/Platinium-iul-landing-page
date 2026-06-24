@@ -1,6 +1,6 @@
 // MisLeadsPage — advisor's CRM list. Clean, no jargon, shadcn Select for stage.
-import { useEffect, useState, useMemo } from "react";
-import { RefreshCw, Phone, PhoneCall, Search, Users } from "lucide-react";
+import { useEffect, useState, useMemo, useRef } from "react";
+import { RefreshCw, Phone, PhoneCall, Search, Users, Send, Eye, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   Select,
@@ -14,6 +14,8 @@ import {
   callLead,
   updateLeadStage,
   getKommoStages,
+  previewCotizacion,
+  sendCotizacion,
 } from "@/lib/asesorApi";
 import type { MyLead, KommoStage } from "@/lib/asesorApi";
 import { fmtRelative } from "@/lib/labels";
@@ -57,6 +59,10 @@ export default function MisLeadsPage() {
   const [error, setError] = useState<string | null>(null);
   const [callingId, setCallingId] = useState<string | null>(null);
   const [stagingId, setStagingId] = useState<string | null>(null);
+  const [sendingCotizId, setSendingCotizId] = useState<string | null>(null);
+  const [previewingId, setPreviewingId] = useState<string | null>(null);
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("todos");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("todo");
   const [search, setSearch] = useState("");
@@ -141,6 +147,30 @@ export default function MisLeadsPage() {
     }
   };
 
+  const handleSendCotizacion = async (row: MyLead) => {
+    setSendingCotizId(row.id);
+    try {
+      const result = await sendCotizacion(row.lead_id);
+      toast.success(`Cotización enviada a ${result.to}`);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSendingCotizId(null);
+    }
+  };
+
+  const handlePreviewCotizacion = async (row: MyLead) => {
+    setPreviewingId(row.id);
+    try {
+      const result = await previewCotizacion(row.lead_id);
+      setPreviewHtml(result.html);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setPreviewingId(null);
+    }
+  };
+
   // ── Chip helper ───────────────────────────────────────────────────────────────
   function Chip<T extends string>({
     value, current, label, onClick,
@@ -159,6 +189,39 @@ export default function MisLeadsPage() {
       </button>
     );
   }
+
+  // ── Preview modal ─────────────────────────────────────────────────────────────
+  const PreviewModal = previewHtml ? (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+      <div className="relative bg-[#0F2229] border border-[#1d9fa9]/30 rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Modal header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#1d9fa9]/20 flex-shrink-0">
+          <div>
+            <h3 className="text-base font-semibold text-[#E4EEF0]">Vista previa — Cotización</h3>
+            <p className="text-xs text-[#6A8E98] mt-0.5">Así verá el cliente el email</p>
+          </div>
+          <button
+            onClick={() => setPreviewHtml(null)}
+            className="p-2 rounded-lg text-[#94B3BB] hover:text-white hover:bg-[#1d9fa9]/10 transition-colors"
+            aria-label="Cerrar"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        {/* iframe preview */}
+        <div className="flex-1 overflow-hidden bg-white rounded-b-2xl">
+          <iframe
+            ref={iframeRef}
+            title="Vista previa de cotización"
+            srcDoc={previewHtml}
+            className="w-full h-full border-0"
+            style={{ minHeight: "60vh" }}
+            sandbox="allow-same-origin"
+          />
+        </div>
+      </div>
+    </div>
+  ) : null;
 
   return (
     <div className="space-y-5">
@@ -330,10 +393,39 @@ export default function MisLeadsPage() {
                   </Select>
                 )}
               </div>
+
+              {/* Cotización actions */}
+              <div className="flex items-center gap-2 border-t border-[#1d9fa9]/10 pt-2">
+                <button
+                  onClick={() => handlePreviewCotizacion(row)}
+                  disabled={previewingId === row.id}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#1d9fa9]/20 text-[#6A8E98] text-xs font-medium hover:text-[#94B3BB] hover:border-[#1d9fa9]/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-1 justify-center"
+                >
+                  {previewingId === row.id ? (
+                    <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Cargando…</>
+                  ) : (
+                    <><Eye className="w-3.5 h-3.5" /> Vista previa</>
+                  )}
+                </button>
+                <button
+                  onClick={() => handleSendCotizacion(row)}
+                  disabled={sendingCotizId === row.id}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium hover:bg-emerald-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-1 justify-center"
+                >
+                  {sendingCotizId === row.id ? (
+                    <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Enviando…</>
+                  ) : (
+                    <><Send className="w-3.5 h-3.5" /> Enviar cotización</>
+                  )}
+                </button>
+              </div>
             </div>
           ))}
         </div>
       )}
+
+      {/* Preview modal (portal-like, rendered at bottom of component tree) */}
+      {PreviewModal}
     </div>
   );
 }
