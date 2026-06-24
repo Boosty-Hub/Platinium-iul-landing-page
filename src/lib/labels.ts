@@ -1,5 +1,16 @@
 // labels.ts — human-readable string mappings (no internal jargon shown to users)
 
+export const DISPOSICION_LABELS: Record<string, string> = {
+  no_contesto:        "No contestó",
+  interesado:         "Interesado",
+  llamar_despues:     "Llamar después",
+  cotizacion_enviada: "Cotización enviada",
+  cita_agendada:      "Cita agendada",
+  no_interesado:      "No interesado",
+  ganado:             "Ganado ✓",
+  numero_equivocado:  "Número equivocado",
+};
+
 export const OUTCOME_LABELS: Record<string, string> = {
   contactado:                  "Contactado",
   advisor_no_answer:           "Asesor no contestó",
@@ -66,4 +77,29 @@ export function fmtRelative(dateStr: string | null | undefined): string {
   if (diffD === 1) return "ayer";
   if (diffD < 7) return `hace ${diffD} días`;
   return new Date(dateStr).toLocaleDateString("es", { day: "numeric", month: "short" });
+}
+
+/**
+ * Like fmtRelative but handles future dates too (e.g. for scheduled follow-ups).
+ */
+export function fmtRelativeAny(dateStr: string | null | undefined): string {
+  if (!dateStr) return "—";
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  const diffMs = then - now; // positive = future
+  if (Math.abs(diffMs) < 60_000) return "ahora";
+  if (diffMs > 0) {
+    // future
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 60) return `en ${diffMin} min`;
+    const diffH = Math.floor(diffMin / 60);
+    if (diffH < 24) return `en ${diffH} h`;
+    const diffD = Math.floor(diffH / 24);
+    if (diffD === 1) return "mañana";
+    if (diffD < 7) return `en ${diffD} días`;
+    return new Date(dateStr).toLocaleDateString("es", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  } else {
+    // past
+    return fmtRelative(dateStr);
+  }
 }

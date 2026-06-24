@@ -198,3 +198,109 @@ export async function getKommoStages(): Promise<KommoStage[]> {
   if (!result.ok) throw new Error(result.error ?? "kommo-stages devolvió error");
   return result.stages ?? [];
 }
+
+// ── Seguimiento / disposición ─────────────────────────────────────────────────
+
+export type Disposicion =
+  | "no_contesto"
+  | "interesado"
+  | "llamar_despues"
+  | "cotizacion_enviada"
+  | "cita_agendada"
+  | "no_interesado"
+  | "ganado"
+  | "numero_equivocado";
+
+export async function setDisposicion(
+  lead_id: string,
+  disposicion: Disposicion,
+  opts?: { nota?: string; programar_para?: string }
+): Promise<{ seguimiento_id: string }> {
+  const { data, error } = await (supabase as any).functions.invoke(
+    "asesor-set-disposicion",
+    { body: { lead_id, disposicion, nota: opts?.nota, programar_para: opts?.programar_para } }
+  );
+  if (error) throw new Error(error.message ?? "Error invocando asesor-set-disposicion");
+  const result = data as { ok: boolean; seguimiento_id?: string; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "asesor-set-disposicion devolvió error");
+  return { seguimiento_id: result.seguimiento_id! };
+}
+
+// ── Timeline / lead history ───────────────────────────────────────────────────
+
+export interface LeadInfo {
+  id: string;
+  nombre: string;
+  telefono: string | null;
+  email: string | null;
+  genero: string | null;
+  edad: number | null;
+  disposicion_actual: string | null;
+}
+
+export interface TimelineEntryBase {
+  tipo: "llamada" | "disposicion" | "cotizacion";
+  fecha: string;
+  asesor: string | null;
+}
+
+export interface TimelineLlamada extends TimelineEntryBase {
+  tipo: "llamada";
+  outcome: string | null;
+  ring_time_sec: number | null;
+  talk_time_sec: number | null;
+  recording: string | null;
+  nota: string | null;
+}
+
+export interface TimelineDisposicion extends TimelineEntryBase {
+  tipo: "disposicion";
+  disposicion: string;
+  nota: string | null;
+  programado_para: string | null;
+}
+
+export interface TimelineCotizacion extends TimelineEntryBase {
+  tipo: "cotizacion";
+  monto: number | null;
+}
+
+export type TimelineEntry = TimelineLlamada | TimelineDisposicion | TimelineCotizacion;
+
+export async function getLeadHistory(
+  lead_id: string
+): Promise<{ lead: LeadInfo; timeline: TimelineEntry[] }> {
+  const { data, error } = await (supabase as any).functions.invoke("lead-history", {
+    body: { lead_id },
+  });
+  if (error) throw new Error(error.message ?? "Error invocando lead-history");
+  const result = data as { ok: boolean; lead?: LeadInfo; timeline?: TimelineEntry[]; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "lead-history devolvió error");
+  return { lead: result.lead!, timeline: result.timeline ?? [] };
+}
+
+// ── Own open seguimientos (RLS-scoped) ───────────────────────────────────────
+
+export interface MiSeguimiento {
+  id: string;
+  lead_id: string;
+  asesor_id: string;
+  disposicion: string;
+  nota: string | null;
+  programado_para: string | null;
+  estado: "pendiente" | "avisado" | "hecho" | "vencido" | "cancelado";
+  creado_en: string;
+  completado_en: string | null;
+  leads: { nombre: string; telefono: string | null } | null;
+}
+
+export async function getMisSeguimientos(): Promise<MiSeguimiento[]> {
+  const { data, error } = await (supabase as any)
+    .from("seguimientos")
+    .select("*, leads(nombre, telefono)")
+    .neq("estado", "hecho")
+    .neq("estado", "cancelado")
+    .order("programado_para", { ascending: true });
+  if (error) throw new Error(error.message);
+  return (data as MiSeguimiento[]) ?? [];
+}
