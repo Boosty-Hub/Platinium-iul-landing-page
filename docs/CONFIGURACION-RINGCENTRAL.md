@@ -98,7 +98,7 @@ Una app de RingCentral solo puede tener **un** método de autenticación (JWT **
    Build: `npm run build` · Publish dir: `dist` · (el `_redirects` ya está incluido).
    *Los secretos (SUPABASE_ACCESS_TOKEN, SB_SECRET_KEY, INTERNAL_TASK_SECRET, etc.) **NO van en Netlify**.*
 
-6. **☐ Pasar el dominio de Netlify** para actualizar el `site_url` de Supabase (hoy apunta a localhost).
+6. **✅ Dominio de producción** = `https://platiniuminsuranceusa.com` — `site_url` de Supabase ya actualizado.
 
 7. **☐ Prueba real con 2 teléfonos** (un asesor + un cliente) para validar el ciclo completo punta a punta.
 
