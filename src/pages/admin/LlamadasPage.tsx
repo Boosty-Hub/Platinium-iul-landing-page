@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { PhoneCall, RefreshCw, ChevronDown, ChevronRight, Mic, PhoneIncoming, PhoneOutgoing, Check } from "lucide-react";
+import { PhoneCall, RefreshCw, ChevronDown, ChevronRight, Mic, PhoneIncoming, PhoneOutgoing, Check, Search } from "lucide-react";
 import { listAsesores, getRecordingUrl } from "@/lib/adminApi";
 import { humanUltimoResultado, TIPO_LABELS, fmtDuration } from "@/lib/labels";
 
@@ -277,6 +277,28 @@ export default function LlamadasPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [search, setSearch] = useState("");
+  const [timeFilter, setTimeFilter] = useState<"todo" | "hoy" | "7d" | "30d">("todo");
+
+  // Filtro por nombre/teléfono + rango de fecha (sobre la última actualización).
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    let cutoff = 0;
+    const now = Date.now();
+    if (timeFilter === "hoy") {
+      const d = new Date(); d.setHours(0, 0, 0, 0); cutoff = d.getTime();
+    } else if (timeFilter === "7d") cutoff = now - 7 * 86400_000;
+    else if (timeFilter === "30d") cutoff = now - 30 * 86400_000;
+    return queue.filter((item) => {
+      if (cutoff && new Date(item.updated_at).getTime() < cutoff) return false;
+      if (q) {
+        const nombre = (item.leads?.nombre ?? "").toLowerCase();
+        const tel = (item.leads?.telefono ?? "").toLowerCase();
+        if (!nombre.includes(q) && !tel.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [queue, search, timeFilter]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -341,6 +363,36 @@ export default function LlamadasPage() {
         </button>
       </div>
 
+      {/* Búsqueda + filtros de fecha */}
+      {!loading && !error && queue.length > 0 && (
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6A8E98]" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por nombre o teléfono…"
+              className="w-full pl-9 pr-3 py-2 rounded-lg bg-[#0B1A1E] border border-[#1d9fa9]/25 text-sm text-[#E4EEF0] placeholder-[#6A8E98] focus:outline-none focus:border-[#1d9fa9]/60 transition-colors"
+            />
+          </div>
+          <div className="flex gap-1.5">
+            {([["todo", "Todo"], ["hoy", "Hoy"], ["7d", "7 días"], ["30d", "30 días"]] as const).map(([val, label]) => (
+              <button
+                key={val}
+                onClick={() => setTimeFilter(val)}
+                className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                  timeFilter === val
+                    ? "bg-[#1d9fa9]/20 border-[#1d9fa9]/50 text-[#1d9fa9]"
+                    : "border-[#1d9fa9]/20 text-[#94B3BB] hover:text-white hover:border-[#1d9fa9]/50"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Loading skeleton */}
       {loading && (
         <div className="space-y-2">
@@ -373,6 +425,11 @@ export default function LlamadasPage() {
       {/* Table — desktop */}
       {!loading && !error && queue.length > 0 && (
         <>
+          {filtered.length === 0 && (
+            <div className="rounded-xl border border-[#1d9fa9]/15 bg-[#0F2229] py-12 text-center text-[#6A8E98] text-sm">
+              No hay llamadas que coincidan con la búsqueda o el filtro de fecha.
+            </div>
+          )}
           {/* Desktop */}
           <div className="hidden md:block rounded-xl border border-[#1d9fa9]/20 bg-[#0F2229] overflow-hidden">
             <table className="w-full text-sm">
@@ -387,7 +444,7 @@ export default function LlamadasPage() {
                 </tr>
               </thead>
               <tbody>
-                {queue.map((item, idx) => {
+                {filtered.map((item, idx) => {
                   const isOpen = expanded.has(item.id);
                   const lead = item.leads;
                   return (
@@ -452,7 +509,7 @@ export default function LlamadasPage() {
 
           {/* Mobile cards */}
           <div className="md:hidden space-y-3">
-            {queue.map((item) => {
+            {filtered.map((item) => {
               const isOpen = expanded.has(item.id);
               const lead = item.leads;
               return (
