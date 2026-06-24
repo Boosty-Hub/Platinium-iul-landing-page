@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyNombre } from "@/lib/asesorApi";
-import { Monitor, Users, Clock, LogOut, Menu, X } from "lucide-react";
+import CambiarPasswordModal from "@/components/asesor/CambiarPasswordModal";
+import { Monitor, Users, Clock, LogOut, Menu, X, KeyRound } from "lucide-react";
 
 const NAV_ITEMS = [
   { to: "cockpit", label: "Cockpit", icon: Monitor },
@@ -13,6 +14,7 @@ const NAV_ITEMS = [
 export default function AsesorLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [nombre, setNombre] = useState<string | null>(null);
+  const [pwOpen, setPwOpen] = useState(false);
   const navigate = useNavigate();
 
   // Nombre de la asesora — para que vea que es SU panel.
@@ -58,8 +60,18 @@ export default function AsesorLayout() {
         ))}
       </nav>
 
-      {/* Sign out */}
-      <div className="px-3 pb-4 border-t border-[#1d9fa9]/15 pt-3">
+      {/* Account actions */}
+      <div className="px-3 pb-4 border-t border-[#1d9fa9]/15 pt-3 space-y-1">
+        <button
+          onClick={() => {
+            onClick?.();
+            setPwOpen(true);
+          }}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#94B3BB] hover:text-[#E4EEF0] hover:bg-[#1d9fa9]/10 transition-colors"
+        >
+          <KeyRound className="w-4 h-4 flex-shrink-0" />
+          Cambiar contraseña
+        </button>
         <button
           onClick={handleSignOut}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#94B3BB] hover:text-[#E4EEF0] hover:bg-[#1d9fa9]/10 transition-colors"
@@ -124,6 +136,8 @@ export default function AsesorLayout() {
           <Outlet />
         </div>
       </main>
+
+      {pwOpen && <CambiarPasswordModal onClose={() => setPwOpen(false)} />}
     </div>
   );
 }
