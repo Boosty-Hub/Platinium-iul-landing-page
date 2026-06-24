@@ -158,6 +158,21 @@ export async function deleteAsesor(id: string): Promise<void> {
   if (error) throw error;
 }
 
+// Estado telefónico en vivo de RingCentral (por número de extensión)
+export interface PresenceInfo {
+  tel: string;       // NoCall | CallConnected | Ringing | OnHold | ...
+  presence: string;  // Available | Busy | Offline
+  user: string;      // Available | Busy | ...
+}
+
+export async function getAsesoresPresence(): Promise<Record<string, PresenceInfo>> {
+  const { data, error } = await (supabase as any).functions.invoke("rc-presence", { body: {} });
+  if (error) throw new Error(error.message ?? "Error invocando rc-presence");
+  const result = data as { ok: boolean; presence?: Record<string, PresenceInfo>; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "rc-presence devolvió error");
+  return result.presence ?? {};
+}
+
 // Horario helpers
 const DIAS = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"] as const;
 
