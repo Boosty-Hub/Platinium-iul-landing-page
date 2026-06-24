@@ -42,6 +42,9 @@ function startRing(): () => void {
     if (stopped) return;
     try {
       if (!ctx) ctx = new AudioContext();
+      // Si el navegador suspendió el audio (política de autoplay), reanudarlo.
+      // Funciona porque el asesor ya interactuó con la página (tocó "Disponible").
+      if (ctx.state === "suspended") ctx.resume().catch(() => {});
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);
