@@ -1,15 +1,156 @@
-/**
- * HistorialPage — Slice 1 stub.
- * Slice 2 will implement the full call history table via asesorApi.getMyHistory().
- * Slice 3 will add recording playback.
- */
-export default function HistorialPage() {
+// HistorialPage — advisor's own call history (Slice 2).
+// Slice 3 will add recording playback (task 3.7).
+import { useEffect, useState } from "react";
+import { RefreshCw, CheckCircle, XCircle, Voicemail, AlertCircle, Clock } from "lucide-react";
+import { getMyHistory } from "@/lib/asesorApi";
+import type { MyCallAttempt } from "@/lib/asesorApi";
+
+const OUTCOME_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string }> = {
+  contactado: { label: "Contactado", icon: CheckCircle, color: "text-emerald-400" },
+  advisor_no_answer: { label: "Asesor no contestó", icon: XCircle, color: "text-orange-400" },
+  client_no_answer: { label: "Cliente no contestó", icon: XCircle, color: "text-yellow-400" },
+  voicemail: { label: "Voicemail", icon: Voicemail, color: "text-blue-400" },
+  failed: { label: "Error", icon: AlertCircle, color: "text-red-400" },
+  cancelled: { label: "Cancelado", icon: XCircle, color: "text-[#94B3BB]" },
+};
+
+function OutcomeBadge({ outcome, estado }: { outcome: string | null; estado: string }) {
+  const key = outcome ?? "";
+  const cfg = OUTCOME_CONFIG[key] ?? { label: estado, icon: Clock, color: "text-[#6A8E98]" };
+  const Icon = cfg.icon;
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
-      <div className="text-6xl">📞</div>
-      <h1 className="text-2xl font-bold text-[#E4EEF0]">Historial de Llamadas</h1>
-      <p className="text-[#94B3BB] text-sm max-w-xs">
-        Próximamente — aquí verás tu historial de llamadas con tiempos, resultados y grabaciones.
+    <span className={`flex items-center gap-1 text-xs font-semibold ${cfg.color}`}>
+      <Icon className="w-3 h-3" />
+      {cfg.label}
+    </span>
+  );
+}
+
+function fmtSec(sec: number | null): string {
+  if (sec == null) return "—";
+  if (sec < 60) return `${sec}s`;
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m}m ${s}s`;
+}
+
+export default function HistorialPage() {
+  const [history, setHistory] = useState<MyCallAttempt[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      setHistory(await getMyHistory());
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold text-[#E4EEF0]">Historial de Llamadas</h1>
+          <p className="text-sm text-[#94B3BB] mt-1">Tus intentos de llamada y resultados</p>
+        </div>
+        <button
+          onClick={load}
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1d9fa9]/10 border border-[#1d9fa9]/30 text-[#1d9fa9] text-sm font-medium hover:bg-[#1d9fa9]/20 transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          Actualizar
+        </button>
+      </div>
+
+      {error && (
+        <div className="bg-red-900/20 border border-red-500/30 rounded-xl px-4 py-3 text-sm text-red-400">
+          Error cargando historial: {error}
+        </div>
+      )}
+
+      {/* Table */}
+      <div className="bg-[#0F2229] border border-[#1d9fa9]/20 rounded-2xl overflow-hidden">
+        {loading && history.length === 0 ? (
+          <div className="flex items-center justify-center py-16 text-[#6A8E98] text-sm">
+            Cargando historial...
+          </div>
+        ) : history.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 space-y-2 text-center">
+            <Clock className="w-10 h-10 text-[#1d9fa9]/40" />
+            <p className="text-[#94B3BB] text-sm">Aún no tienes llamadas registradas.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#1d9fa9]/20 text-[10px] text-[#6A8E98] uppercase tracking-wider">
+                  <th className="text-left px-4 py-3 font-semibold">Fecha</th>
+                  <th className="text-left px-4 py-3 font-semibold">Lead</th>
+                  <th className="text-left px-4 py-3 font-semibold">Resultado</th>
+                  <th className="text-left px-4 py-3 font-semibold">T. timbre</th>
+                  <th className="text-left px-4 py-3 font-semibold">T. conversación</th>
+                  <th className="text-left px-4 py-3 font-semibold">Nota</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#1d9fa9]/10">
+                {history.map((attempt) => (
+                  <tr key={attempt.id} className="hover:bg-[#1d9fa9]/5 transition-colors">
+                    <td className="px-4 py-3 text-[#6A8E98] text-xs whitespace-nowrap">
+                      {attempt.inicio_at
+                        ? new Date(attempt.inicio_at).toLocaleString("es", {
+                            month: "short", day: "numeric",
+                            hour: "2-digit", minute: "2-digit",
+                          })
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="text-[#E4EEF0] font-medium">
+                        {attempt.lead?.nombre ?? "—"}
+                      </div>
+                      <div className="text-[#6A8E98] text-xs font-mono">
+                        {attempt.lead?.telefono ?? ""}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <OutcomeBadge outcome={attempt.outcome} estado={attempt.estado} />
+                    </td>
+                    <td className="px-4 py-3 text-[#94B3BB] text-xs font-mono">
+                      {fmtSec(attempt.ring_time_sec)}
+                    </td>
+                    <td className="px-4 py-3 text-[#94B3BB] text-xs font-mono">
+                      {fmtSec(attempt.talk_time_sec)}
+                    </td>
+                    <td className="px-4 py-3">
+                      {attempt.notas ? (
+                        <span
+                          className="text-xs text-[#94B3BB] max-w-[160px] block truncate"
+                          title={attempt.notas}
+                        >
+                          {attempt.notas}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-[#6A8E98]">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <p className="text-xs text-[#6A8E98]">
+        {history.length} intento{history.length !== 1 ? "s" : ""} (últimos 200).
       </p>
     </div>
   );

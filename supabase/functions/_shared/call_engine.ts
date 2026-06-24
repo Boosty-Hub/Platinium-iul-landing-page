@@ -196,12 +196,41 @@ interface QueueItem {
 
 async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: KommoCfg | null; horario: Horario }) {
   const { rc, kommo, horario } = ctx;
-  const { data: lead } = await admin.from("leads").select("id, telefono, nombre").eq("id", item.lead_id).single();
+
+  // Load lead with full snapshot for Realtime broadcast payload
+  const { data: lead } = await admin.from("leads").select(
+    "id, telefono, nombre, interes, anio_nacimiento, edad, ahorro_semanal, city, fuente, utm_source"
+  ).eq("id", item.lead_id).single();
   const client = normalizePhone(lead?.telefono);
   if (!client) { await setQueue(admin, item.id, { estado: "failed", ultimo_resultado: "sin_telefono" }); return { lead: item.lead_id, action: "failed_no_phone" }; }
 
   const { data: asesores } = await admin.from("asesores").select("*").eq("activo", true).order("orden", { ascending: true });
   if (!asesores?.length) { await setQueue(admin, item.id, { estado: "scheduled", scheduled_at: plusMin(2), ultimo_resultado: "sin_asesores" }); return { lead: item.lead_id, action: "no_advisors" }; }
+
+  // ── TASK 2.2: Presence gate ───────────────────────────────────────────────
+  // Fetch advisor_presence ONCE, outside the per-advisor loop, to keep it cheap.
+  // CRITICAL DEFAULT (avoids the engine going silent on cold start):
+  //   - An advisor with NO presence row at all is treated as AVAILABLE and will be rung.
+  //   - An advisor is SKIPPED only if they have a presence row that explicitly has
+  //     disponible=false OR last_seen_at older than 90 seconds.
+  // This means the engine keeps working even before any advisor has ever logged in.
+  const { data: presenceRows } = await admin
+    .from("advisor_presence")
+    .select("asesor_id, disponible, last_seen_at");
+
+  // Build a Set of advisor IDs that are EXPLICITLY offline
+  // (only populated if at least one presence row exists)
+  const offlineIds = new Set<string>();
+  if (presenceRows && presenceRows.length > 0) {
+    const threshold = new Date(Date.now() - 90_000).toISOString();
+    for (const row of presenceRows) {
+      if (!row.disponible || row.last_seen_at < threshold) {
+        offlineIds.add(row.asesor_id as string);
+      }
+    }
+  }
+  // If presenceRows is empty (no advisor has ever registered), offlineIds stays empty
+  // and all advisors are treated as available (cold-start safe behavior).
 
   await setQueue(admin, item.id, { estado: "in_progress" });
   const token = await rcAuth(rc);
@@ -219,19 +248,75 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
     const from = normalizePhone(asesor.telefono);
     if (!from) continue;
 
+    // Skip advisor if they are explicitly offline
+    if (offlineIds.has(asesor.id)) {
+      console.log(`presence gate: skipping advisor ${asesor.nombre} (offline or unavailable)`);
+      continue;
+    }
+
     let ringoutId: string;
     try { ringoutId = await rcRingOutCreate(rc, token, from, client); }
     catch (e) { console.error("ringout create", (e as Error).message); continue; }
+
+    // ── TASK 2.3: Broadcast on ring ───────────────────────────────────────
+    // Fire-and-forget: MUST NOT block or slow the dial loop (55s budget).
+    // Wrap in void async IIFE so any await inside does not delay the main flow.
+    void (async () => {
+      try {
+        const ch = admin.channel("advisor:" + asesor.id);
+        await ch.subscribe();
+        await ch.send({
+          type: "broadcast",
+          event: "incoming_call",
+          payload: {
+            attempt_id: null, // will be set below after logAttempt — best-effort, see note
+            lead_id: item.lead_id,
+            kommo_lead_id: item.kommo_lead_id ?? null,
+            nombre: lead?.nombre ?? null,
+            telefono: lead?.telefono ?? null,
+            interes: lead?.interes ?? null,
+            edad: lead?.edad ?? null,
+            anio_nacimiento: lead?.anio_nacimiento ?? null,
+            ahorro_semanal: lead?.ahorro_semanal ?? null,
+            city: lead?.city ?? null,
+            fuente: lead?.fuente ?? null,
+            utm_source: lead?.utm_source ?? null,
+            ts: nowIso(),
+          },
+        });
+        await admin.removeChannel(ch);
+      } catch (e) { console.error("broadcast incoming_call", e); }
+    })();
+
     const attemptId = await logAttempt(admin, item, asesor.id, ringoutId);
+
+    // ── TASK 2.4: Capture timings ─────────────────────────────────────────
+    const ringStartIso = nowIso();
 
     // ¿contesta el asesor?
     const adv = await pollLeg(rc, token, ringoutId, "caller", advisorPoll);
     if (adv !== "Success") {
       await rcRingOutCancel(rc, token, ringoutId);
-      await updAttempt(admin, attemptId, { estado: "no_answer", notas: "asesor_no_contesto", fin_at: nowIso() });
+      // Compute ring_time_sec as wall-clock since dial started
+      const ringTimeSec = Math.round((Date.now() - new Date(ringStartIso).getTime()) / 1000);
+      await updAttempt(admin, attemptId, {
+        estado: "no_answer",
+        notas: "asesor_no_contesto",
+        fin_at: nowIso(),
+        outcome: "advisor_no_answer",
+        ring_time_sec: ringTimeSec,
+      });
       continue; // siguiente asesor
     }
-    await updAttempt(admin, attemptId, { estado: "advisor_answered" });
+
+    // Advisor answered
+    const answeredAt = nowIso();
+    const ringTimeSec = Math.round((new Date(answeredAt).getTime() - new Date(ringStartIso).getTime()) / 1000);
+    await updAttempt(admin, attemptId, {
+      estado: "advisor_answered",
+      answered_at: answeredAt,
+      ring_time_sec: ringTimeSec,
+    });
     await setQueue(admin, item.id, { asesor_id: asesor.id });
     if (kommo && item.kommo_lead_id) {
       kommoUpdateLead(kommo, item.kommo_lead_id, { statusCallEnumId: statusCallEnum(kommo, "calling") }).catch((e) => console.error("kommo calling", e));
@@ -240,7 +325,16 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
     // ¿contesta el cliente?
     const cli = await pollLeg(rc, token, ringoutId, "callee", clientPoll);
     if (cli === "Success") {
-      await updAttempt(admin, attemptId, { estado: "completed", fin_at: nowIso(), rc_session_id: ringoutId });
+      const clientAnsweredAt = nowIso();
+      const talkTimeSec = Math.round((new Date(clientAnsweredAt).getTime() - new Date(answeredAt).getTime()) / 1000);
+      await updAttempt(admin, attemptId, {
+        estado: "completed",
+        fin_at: nowIso(),
+        rc_session_id: ringoutId,
+        client_answered_at: clientAnsweredAt,
+        talk_time_sec: talkTimeSec,
+        outcome: "contactado",
+      });
       await setQueue(admin, item.id, { estado: "contactado", asesor_id: asesor.id, next_asesor_idx: 0, ultimo_resultado: "contactado" });
       if (kommo && item.kommo_lead_id) {
         kommoUpdateLead(kommo, item.kommo_lead_id, {
@@ -254,7 +348,13 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
 
     // asesor contestó pero el cliente no
     await rcRingOutCancel(rc, token, ringoutId);
-    await updAttempt(admin, attemptId, { estado: cli === "Voicemail" ? "voicemail" : "no_answer", fin_at: nowIso(), notas: "cliente_no_contesto" });
+    const voicemail = cli === "Voicemail";
+    await updAttempt(admin, attemptId, {
+      estado: voicemail ? "voicemail" : "no_answer",
+      fin_at: nowIso(),
+      notas: "cliente_no_contesto",
+      outcome: voicemail ? "voicemail" : "client_no_answer",
+    });
     const attempts = (item.client_attempts ?? 0) + 1;
     if (attempts < horario.max_client_attempts) {
       const delays = horario.client_retry_delays_min;
