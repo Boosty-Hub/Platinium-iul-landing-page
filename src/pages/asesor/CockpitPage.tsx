@@ -37,6 +37,22 @@ export default function CockpitPage() {
   const [openLeadId, setOpenLeadId] = useState<string | null>(null);
   const [dispositionLead, setDispositionLead] = useState<{ id: string; nombre: string } | null>(null);
 
+  // Al colgar en el softphone (rc-call-end-notify) cerramos el pop-up entrante y abrimos
+  // "¿Cómo fue la llamada?" — igual que el flujo manual.
+  const incomingCallRef = useRef<IncomingCallPayload | null>(null);
+  useEffect(() => { incomingCallRef.current = incomingCall; }, [incomingCall]);
+  useEffect(() => {
+    function onCallEnd(e: MessageEvent) {
+      if (e.origin !== "https://apps.ringcentral.com") return;
+      if (!e.data || (e.data as { type?: string }).type !== "rc-call-end-notify") return;
+      const cur = incomingCallRef.current;
+      if (cur?.lead_id) setDispositionLead({ id: cur.lead_id, nombre: cur.nombre ?? "este lead" });
+      setIncomingCall(null);
+    }
+    window.addEventListener("message", onCallEnd);
+    return () => window.removeEventListener("message", onCallEnd);
+  }, []);
+
   // T1: null = aún no sabemos / true = con sesión / false = sin sesión
   const [softphoneReady, setSoftphoneReady] = useState<boolean | null>(null);
 

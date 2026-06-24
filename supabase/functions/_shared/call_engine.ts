@@ -135,11 +135,14 @@ export async function kommoUpdateLead(
 }
 
 // ── RingCentral RingOut (from/to explícitos) ──────────────────────────────────
-async function rcRingOutCreate(rc: RCCfg, token: string, from: string, to: string): Promise<string> {
+// fromExt: si se pasa la extensión del asesor, el RingOut suena en SU extensión
+// (incluido el softphone del navegador), no en un número personal.
+async function rcRingOutCreate(rc: RCCfg, token: string, from: string, to: string, fromExt?: string | null): Promise<string> {
+  const fromObj = fromExt ? { phoneNumber: from, extensionNumber: String(fromExt) } : { phoneNumber: from };
   const res = await fetch(`${rc.server_url}/restapi/v1.0/account/~/extension/~/ring-out`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: { phoneNumber: from }, to: { phoneNumber: to }, playPrompt: false }),
+    body: JSON.stringify({ from: fromObj, to: { phoneNumber: to }, playPrompt: false }),
   });
   const txt = await res.text();
   if (!res.ok) throw new Error(`RingOut ${res.status}: ${txt.slice(0, 200)}`);
@@ -313,7 +316,8 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
     }
 
     let ringoutId: string;
-    try { ringoutId = await rcRingOutCreate(rc, token, from, client); }
+    // from = número del asesor + su extensión → suena en SU softphone/extensión.
+    try { ringoutId = await rcRingOutCreate(rc, token, from, client, asesor.rc_extension); }
     catch (e) { console.error("ringout create", (e as Error).message); continue; }
 
     const attemptId = await logAttempt(admin, item, asesor.id, ringoutId);

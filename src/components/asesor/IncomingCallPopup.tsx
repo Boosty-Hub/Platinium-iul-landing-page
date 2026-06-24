@@ -86,6 +86,16 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, o
     onClose();
   };
 
+  // Contestar: atiende la llamada entrante directamente en el softphone del asesor.
+  const answerCall = () => {
+    const frame = document.querySelector("#rc-widget-adapter-frame") as HTMLIFrameElement | null;
+    frame?.contentWindow?.postMessage(
+      { type: "rc-adapter-control-call", callAction: "answer" },
+      "https://apps.ringcentral.com",
+    );
+    stopRingRef.current?.(); // el softphone toma el audio; cortamos nuestro tono
+  };
+
   const handleSaveNote = async () => {
     if (!payload.attempt_id || !note.trim()) return;
     setSaving(true);
@@ -168,6 +178,15 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, o
 
         {/* Actions */}
         <div className="px-6 pb-5 space-y-3">
+          {/* Contestar — atiende la llamada en el softphone del asesor */}
+          <button
+            onClick={answerCall}
+            className="flex items-center justify-center gap-2.5 w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base transition-colors shadow-lg shadow-emerald-900/40 animate-pulse"
+          >
+            <Phone className="w-5 h-5" />
+            Contestar
+          </button>
+
           {/* Kommo link */}
           {kommoLink && (
             <a
