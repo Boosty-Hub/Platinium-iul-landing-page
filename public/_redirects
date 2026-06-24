@@ -1,0 +1,3 @@
+# SPA fallback — todas las rutas las maneja React Router en el cliente.
+# Sin esto, un refresh/deep-link a /admin/* o /asesor/* devuelve 404 en Netlify.
+/*    /index.html   200
