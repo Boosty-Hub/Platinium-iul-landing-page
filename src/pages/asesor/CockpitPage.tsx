@@ -7,6 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCurrentAsesorId, updatePresence } from "@/lib/asesorApi";
 import IncomingCallPopup from "@/components/asesor/IncomingCallPopup";
 import type { IncomingCallPayload } from "@/components/asesor/IncomingCallPopup";
+import SeguimientoReminder from "@/components/asesor/SeguimientoReminder";
+import type { SeguimientoReminderPayload } from "@/components/asesor/SeguimientoReminder";
+import LeadDetailSheet from "@/components/asesor/LeadDetailSheet";
 
 const HEARTBEAT_INTERVAL_MS = 30_000;
 const RC_CLIENT_ID = import.meta.env.VITE_RC_CLIENT_ID as string | undefined;
@@ -18,6 +21,8 @@ export default function CockpitPage() {
   const [toggling, setToggling] = useState(false);
   const [incomingCall, setIncomingCall] = useState<IncomingCallPayload | null>(null);
   const [presenceError, setPresenceError] = useState<string | null>(null);
+  const [seguimientoReminder, setSeguimientoReminder] = useState<SeguimientoReminderPayload | null>(null);
+  const [openLeadId, setOpenLeadId] = useState<string | null>(null);
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
@@ -64,6 +69,10 @@ export default function CockpitPage() {
 
     channel.on("broadcast", { event: "incoming_call" }, ({ payload }) => {
       setIncomingCall(payload as IncomingCallPayload);
+    });
+
+    channel.on("broadcast", { event: "seguimiento_reminder" }, ({ payload }) => {
+      setSeguimientoReminder(payload as SeguimientoReminderPayload);
     });
 
     channel.subscribe((status) => {
@@ -202,6 +211,28 @@ export default function CockpitPage() {
         <IncomingCallPopup
           payload={incomingCall}
           onClose={() => setIncomingCall(null)}
+          onVerHistorial={(lead_id) => {
+            setIncomingCall(null);
+            setOpenLeadId(lead_id);
+          }}
+        />
+      )}
+
+      {/* Seguimiento reminder pop-up */}
+      {seguimientoReminder && (
+        <SeguimientoReminder
+          payload={seguimientoReminder}
+          onClose={() => setSeguimientoReminder(null)}
+          onVerLead={(lead_id) => setOpenLeadId(lead_id)}
+        />
+      )}
+
+      {/* Lead detail drawer (opened from reminder or incoming call) */}
+      {openLeadId && (
+        <LeadDetailSheet
+          leadId={openLeadId}
+          onClose={() => setOpenLeadId(null)}
+          onRefresh={() => {}}
         />
       )}
     </div>

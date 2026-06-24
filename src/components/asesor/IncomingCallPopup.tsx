@@ -19,13 +19,18 @@ export interface IncomingCallPayload {
   fuente: string | null;
   utm_source: string | null;
   ts: string;
+  es_seguimiento?: boolean;
 }
 
 interface Props {
   payload: IncomingCallPayload;
   kommoSubdominio?: string | null;
   onClose: () => void;
+  onVerHistorial?: (lead_id: string) => void;
 }
+
+// ── Imports for seguimiento badge ────────────────────────────────────────────
+import { History } from "lucide-react";
 
 // ── Web Audio ring generator ─────────────────────────────────────────────────
 function startRing(): () => void {
@@ -60,7 +65,7 @@ function startRing(): () => void {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function IncomingCallPopup({ payload, kommoSubdominio, onClose }: Props) {
+export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, onVerHistorial }: Props) {
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -134,6 +139,12 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose }:
         <div className="px-6 pt-5 pb-4 space-y-4">
           {/* Name — BIG */}
           <div>
+            {payload.es_seguimiento && (
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-400 text-xs font-semibold mb-2">
+                <History className="w-3.5 h-3.5" />
+                Recontacto programado
+              </div>
+            )}
             <p className="text-3xl font-bold text-[#E4EEF0] leading-tight">
               {payload.nombre ?? "Lead desconocido"}
             </p>
@@ -184,7 +195,7 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose }:
             {saved && <p className="text-xs text-emerald-400">Nota guardada en Kommo.</p>}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={handleSaveNote}
               disabled={saving || saved || !note.trim() || !payload.attempt_id}
@@ -193,6 +204,15 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose }:
               <Send className="w-4 h-4" />
               {saving ? "Guardando..." : saved ? "Guardado" : "Guardar nota"}
             </button>
+            {payload.es_seguimiento && onVerHistorial && payload.lead_id && (
+              <button
+                onClick={() => { stopRingRef.current?.(); onVerHistorial(payload.lead_id!); }}
+                className="px-4 py-2.5 rounded-xl bg-blue-500/15 border border-blue-500/30 text-blue-400 hover:bg-blue-500/25 text-sm font-medium transition-colors flex items-center gap-1.5"
+              >
+                <History className="w-4 h-4" />
+                Ver historial
+              </button>
+            )}
             <button
               onClick={handleClose}
               className="px-4 py-2.5 rounded-xl border border-[#1d9fa9]/30 text-[#94B3BB] hover:text-white hover:border-[#1d9fa9]/60 text-sm font-medium transition-colors"
