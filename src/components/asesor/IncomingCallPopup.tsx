@@ -6,6 +6,7 @@ import { submitCallNote } from "@/lib/asesorApi";
 
 export interface IncomingCallPayload {
   attempt_id: string | null;
+  kommo_subdominio: string | null;
   lead_id: string | null;
   kommo_lead_id: string | null;
   nombre: string | null;
@@ -95,12 +96,12 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose }:
   // Compute edad from anio_nacimiento if edad not present
   const edad = payload.edad ?? (payload.anio_nacimiento ? new Date().getFullYear() - payload.anio_nacimiento : null);
 
-  // Kommo link
-  const kommoLink = payload.kommo_lead_id && kommoSubdominio
-    ? `https://${kommoSubdominio}.kommo.com/leads/detail/${payload.kommo_lead_id}`
-    : payload.kommo_lead_id
-      ? `#kommo-lead-${payload.kommo_lead_id}` // fallback if subdominio unknown
-      : null;
+  // Kommo link — el subdominio viene en el payload (broadcast del motor);
+  // el prop queda como override opcional.
+  const subdominio = payload.kommo_subdominio ?? kommoSubdominio ?? null;
+  const kommoLink = payload.kommo_lead_id && subdominio
+    ? `https://${subdominio}.kommo.com/leads/detail/${payload.kommo_lead_id}`
+    : null;
 
   return (
     // Full-screen overlay — z-[9999] ensures it sits above everything including mobile top bar

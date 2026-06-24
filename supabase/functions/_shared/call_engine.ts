@@ -258,9 +258,12 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
     try { ringoutId = await rcRingOutCreate(rc, token, from, client); }
     catch (e) { console.error("ringout create", (e as Error).message); continue; }
 
-    // ── TASK 2.3: Broadcast on ring ───────────────────────────────────────
-    // Fire-and-forget: MUST NOT block or slow the dial loop (55s budget).
-    // Wrap in void async IIFE so any await inside does not delay the main flow.
+    const attemptId = await logAttempt(admin, item, asesor.id, ringoutId);
+
+    // ── Broadcast on ring ──────────────────────────────────────────────────
+    // Fire-and-forget: NUNCA bloquea el loop (presupuesto 55s). Incluye
+    // attempt_id (para que el asesor guarde la nota) y el subdominio de Kommo
+    // (para el link "Abrir en Kommo" del pop-up).
     void (async () => {
       try {
         const ch = admin.channel("advisor:" + asesor.id);
@@ -269,7 +272,8 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
           type: "broadcast",
           event: "incoming_call",
           payload: {
-            attempt_id: null, // will be set below after logAttempt — best-effort, see note
+            attempt_id: attemptId,
+            kommo_subdominio: (kommo as unknown as { subdominio?: string })?.subdominio ?? null,
             lead_id: item.lead_id,
             kommo_lead_id: item.kommo_lead_id ?? null,
             nombre: lead?.nombre ?? null,
@@ -287,8 +291,6 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
         await admin.removeChannel(ch);
       } catch (e) { console.error("broadcast incoming_call", e); }
     })();
-
-    const attemptId = await logAttempt(admin, item, asesor.id, ringoutId);
 
     // ── TASK 2.4: Capture timings ─────────────────────────────────────────
     const ringStartIso = nowIso();
