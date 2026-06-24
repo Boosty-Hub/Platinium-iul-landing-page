@@ -38,3 +38,6 @@ dist-ssr
 # Supabase CLI
 supabase/.temp
 supabase/.branches
+
+# Capturas de pantalla sueltas en la raíz (dev/QA) — los assets reales viven en public/
+/*.png

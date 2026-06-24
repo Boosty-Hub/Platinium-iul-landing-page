@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cotización de Seguro de Vida – ${nombre}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#1d9fa9;--teal-dark:#17858d;--teal-darker:#0E6B73;
+  --bg:#FAFCFC;--bg2:#F0F6F7;--card-border:rgba(29,159,169,0.1);
+  --text:#1A2E33;--text-mid:#4A6B73;--text-muted:#7A9BA3;
+  --divider:rgba(29,159,169,0.12);
+  --dark-bg:#0B1A1E;--dark-bg2:#0F2229;--dark-bg3:#0E3A42;
+  --dark-body:#E4EEF0;--dark-mid:#94B3BB;
+}
+body{font-family:'DM Sans',Arial,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:20px}
+.print-bar{max-width:840px;margin:0 auto 16px;display:flex;justify-content:flex-end}
+.btn-print{background:linear-gradient(135deg,#1d9fa9,#17858d);color:white;border:none;border-radius:12px;padding:12px 28px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 6px 25px rgba(29,159,169,0.35);display:flex;align-items:center;gap:8px;transition:transform .1s}
+.btn-print:hover{transform:translateY(-1px)}
+.btn-print svg{width:18px;height:18px;flex-shrink:0}
+.page{max-width:840px;margin:0 auto 32px;background:white;border-radius:20px;overflow:hidden;box-shadow:0 10px 30px -10px rgba(29,159,169,0.3);border:1px solid var(--card-border);page-break-after:always}
+.header{background:linear-gradient(135deg,#0B1A1E 0%,#0F2229 55%,#0E3A42 100%);padding:28px 48px 24px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.header::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:rgba(29,159,169,0.1)}
+.header::after{content:'';position:absolute;bottom:-40px;left:20%;width:160px;height:160px;border-radius:50%;background:rgba(29,159,169,0.05)}
+.header-left{z-index:1;display:flex;flex-direction:column;gap:10px}
+.header-logo-platinium{height:46px;width:auto;object-fit:contain;display:block;filter:brightness(1.15) drop-shadow(0 2px 8px rgba(0,0,0,0.3))}
+.header-divider{width:40px;height:2px;background:linear-gradient(90deg,var(--teal),transparent);border-radius:2px}
+.header-title{font-family:'Playfair Display',serif;color:white;font-size:24px;font-weight:900;line-height:1.2}
+.header-title span{color:#1d9fa9}
+.header-subtitle{color:var(--dark-mid);font-size:11.5px;font-weight:300;letter-spacing:0.4px}
+.header-right{z-index:1;display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex-shrink:0}
+.header-badge{background:rgba(29,159,169,0.18);border:1px solid rgba(29,159,169,0.35);backdrop-filter:blur(12px);border-radius:14px;padding:12px 20px;text-align:center}
+.header-badge .amount{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:white;letter-spacing:-0.5px;line-height:1}
+.header-badge .label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dark-mid);margin-top:3px}
+.client-strip{background:linear-gradient(90deg,#F0F6F7,white);border-bottom:1px solid var(--divider);padding:16px 48px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.client-info{display:flex;align-items:center;gap:14px}
+.client-avatar{width:44px;height:44px;background:linear-gradient(135deg,var(--teal-darker),var(--teal));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-family:'Playfair Display',serif;font-size:18px;font-weight:700;flex-shrink:0;box-shadow:0 4px 14px rgba(29,159,169,0.3)}
+.client-name{font-size:15px;font-weight:600;color:var(--teal-darker)}
+.client-details{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.prepared-by{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);font-weight:500;text-align:right}
+.prepared-date{font-size:12px;color:var(--text-mid);margin-top:2px;font-weight:600}
+.content{padding:24px 48px 32px;display:flex;flex-direction:column;gap:18px;background:var(--bg2)}
+.card{border-radius:16px;overflow:hidden;border:1px solid var(--card-border);box-shadow:0 4px 20px rgba(0,0,0,0.06)}
+.card-inner{display:flex;align-items:stretch;min-height:120px}
+.card-icon{width:84px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:14px 8px;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-align:center;line-height:1.3}
+.puzzle-svg{width:38px;height:38px}
+.card-left{padding:18px 20px;display:flex;flex-direction:column;justify-content:center;flex:1}
+.card-heading{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:5px;line-height:1.2}
+.card-body{font-size:12px;line-height:1.55;font-weight:300}
+.card-death .card-icon{background:linear-gradient(180deg,#0B1A1E,#0F2229);color:rgba(255,255,255,0.85)}
+.card-death .card-left{background:linear-gradient(135deg,rgba(29,159,169,0.06),rgba(29,159,169,0.02));color:var(--teal-darker)}
+.card-death .card-heading{color:var(--teal-darker)}
+.card-death .card-body{color:var(--text-mid)}
+.card-death .card-right{background:linear-gradient(135deg,#0B1A1E,#0E3A42);color:white;min-width:185px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;text-align:center;border-left:1px solid rgba(29,159,169,0.2)}
+.death-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dark-mid);margin-bottom:5px}
+.death-amount{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;letter-spacing:-1px;line-height:1;color:#1d9fa9}
+.death-sub{font-size:10px;color:var(--dark-mid);margin-top:5px}
+.card-cash .card-icon{background:linear-gradient(180deg,var(--teal-darker),var(--teal-dark));color:rgba(255,255,255,0.9)}
+.card-cash .card-left{background:#F0F6F7;color:var(--teal-darker)}
+.card-cash .card-heading{color:var(--teal-darker)}
+.card-cash .card-body{color:var(--text-mid)}
+.chart-area{flex:2;padding:14px 20px 14px;display:flex;flex-direction:column;justify-content:space-between;background:#F0F6F7;border-left:1px solid var(--divider);min-height:120px}
+.chart-title{font-size:10.5px;color:var(--text-muted);text-align:center;line-height:1.4;padding-bottom:8px;border-bottom:1px solid var(--divider);margin-bottom:10px;flex-shrink:0}
+.bar-chart{display:flex;align-items:flex-end;gap:32px;justify-content:center;flex:1}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:0}
+.bar-val{font-size:12px;font-weight:700;color:var(--teal-darker);white-space:nowrap;margin-bottom:5px;line-height:1}
+.bar-rect{background:linear-gradient(180deg,var(--teal),var(--teal-darker));border-radius:6px 6px 0 0;width:54px;box-shadow:0 4px 14px rgba(29,159,169,0.3);position:relative;flex-shrink:0}
+.bar-rect::after{content:'';position:absolute;top:0;left:5px;right:5px;height:5px;background:rgba(255,255,255,0.22);border-radius:4px 4px 0 0}
+.bar-age{font-size:11px;color:var(--text-muted);font-weight:500;margin-top:5px;white-space:nowrap}
+.bar-axis{font-size:10px;color:var(--text-muted);text-align:center;margin-top:8px;letter-spacing:0.4px;flex-shrink:0}
+.card-ill .card-icon{background:linear-gradient(180deg,#0E3A42,var(--teal-darker));color:rgba(255,255,255,0.9)}
+.card-ill .card-left{background:#F0F6F7;color:var(--teal-darker)}
+.card-ill .card-heading{color:var(--teal-darker)}
+.card-ill .card-body{color:var(--text-mid)}
+.benefits-area{flex:2;padding:14px 20px 16px;background:#F0F6F7;border-left:1px solid var(--divider)}
+.benefits-title{font-size:10.5px;color:var(--text-muted);text-align:center;margin-bottom:9px;line-height:1.4}
+.benefits-table{width:100%;border-collapse:collapse}
+.benefits-table tr{border-bottom:1px solid var(--divider)}
+.benefits-table tr:last-child{border-bottom:none}
+.benefits-table td{padding:5.5px 4px;font-size:11.5px}
+.benefits-table td:first-child{color:var(--text-mid);font-weight:400;width:57%}
+.benefits-table td:last-child{font-weight:700;color:var(--teal-darker);text-align:right;white-space:nowrap}
+.hl-row td{background:rgba(29,159,169,0.06)}
+.section-divider{display:flex;align-items:center;gap:12px}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--divider)}
+.divider-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);opacity:0.4}
+.footer-p1{background:linear-gradient(90deg,#F0F6F7,white);border-top:2px solid var(--teal);padding:14px 48px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.footer-note{font-size:9.5px;color:var(--text-muted);line-height:1.6;max-width:460px}
+.footer-note sup{font-size:7.5px}
+.footer-brand{font-family:'Playfair Display',serif;font-size:12px;color:var(--teal);font-weight:700;text-align:right}
+.footer-date{font-size:10px;color:var(--text-muted);margin-top:2px;text-align:right}
+.page2{background:var(--dark-bg)}
+.p2-header{background:linear-gradient(135deg,#0B1A1E 0%,#0F2229 50%,#0E3A42 100%);padding:28px 48px 24px;position:relative;overflow:hidden;border-bottom:2px solid rgba(29,159,169,0.25)}
+.p2-header::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(29,159,169,0.1) 0%,transparent 70%)}
+.p2-header-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;position:relative;z-index:1}
+.p2-header-left{flex:1}
+.p2-eyebrow{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);font-weight:700;margin-bottom:8px}
+.p2-title{font-family:'Playfair Display',serif;color:white;font-size:26px;font-weight:900;line-height:1.15}
+.p2-title span{color:var(--teal);font-style:italic}
+.p2-subtitle{color:var(--dark-mid);font-size:12.5px;margin-top:7px;font-weight:300;line-height:1.5}
+.p2-intro{background:rgba(29,159,169,0.08);border-left:3px solid var(--teal);padding:11px 16px;margin-top:14px;border-radius:0 10px 10px 0}
+.p2-intro p{font-size:12px;color:var(--dark-body);line-height:1.55}
+.p2-intro strong{color:var(--teal)}
+.p2-logos{display:flex;flex-direction:column;align-items:flex-end;gap:14px;flex-shrink:0}
+.p2-logo-platinium{height:44px;width:auto;object-fit:contain;filter:brightness(1.15) drop-shadow(0 2px 8px rgba(0,0,0,0.4));display:block}
+.p2-logos-divider{width:100%;height:1px;background:rgba(29,159,169,0.25)}
+.p2-logo-nlg-wrap{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.p2-logo-nlg{height:34px;width:auto;object-fit:contain;filter:brightness(1.1) drop-shadow(0 1px 6px rgba(0,0,0,0.35))}
+.nlg-tagline{font-size:9px;color:rgba(255,255,255,0.4);text-align:right;margin-top:2px;letter-spacing:0.3px}
+.p2-section{padding:22px 48px 0}
+.p2-section-title{font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--teal);font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.p2-section-title::after{content:'';flex:1;height:1px;background:rgba(29,159,169,0.2)}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:22px}
+.stat-card{background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.15);border-radius:13px;padding:15px;text-align:center;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--teal),transparent)}
+.stat-number{font-family:'Playfair Display',serif;font-size:25px;font-weight:900;color:var(--teal);line-height:1;margin-bottom:4px}
+.stat-label{font-size:9.5px;color:var(--dark-mid);letter-spacing:0.4px;text-transform:uppercase;line-height:1.3}
+.ratings-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:22px}
+.rating-card{background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.15);border-radius:13px;padding:15px;text-align:center}
+.rating-grade{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--teal);line-height:1}
+.rating-agency{font-size:10.5px;font-weight:700;color:white;margin-top:3px}
+.rating-desc{font-size:9.5px;color:var(--dark-mid);margin-top:2px;line-height:1.3}
+.pillars-row{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:22px}
+.pillar-card{background:rgba(15,34,41,0.7);border:1px solid rgba(29,159,169,0.12);border-radius:13px;padding:15px;text-align:center}
+.pillar-icon{font-size:20px;margin-bottom:6px}
+.pillar-title{font-size:9.5px;font-weight:700;color:var(--teal);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.pillar-text{font-size:11.5px;color:var(--dark-body);line-height:1.5}
+.benefits-row{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:22px}
+.benefit-item{display:flex;align-items:flex-start;gap:9px;background:rgba(15,34,41,0.6);border:1px solid rgba(29,159,169,0.1);border-radius:11px;padding:13px}
+.benefit-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px}
+.benefit-text{font-size:11.5px;color:var(--dark-body);line-height:1.4}
+.benefit-text strong{color:white;font-weight:600;display:block;margin-bottom:2px}
+.issuer-note{margin:0 0 22px;background:rgba(29,159,169,0.06);border:1px solid rgba(29,159,169,0.15);border-radius:11px;padding:11px 16px;font-size:10.5px;color:var(--dark-mid);line-height:1.6;text-align:center}
+.issuer-note strong{color:var(--teal)}
+.footer-p2{border-top:2px solid rgba(29,159,169,0.3);padding:14px 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(11,26,30,0.97)}
+.fp2-contact{font-size:11px;color:var(--dark-mid);line-height:1.6}
+.fp2-contact a{color:var(--teal);text-decoration:none}
+.fp2-legal{font-size:9px;color:rgba(148,179,187,0.55);max-width:360px;text-align:right;line-height:1.5}
+@media print{
+  body{background:white!important;padding:0!important}
+  .print-bar{display:none!important}
+  .page,.page2{box-shadow:none!important;border-radius:0!important;max-width:100%!important;margin:0!important;page-break-after:always}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+@page{margin:.4cm;size:A4}
+</style>
+</head>
+<body>
+<div class="print-bar">
+  <button class="btn-print" onclick="window.print()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 6 2 18 2 18 9"/>
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+      <rect x="6" y="14" width="12" height="8"/>
+    </svg>
+    Descargar / Imprimir PDF
+  </button>
+</div>
+<div class="page">
+  <div class="header">
+    <div class="header-left">
+      <img class="header-logo-platinium" src="${LOGO_PLATINIUM}" alt="Platinium Insurance Group"/>
+      <div class="header-divider"></div>
+      <div class="header-title">Mis <span>Beneficios de Seguro de Vida</span> Planificados</div>
+      <div class="header-subtitle">Ilustración personalizada preparada exclusivamente para usted</div>
+    </div>
+    <div class="header-right">
+      <div class="header-badge">
+        <div class="amount">${fmt(mensual)}</div>
+        <div class="label">Prima Mensual</div>
+      </div>
+    </div>
+  </div>
+  <div class="client-strip">
+    <div class="client-info">
+      <div class="client-avatar">${inicial}</div>
+      <div>
+        <div class="client-name">${nombre}</div>
+        <div class="client-details">${email} &nbsp;·&nbsp; ${telefono} &nbsp;·&nbsp; Edad ${edad}</div>
+      </div>
+    </div>
+    <div>
+      <div class="prepared-by">Preparado el</div>
+      <div class="prepared-date">${hoy}</div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card card-death">
+      <div class="card-inner">
+        <div class="card-icon">
+          <svg class="puzzle-svg" viewBox="0 0 60 60" fill="none"><path d="M10 10h16v6a6 6 0 0 1 0 12v6H10v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.4)"/><path d="M30 10h16v6a6 6 0 0 1 0 12v6H30v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.2)"/></svg>
+          Muerte<br>Prematura
+        </div>
+        <div class="card-left">
+          <div class="card-heading">Si Fallezco Mañana...</div>
+          <div class="card-body">Las personas que he elegido<br>recibirán:</div>
+        </div>
+        <div class="card-right">
+          <div class="death-label">Beneficio por Fallecimiento</div>
+          <div class="death-amount">${fmt(fallecimiento)}</div>
+          <div class="death-sub">Suma Global</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-divider"><div class="divider-dot"></div></div>
+    <div class="card card-cash">
+      <div class="card-inner">
+        <div class="card-icon">
+          <svg class="puzzle-svg" viewBox="0 0 60 60" fill="none"><path d="M10 10h16v6a6 6 0 0 1 0 12v6H10v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.45)"/><path d="M30 10h16v6a6 6 0 0 1 0 12v6H30v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.2)"/></svg>
+          Años de<br>Vida Larga
+        </div>
+        <div class="card-left">
+          <div class="card-heading">Si Necesito Efectivo...</div>
+          <div class="card-body">Puedo tomar un préstamo o retiro<br>del Valor en Efectivo de mi póliza<sup>1</sup>.</div>
+        </div>
+        <div class="chart-area">
+          <div class="chart-title">El Valor en Efectivo proyectado de mi póliza es:</div>
+          <div class="bar-chart">
+            <div class="bar-col">
+              <div class="bar-val">${fmt(acum10)}</div>
+              <div class="bar-rect" style="height:${barH1}px;"></div>
+              <div class="bar-age">Edad ${edad10}</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar-val">${fmt(acum20)}</div>
+              <div class="bar-rect" style="height:${barH2}px;"></div>
+              <div class="bar-age">Edad ${edad20}</div>
+            </div>
+          </div>
+          <div class="bar-axis">Edad Alcanzada</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-divider"><div class="divider-dot"></div></div>
+    <div class="card card-ill">
+      <div class="card-inner">
+        <div class="card-icon">
+          <svg class="puzzle-svg" viewBox="0 0 60 60" fill="none"><path d="M10 10h16v6a6 6 0 0 1 0 12v6H10v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.45)"/><path d="M30 10h16v6a6 6 0 0 1 0 12v6H30v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.2)"/><path d="M10 34h16v6a6 6 0 0 1 0 12v6H10v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.2)"/></svg>
+          Me<br>Enfermo
+        </div>
+        <div class="card-left">
+          <div class="card-heading">Si Me Enfermo...</div>
+          <div class="card-body">Puedo acceder a una parte<br>de mi Beneficio por Fallecimiento.</div>
+        </div>
+        <div class="benefits-area">
+          <div class="benefits-title">Valores proyectados del Rider de Beneficios Anticipados<sup>2</sup> a los 65 años:</div>
+          <table class="benefits-table">
+            <tr><td>Beneficio por Enfermedad Terminal:</td><td>${fmt(terminal)} Suma Global</td></tr>
+            <tr><td>Beneficio por Enfermedad Crónica:</td><td>${fmt(cronica)} Por Mes</td></tr>
+            <tr class="hl-row"><td>Beneficio por Enfermedad Crítica:</td><td>Hasta ${fmt(critica)} Suma Global</td></tr>
+            <tr class="hl-row"><td>Beneficio por Lesión Crítica:</td><td>Hasta ${fmt(critica)} Suma Global</td></tr>
+            <tr><td>Beneficio por Enfermedad de Alzheimer:</td><td>${fmt(alzheimer)} Suma Global</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-p1">
+    <div class="footer-note">
+      <sup>1</sup> Los préstamos y retiros pueden reducir el beneficio por fallecimiento y el valor en efectivo.<br>
+      <sup>2</sup> Los valores del Rider de Beneficios Anticipados son proyecciones y no están garantizados.<br>
+      Esta ilustración no es un contrato. Los valores son solo para fines informativos.
+    </div>
+    <div>
+      <div class="footer-brand">Platinium Insurance Group</div>
+      <div class="footer-date">${hoy}</div>
+    </div>
+  </div>
+</div>
+<div class="page page2">
+  <div class="p2-header">
+    <div class="p2-header-inner">
+      <div class="p2-header-left">
+        <div class="p2-eyebrow">Por qué confiar en nosotros</div>
+        <div class="p2-title">Nuestra Historia &amp; <span>Fortaleza</span></div>
+        <div class="p2-subtitle">Respaldados por uno de los grupos de seguros más confiables de América — cumpliendo promesas desde 1848.</div>
+        <div class="p2-intro"><p>En <strong>National Life Group</strong>, somos una empresa con propósito. Nuestra causa es simple: brindar estabilidad y tranquilidad a las personas — en buenos y malos tiempos. Desde 1848, hemos cumplido nuestras promesas.</p></div>
+      </div>
+      <div class="p2-logos">
+        <img class="p2-logo-platinium" src="${LOGO_PLATINIUM}" alt="Platinium Insurance Group"/>
+        <div class="p2-logos-divider"></div>
+        <div class="p2-logo-nlg-wrap"><img class="p2-logo-nlg" src="${LOGO_NLG}" alt="National Life Group"/></div>
+        <div class="nlg-tagline">Powered by National Life Group®</div>
+      </div>
+    </div>
+  </div>
+  <div class="p2-section">
+    <div class="p2-section-title">Solidez Financiera (2024)</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-number">$57B</div><div class="stat-label">Total de Activos</div></div>
+      <div class="stat-card"><div class="stat-number">$3.9B</div><div class="stat-label">Beneficios y Promesas Cumplidas</div></div>
+      <div class="stat-card"><div class="stat-number">$635M</div><div class="stat-label">Nuevas Primas de Seguro de Vida</div></div>
+    </div>
+    <div class="p2-section-title">Calificaciones Financieras Independientes</div>
+    <div class="ratings-grid">
+      <div class="rating-card"><div class="rating-grade">A+</div><div class="rating-agency">A.M. Best</div><div class="rating-desc">Superior · 2.º más alto de 16</div></div>
+      <div class="rating-card"><div class="rating-grade">A+</div><div class="rating-agency">Standard &amp; Poor's</div><div class="rating-desc">Sólida · 5.º más alto de 21</div></div>
+      <div class="rating-card"><div class="rating-grade">A1</div><div class="rating-agency">Moody's</div><div class="rating-desc">Buena · 5.º más alto de 21</div></div>
+    </div>
+    <div class="p2-section-title">Nuestro Propósito</div>
+    <div class="pillars-row">
+      <div class="pillar-card"><div class="pillar-icon">🎯</div><div class="pillar-title">Misión</div><div class="pillar-text">Cumplir nuestras promesas — cada póliza, cada reclamación, cada día.</div></div>
+      <div class="pillar-card"><div class="pillar-icon">🌟</div><div class="pillar-title">Visión</div><div class="pillar-text">Brindar tranquilidad a todas las personas con las que estamos en contacto.</div></div>
+      <div class="pillar-card"><div class="pillar-icon">💚</div><div class="pillar-title">Valores</div><div class="pillar-text">Hacer el bien. Ser buenos. Realizar buenas acciones en cada comunidad.</div></div>
+    </div>
+    <div class="p2-section-title">Por qué no tiene que morir para usar este seguro</div>
+    <div class="benefits-row">
+      <div class="benefit-item"><div class="benefit-dot"></div><div class="benefit-text"><strong>Muerte Prematura</strong>Sus seres queridos reciben el beneficio completo como suma global — protección financiera inmediata.</div></div>
+      <div class="benefit-item"><div class="benefit-dot"></div><div class="benefit-text"><strong>Años de Vida Larga</strong>Acceda al valor en efectivo para jubilación, educación o emergencias mediante préstamos o retiros.</div></div>
+      <div class="benefit-item"><div class="benefit-dot"></div><div class="benefit-text"><strong>Me Enfermo</strong>Riders de beneficios anticipados para enfermedades terminales, crónicas, críticas y Alzheimer.</div></div>
+    </div>
+    <div class="issuer-note">
+      Productos emitidos por <strong>National Life Insurance Company®</strong> · Fundada en Montpelier, VT en 1848 &nbsp;|&nbsp;
+      <strong>Life Insurance Company of the Southwest®</strong> · Establecida en Addison, TX en 1955<br>
+      Cada compañía es la única responsable de su propio estado financiero y de sus obligaciones contractuales.
+    </div>
+  </div>
+  <div class="footer-p2">
+    <div class="fp2-contact">
+      <strong style="color:white;">Platinium Insurance Group</strong><br>
+      <a href="https://platiniuminsuranceusa.com">platiniuminsuranceusa.com</a> &nbsp;|&nbsp; 800-732-8939
+    </div>
+    <div class="fp2-legal">Calificaciones al 31 dic. 2024. Las garantías dependen de la capacidad de pago de la compañía emisora. Esta declaración es válida por 30 días. Serie 2026.</div>
+  </div>
+</div>
+</body>
+</html>`;
+
+
+// ══════════════════════════════════════════════════════
+//  B) HTML_EMAIL — compatible Gmail / Outlook
+//  100% inline CSS, table-based, sin JS, sin CSS vars
+// ══════════════════════════════════════════════════════
+const html_email = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tu Cotización – ${nombre}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#F0F6F7;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F0F6F7;padding:24px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+
+  <!-- ═══ HEADER ═══ -->
+  <tr>
+    <td style="background:linear-gradient(135deg,#0B1A1E,#0E3A42);border-radius:16px 16px 0 0;padding:28px 32px 24px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td>
+            <img src="${LOGO_PLATINIUM}" height="42" alt="Platinium Insurance Group" style="display:block;height:42px;width:auto;margin-bottom:14px;"/>
+            <p style="margin:0 0 4px;font-family:Georgia,serif;color:#ffffff;font-size:20px;font-weight:bold;line-height:1.25;">
+              Mis <span style="color:#1d9fa9;">Beneficios de Seguro de Vida</span> Planificados
+            </p>
+            <p style="margin:0;color:#94B3BB;font-size:11px;font-weight:300;">Ilustración personalizada preparada exclusivamente para usted</p>
+          </td>
+          <td align="right" valign="middle" style="padding-left:20px;">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="background:rgba(29,159,169,0.2);border:1px solid rgba(29,159,169,0.4);border-radius:12px;padding:10px 18px;text-align:center;">
+                  <p style="margin:0;font-family:Georgia,serif;font-size:26px;font-weight:bold;color:#ffffff;line-height:1;">${fmt(mensual)}</p>
+                  <p style="margin:4px 0 0;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#94B3BB;">Prima Mensual</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ CLIENTE ═══ -->
+  <tr>
+    <td style="background:#F0F6F7;border-left:1px solid rgba(29,159,169,0.15);border-right:1px solid rgba(29,159,169,0.15);padding:14px 32px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td>
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td width="40" style="vertical-align:middle;">
+                  <div style="width:40px;height:40px;background:linear-gradient(135deg,#0E6B73,#1d9fa9);border-radius:50%;text-align:center;line-height:40px;color:white;font-family:Georgia,serif;font-size:17px;font-weight:bold;">${inicial}</div>
+                </td>
+                <td style="padding-left:12px;vertical-align:middle;">
+                  <p style="margin:0;font-size:15px;font-weight:bold;color:#0E6B73;">${nombre}</p>
+                  <p style="margin:2px 0 0;font-size:11px;color:#7A9BA3;">${email} · ${telefono} · Edad ${edad}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td align="right" valign="middle">
+            <p style="margin:0;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#7A9BA3;">Preparado el</p>
+            <p style="margin:2px 0 0;font-size:12px;font-weight:bold;color:#4A6B73;">${hoy}</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ CARD 1: FALLECIMIENTO ═══ -->
+  <tr>
+    <td style="padding:0 0 2px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-left:1px solid rgba(29,159,169,0.15);border-right:1px solid rgba(29,159,169,0.15);">
+        <tr>
+          <td width="72" style="background:#0B1A1E;padding:16px 8px;text-align:center;vertical-align:middle;border-right:none;">
+            <p style="margin:0;font-size:9px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.8);line-height:1.4;">Muerte<br>Prematura</p>
+          </td>
+          <td style="background:#F5EEFF;padding:16px 20px;vertical-align:middle;">
+            <p style="margin:0 0 4px;font-family:Georgia,serif;font-size:17px;font-weight:bold;color:#0E6B73;">Si Fallezco Mañana...</p>
+            <p style="margin:0;font-size:12px;color:#4A6B73;font-weight:300;">Las personas que he elegido recibirán:</p>
+          </td>
+          <td style="background:linear-gradient(135deg,#0B1A1E,#0E3A42);padding:16px 20px;text-align:center;vertical-align:middle;min-width:160px;">
+            <p style="margin:0 0 4px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#94B3BB;">Beneficio por Fallecimiento</p>
+            <p style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:bold;color:#1d9fa9;line-height:1;">${fmt(fallecimiento)}</p>
+            <p style="margin:4px 0 0;font-size:10px;color:#94B3BB;">Suma Global</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ CARD 2: EFECTIVO ═══ -->
+  <tr>
+    <td style="padding:2px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-left:1px solid rgba(29,159,169,0.15);border-right:1px solid rgba(29,159,169,0.15);">
+        <tr>
+          <td width="72" style="background:#0E6B73;padding:16px 8px;text-align:center;vertical-align:middle;">
+            <p style="margin:0;font-size:9px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.9);line-height:1.4;">Años de<br>Vida Larga</p>
+          </td>
+          <td style="background:#F0F6F7;padding:16px 20px;vertical-align:middle;width:200px;">
+            <p style="margin:0 0 4px;font-family:Georgia,serif;font-size:17px;font-weight:bold;color:#0E6B73;">Si Necesito Efectivo...</p>
+            <p style="margin:0;font-size:12px;color:#4A6B73;font-weight:300;">Puedo tomar un préstamo o retiro del Valor en Efectivo de mi póliza.</p>
+          </td>
+          <td style="background:#F0F6F7;padding:14px 20px;vertical-align:top;border-left:1px solid rgba(29,159,169,0.12);">
+            <p style="margin:0 0 12px;font-size:10px;color:#7A9BA3;text-align:center;padding-bottom:8px;border-bottom:1px solid rgba(29,159,169,0.15);">El Valor en Efectivo proyectado de mi póliza es:</p>
+            <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+              <tr valign="bottom">
+                <td align="center" style="padding:0 12px;">
+                  <p style="margin:0 0 5px;font-size:12px;font-weight:bold;color:#0E6B73;white-space:nowrap;">${fmt(acum10)}</p>
+                  <div style="width:50px;height:${barH1}px;background:linear-gradient(180deg,#1d9fa9,#0E6B73);border-radius:4px 4px 0 0;"></div>
+                  <p style="margin:5px 0 0;font-size:10px;color:#7A9BA3;">Edad ${edad10}</p>
+                </td>
+                <td align="center" style="padding:0 12px;">
+                  <p style="margin:0 0 5px;font-size:12px;font-weight:bold;color:#0E6B73;white-space:nowrap;">${fmt(acum20)}</p>
+                  <div style="width:50px;height:${barH2}px;background:linear-gradient(180deg,#1d9fa9,#0E6B73);border-radius:4px 4px 0 0;"></div>
+                  <p style="margin:5px 0 0;font-size:10px;color:#7A9BA3;">Edad ${edad20}</p>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:8px 0 0;font-size:10px;color:#7A9BA3;text-align:center;border-top:1px solid rgba(29,159,169,0.12);padding-top:6px;">Edad Alcanzada</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ CARD 3: ENFERMEDAD ═══ -->
+  <tr>
+    <td style="padding:2px 0 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-left:1px solid rgba(29,159,169,0.15);border-right:1px solid rgba(29,159,169,0.15);">
+        <tr>
+          <td width="72" style="background:#0B3A40;padding:16px 8px;text-align:center;vertical-align:middle;">
+            <p style="margin:0;font-size:9px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.9);line-height:1.4;">Me<br>Enfermo</p>
+          </td>
+          <td style="background:#F0F6F7;padding:16px 20px;vertical-align:middle;width:180px;">
+            <p style="margin:0 0 4px;font-family:Georgia,serif;font-size:17px;font-weight:bold;color:#0E6B73;">Si Me Enfermo...</p>
+            <p style="margin:0;font-size:12px;color:#4A6B73;font-weight:300;">Puedo acceder a una parte de mi Beneficio por Fallecimiento.</p>
+          </td>
+          <td style="background:#F0F6F7;padding:14px 20px;vertical-align:top;border-left:1px solid rgba(29,159,169,0.12);">
+            <p style="margin:0 0 10px;font-size:10px;color:#7A9BA3;text-align:center;">Valores proyectados del Rider de Beneficios Anticipados a los 65 años:</p>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr style="border-bottom:1px solid rgba(29,159,169,0.12);">
+                <td style="font-size:11px;color:#4A6B73;padding:5px 0;">Beneficio por Enfermedad Terminal:</td>
+                <td align="right" style="font-size:11px;font-weight:bold;color:#0E6B73;padding:5px 0;white-space:nowrap;">${fmt(terminal)} Suma Global</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(29,159,169,0.12);">
+                <td style="font-size:11px;color:#4A6B73;padding:5px 0;">Beneficio por Enfermedad Crónica:</td>
+                <td align="right" style="font-size:11px;font-weight:bold;color:#0E6B73;padding:5px 0;white-space:nowrap;">${fmt(cronica)} Por Mes</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(29,159,169,0.12);background:rgba(29,159,169,0.05);">
+                <td style="font-size:11px;color:#4A6B73;padding:5px 3px;">Beneficio por Enfermedad Crítica:</td>
+                <td align="right" style="font-size:11px;font-weight:bold;color:#0E6B73;padding:5px 0;white-space:nowrap;">Hasta ${fmt(critica)} S.G.</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(29,159,169,0.12);background:rgba(29,159,169,0.05);">
+                <td style="font-size:11px;color:#4A6B73;padding:5px 3px;">Beneficio por Lesión Crítica:</td>
+                <td align="right" style="font-size:11px;font-weight:bold;color:#0E6B73;padding:5px 0;white-space:nowrap;">Hasta ${fmt(critica)} S.G.</td>
+              </tr>
+              <tr>
+                <td style="font-size:11px;color:#4A6B73;padding:5px 0;">Beneficio por Alzheimer:</td>
+                <td align="right" style="font-size:11px;font-weight:bold;color:#0E6B73;padding:5px 0;white-space:nowrap;">${fmt(alzheimer)} Suma Global</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ NOTA PIE ═══ -->
+  <tr>
+    <td style="background:#ffffff;border:1px solid rgba(29,159,169,0.15);border-top:none;padding:14px 32px;">
+      <p style="margin:0;font-size:9.5px;color:#7A9BA3;line-height:1.6;">
+        ¹ Los préstamos y retiros pueden reducir el beneficio por fallecimiento y el valor en efectivo.<br>
+        ² Los valores del Rider de Beneficios Anticipados son proyecciones y no están garantizados.<br>
+        Esta ilustración no es un contrato. Los valores son solo para fines informativos.
+      </p>
+    </td>
+  </tr>
+
+  <!-- ═══ SPACER ═══ -->
+  <tr><td style="height:16px;"></td></tr>
+
+  <!-- ═══ EMPRESA ═══ -->
+  <tr>
+    <td style="background:#0B1A1E;border-radius:16px 16px 0 0;padding:24px 32px 20px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td>
+            <p style="margin:0 0 4px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#1d9fa9;font-weight:bold;">Por qué confiar en nosotros</p>
+            <p style="margin:0 0 6px;font-family:Georgia,serif;color:#ffffff;font-size:20px;font-weight:bold;">Nuestra Historia &amp; <span style="color:#1d9fa9;font-style:italic;">Fortaleza</span></p>
+            <p style="margin:0 0 12px;font-size:11.5px;color:#94B3BB;line-height:1.5;">Respaldados por uno de los grupos de seguros más confiables de América — cumpliendo promesas desde 1848.</p>
+            <table cellpadding="0" cellspacing="0" border="0" style="border-left:3px solid #1d9fa9;background:rgba(29,159,169,0.08);border-radius:0 8px 8px 0;">
+              <tr><td style="padding:10px 14px;font-size:11.5px;color:#E4EEF0;line-height:1.5;">
+                En <strong style="color:#1d9fa9;">National Life Group</strong>, somos una empresa con propósito. Desde 1848 brindamos estabilidad y tranquilidad — en buenos y malos tiempos.
+              </td></tr>
+            </table>
+          </td>
+          <td align="right" valign="top" style="padding-left:24px;white-space:nowrap;">
+            <img src="${LOGO_PLATINIUM}" height="38" alt="Platinium" style="display:block;height:38px;margin-bottom:10px;"/>
+            <table cellpadding="0" cellspacing="0" border="0" style="margin-left:auto;"><tr><td style="height:1px;background:rgba(29,159,169,0.3);width:120px;"></td></tr></table>
+            <div style="margin-top:10px;">
+              <img src="${LOGO_NLG}" height="30" alt="National Life Group" style="display:block;height:30px;"/>
+              <p style="margin:4px 0 0;font-size:8.5px;color:rgba(255,255,255,0.35);text-align:right;">Powered by National Life Group®</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ STATS ═══ -->
+  <tr>
+    <td style="background:#0F2229;padding:18px 32px;">
+      <p style="margin:0 0 14px;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#1d9fa9;font-weight:bold;">Solidez Financiera (2024)</p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td width="33%" style="text-align:center;padding:0 6px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.2);border-radius:10px;">
+              <tr><td style="padding:12px 8px;text-align:center;">
+                <p style="margin:0 0 3px;font-family:Georgia,serif;font-size:22px;font-weight:bold;color:#1d9fa9;">$57B</p>
+                <p style="margin:0;font-size:9px;color:#94B3BB;text-transform:uppercase;letter-spacing:0.5px;">Total de Activos</p>
+              </td></tr>
+            </table>
+          </td>
+          <td width="33%" style="text-align:center;padding:0 6px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.2);border-radius:10px;">
+              <tr><td style="padding:12px 8px;text-align:center;">
+                <p style="margin:0 0 3px;font-family:Georgia,serif;font-size:22px;font-weight:bold;color:#1d9fa9;">$3.9B</p>
+                <p style="margin:0;font-size:9px;color:#94B3BB;text-transform:uppercase;letter-spacing:0.5px;">Beneficios Cumplidos</p>
+              </td></tr>
+            </table>
+          </td>
+          <td width="33%" style="text-align:center;padding:0 6px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.2);border-radius:10px;">
+              <tr><td style="padding:12px 8px;text-align:center;">
+                <p style="margin:0 0 3px;font-family:Georgia,serif;font-size:22px;font-weight:bold;color:#1d9fa9;">$635M</p>
+                <p style="margin:0;font-size:9px;color:#94B3BB;text-transform:uppercase;letter-spacing:0.5px;">Nuevas Primas</p>
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ RATINGS ═══ -->
+  <tr>
+    <td style="background:#0F2229;padding:0 32px 18px;">
+      <p style="margin:0 0 14px;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#1d9fa9;font-weight:bold;">Calificaciones Independientes</p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td width="33%" style="padding:0 6px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.2);border-radius:10px;">
+              <tr><td style="padding:12px 8px;text-align:center;">
+                <p style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:bold;color:#1d9fa9;">A+</p>
+                <p style="margin:3px 0 0;font-size:10px;font-weight:bold;color:white;">A.M. Best</p>
+                <p style="margin:2px 0 0;font-size:9px;color:#94B3BB;">Superior · 2.º de 16</p>
+              </td></tr>
+            </table>
+          </td>
+          <td width="33%" style="padding:0 6px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.2);border-radius:10px;">
+              <tr><td style="padding:12px 8px;text-align:center;">
+                <p style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:bold;color:#1d9fa9;">A+</p>
+                <p style="margin:3px 0 0;font-size:10px;font-weight:bold;color:white;">Standard &amp; Poor's</p>
+                <p style="margin:2px 0 0;font-size:9px;color:#94B3BB;">Sólida · 5.º de 21</p>
+              </td></tr>
+            </table>
+          </td>
+          <td width="33%" style="padding:0 6px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.2);border-radius:10px;">
+              <tr><td style="padding:12px 8px;text-align:center;">
+                <p style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:bold;color:#1d9fa9;">A1</p>
+                <p style="margin:3px 0 0;font-size:10px;font-weight:bold;color:white;">Moody's</p>
+                <p style="margin:2px 0 0;font-size:9px;color:#94B3BB;">Buena · 5.º de 21</p>
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ FOOTER ═══ -->
+  <tr>
+    <td style="background:#0B1A1E;border-top:2px solid rgba(29,159,169,0.3);border-radius:0 0 16px 16px;padding:16px 32px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td>
+            <p style="margin:0;font-size:12px;font-weight:bold;color:white;">Platinium Insurance Group</p>
+            <p style="margin:3px 0 0;font-size:11px;color:#94B3BB;">
+              <a href="https://platiniuminsuranceusa.com" style="color:#1d9fa9;text-decoration:none;">platiniuminsuranceusa.com</a>
+              &nbsp;·&nbsp; +16893082809
+            </p>
+          </td>
+          <td align="right" valign="middle">
+            <p style="margin:0;font-size:9px;color:rgba(148,179,187,0.5);text-align:right;line-height:1.5;max-width:240px;">
+              Calificaciones al 31 dic. 2024. Las garantías dependen de la capacidad de pago de la compañía emisora.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cotización de Seguro de Vida – ${nombre}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#1d9fa9;--teal-dark:#17858d;--teal-darker:#0E6B73;
+  --bg:#FAFCFC;--bg2:#F0F6F7;--card-border:rgba(29,159,169,0.1);
+  --text:#1A2E33;--text-mid:#4A6B73;--text-muted:#7A9BA3;
+  --divider:rgba(29,159,169,0.12);
+  --dark-bg:#0B1A1E;--dark-bg2:#0F2229;--dark-bg3:#0E3A42;
+  --dark-body:#E4EEF0;--dark-mid:#94B3BB;
+}
+body{font-family:'DM Sans',Arial,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:20px}
+.print-bar{max-width:840px;margin:0 auto 16px;display:flex;justify-content:flex-end}
+.btn-print{background:linear-gradient(135deg,#1d9fa9,#17858d);color:white;border:none;border-radius:12px;padding:12px 28px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 6px 25px rgba(29,159,169,0.35);display:flex;align-items:center;gap:8px;transition:transform .1s}
+.btn-print:hover{transform:translateY(-1px)}
+.btn-print svg{width:18px;height:18px;flex-shrink:0}
+.page{max-width:840px;margin:0 auto 32px;background:white;border-radius:20px;overflow:hidden;box-shadow:0 10px 30px -10px rgba(29,159,169,0.3);border:1px solid var(--card-border);page-break-after:always}
+.header{background:linear-gradient(135deg,#0B1A1E 0%,#0F2229 55%,#0E3A42 100%);padding:28px 48px 24px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.header::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:rgba(29,159,169,0.1)}
+.header::after{content:'';position:absolute;bottom:-40px;left:20%;width:160px;height:160px;border-radius:50%;background:rgba(29,159,169,0.05)}
+.header-left{z-index:1;display:flex;flex-direction:column;gap:10px}
+.header-logo-platinium{height:46px;width:auto;object-fit:contain;display:block;filter:brightness(1.15) drop-shadow(0 2px 8px rgba(0,0,0,0.3))}
+.header-divider{width:40px;height:2px;background:linear-gradient(90deg,var(--teal),transparent);border-radius:2px}
+.header-title{font-family:'Playfair Display',serif;color:white;font-size:24px;font-weight:900;line-height:1.2}
+.header-title span{color:#1d9fa9}
+.header-subtitle{color:var(--dark-mid);font-size:11.5px;font-weight:300;letter-spacing:0.4px}
+.header-right{z-index:1;display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex-shrink:0}
+.header-badge{background:rgba(29,159,169,0.18);border:1px solid rgba(29,159,169,0.35);backdrop-filter:blur(12px);border-radius:14px;padding:12px 20px;text-align:center}
+.header-badge .amount{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:white;letter-spacing:-0.5px;line-height:1}
+.header-badge .label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dark-mid);margin-top:3px}
+.client-strip{background:linear-gradient(90deg,#F0F6F7,white);border-bottom:1px solid var(--divider);padding:16px 48px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.client-info{display:flex;align-items:center;gap:14px}
+.client-avatar{width:44px;height:44px;background:linear-gradient(135deg,var(--teal-darker),var(--teal));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-family:'Playfair Display',serif;font-size:18px;font-weight:700;flex-shrink:0;box-shadow:0 4px 14px rgba(29,159,169,0.3)}
+.client-name{font-size:15px;font-weight:600;color:var(--teal-darker)}
+.client-details{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.prepared-by{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);font-weight:500;text-align:right}
+.prepared-date{font-size:12px;color:var(--text-mid);margin-top:2px;font-weight:600}
+.content{padding:24px 48px 32px;display:flex;flex-direction:column;gap:18px;background:var(--bg2)}
+.card{border-radius:16px;overflow:hidden;border:1px solid var(--card-border);box-shadow:0 4px 20px rgba(0,0,0,0.06)}
+.card-inner{display:flex;align-items:stretch;min-height:120px}
+.card-icon{width:84px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:14px 8px;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-align:center;line-height:1.3}
+.puzzle-svg{width:38px;height:38px}
+.card-left{padding:18px 20px;display:flex;flex-direction:column;justify-content:center;flex:1}
+.card-heading{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:5px;line-height:1.2}
+.card-body{font-size:12px;line-height:1.55;font-weight:300}
+.card-death .card-icon{background:linear-gradient(180deg,#0B1A1E,#0F2229);color:rgba(255,255,255,0.85)}
+.card-death .card-left{background:linear-gradient(135deg,rgba(29,159,169,0.06),rgba(29,159,169,0.02));color:var(--teal-darker)}
+.card-death .card-heading{color:var(--teal-darker)}
+.card-death .card-body{color:var(--text-mid)}
+.card-death .card-right{background:linear-gradient(135deg,#0B1A1E,#0E3A42);color:white;min-width:185px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;text-align:center;border-left:1px solid rgba(29,159,169,0.2)}
+.death-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dark-mid);margin-bottom:5px}
+.death-amount{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;letter-spacing:-1px;line-height:1;color:#1d9fa9}
+.death-sub{font-size:10px;color:var(--dark-mid);margin-top:5px}
+.card-cash .card-icon{background:linear-gradient(180deg,var(--teal-darker),var(--teal-dark));color:rgba(255,255,255,0.9)}
+.card-cash .card-left{background:#F0F6F7;color:var(--teal-darker)}
+.card-cash .card-heading{color:var(--teal-darker)}
+.card-cash .card-body{color:var(--text-mid)}
+.chart-area{flex:2;padding:14px 20px 14px;display:flex;flex-direction:column;justify-content:space-between;background:#F0F6F7;border-left:1px solid var(--divider);min-height:120px}
+.chart-title{font-size:10.5px;color:var(--text-muted);text-align:center;line-height:1.4;padding-bottom:8px;border-bottom:1px solid var(--divider);margin-bottom:10px;flex-shrink:0}
+.bar-chart{display:flex;align-items:flex-end;gap:32px;justify-content:center;flex:1}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:0}
+.bar-val{font-size:12px;font-weight:700;color:var(--teal-darker);white-space:nowrap;margin-bottom:5px;line-height:1}
+.bar-rect{background:linear-gradient(180deg,var(--teal),var(--teal-darker));border-radius:6px 6px 0 0;width:54px;box-shadow:0 4px 14px rgba(29,159,169,0.3);position:relative;flex-shrink:0}
+.bar-rect::after{content:'';position:absolute;top:0;left:5px;right:5px;height:5px;background:rgba(255,255,255,0.22);border-radius:4px 4px 0 0}
+.bar-age{font-size:11px;color:var(--text-muted);font-weight:500;margin-top:5px;white-space:nowrap}
+.bar-axis{font-size:10px;color:var(--text-muted);text-align:center;margin-top:8px;letter-spacing:0.4px;flex-shrink:0}
+.card-ill .card-icon{background:linear-gradient(180deg,#0E3A42,var(--teal-darker));color:rgba(255,255,255,0.9)}
+.card-ill .card-left{background:#F0F6F7;color:var(--teal-darker)}
+.card-ill .card-heading{color:var(--teal-darker)}
+.card-ill .card-body{color:var(--text-mid)}
+.benefits-area{flex:2;padding:14px 20px 16px;background:#F0F6F7;border-left:1px solid var(--divider)}
+.benefits-title{font-size:10.5px;color:var(--text-muted);text-align:center;margin-bottom:9px;line-height:1.4}
+.benefits-table{width:100%;border-collapse:collapse}
+.benefits-table tr{border-bottom:1px solid var(--divider)}
+.benefits-table tr:last-child{border-bottom:none}
+.benefits-table td{padding:5.5px 4px;font-size:11.5px}
+.benefits-table td:first-child{color:var(--text-mid);font-weight:400;width:57%}
+.benefits-table td:last-child{font-weight:700;color:var(--teal-darker);text-align:right;white-space:nowrap}
+.hl-row td{background:rgba(29,159,169,0.06)}
+.section-divider{display:flex;align-items:center;gap:12px}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--divider)}
+.divider-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);opacity:0.4}
+.footer-p1{background:linear-gradient(90deg,#F0F6F7,white);border-top:2px solid var(--teal);padding:14px 48px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.footer-note{font-size:9.5px;color:var(--text-muted);line-height:1.6;max-width:460px}
+.footer-note sup{font-size:7.5px}
+.footer-brand{font-family:'Playfair Display',serif;font-size:12px;color:var(--teal);font-weight:700;text-align:right}
+.footer-date{font-size:10px;color:var(--text-muted);margin-top:2px;text-align:right}
+.page2{background:var(--dark-bg)}
+.p2-header{background:linear-gradient(135deg,#0B1A1E 0%,#0F2229 50%,#0E3A42 100%);padding:28px 48px 24px;position:relative;overflow:hidden;border-bottom:2px solid rgba(29,159,169,0.25)}
+.p2-header::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(29,159,169,0.1) 0%,transparent 70%)}
+.p2-header-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;position:relative;z-index:1}
+.p2-header-left{flex:1}
+.p2-eyebrow{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);font-weight:700;margin-bottom:8px}
+.p2-title{font-family:'Playfair Display',serif;color:white;font-size:26px;font-weight:900;line-height:1.15}
+.p2-title span{color:var(--teal);font-style:italic}
+.p2-subtitle{color:var(--dark-mid);font-size:12.5px;margin-top:7px;font-weight:300;line-height:1.5}
+.p2-intro{background:rgba(29,159,169,0.08);border-left:3px solid var(--teal);padding:11px 16px;margin-top:14px;border-radius:0 10px 10px 0}
+.p2-intro p{font-size:12px;color:var(--dark-body);line-height:1.55}
+.p2-intro strong{color:var(--teal)}
+.p2-logos{display:flex;flex-direction:column;align-items:flex-end;gap:14px;flex-shrink:0}
+.p2-logo-platinium{height:44px;width:auto;object-fit:contain;filter:brightness(1.15) drop-shadow(0 2px 8px rgba(0,0,0,0.4));display:block}
+.p2-logos-divider{width:100%;height:1px;background:rgba(29,159,169,0.25)}
+.p2-logo-nlg-wrap{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.p2-logo-nlg{height:34px;width:auto;object-fit:contain;filter:brightness(1.1) drop-shadow(0 1px 6px rgba(0,0,0,0.35))}
+.nlg-tagline{font-size:9px;color:rgba(255,255,255,0.4);text-align:right;margin-top:2px;letter-spacing:0.3px}
+.p2-section{padding:22px 48px 0}
+.p2-section-title{font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--teal);font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.p2-section-title::after{content:'';flex:1;height:1px;background:rgba(29,159,169,0.2)}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:22px}
+.stat-card{background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.15);border-radius:13px;padding:15px;text-align:center;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--teal),transparent)}
+.stat-number{font-family:'Playfair Display',serif;font-size:25px;font-weight:900;color:var(--teal);line-height:1;margin-bottom:4px}
+.stat-label{font-size:9.5px;color:var(--dark-mid);letter-spacing:0.4px;text-transform:uppercase;line-height:1.3}
+.ratings-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:22px}
+.rating-card{background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.15);border-radius:13px;padding:15px;text-align:center}
+.rating-grade{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--teal);line-height:1}
+.rating-agency{font-size:10.5px;font-weight:700;color:white;margin-top:3px}
+.rating-desc{font-size:9.5px;color:var(--dark-mid);margin-top:2px;line-height:1.3}
+.pillars-row{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:22px}
+.pillar-card{background:rgba(15,34,41,0.7);border:1px solid rgba(29,159,169,0.12);border-radius:13px;padding:15px;text-align:center}
+.pillar-icon{font-size:20px;margin-bottom:6px}
+.pillar-title{font-size:9.5px;font-weight:700;color:var(--teal);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.pillar-text{font-size:11.5px;color:var(--dark-body);line-height:1.5}
+.benefits-row{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:22px}
+.benefit-item{display:flex;align-items:flex-start;gap:9px;background:rgba(15,34,41,0.6);border:1px solid rgba(29,159,169,0.1);border-radius:11px;padding:13px}
+.benefit-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px}
+.benefit-text{font-size:11.5px;color:var(--dark-body);line-height:1.4}
+.benefit-text strong{color:white;font-weight:600;display:block;margin-bottom:2px}
+.issuer-note{margin:0 0 22px;background:rgba(29,159,169,0.06);border:1px solid rgba(29,159,169,0.15);border-radius:11px;padding:11px 16px;font-size:10.5px;color:var(--dark-mid);line-height:1.6;text-align:center}
+.issuer-note strong{color:var(--teal)}
+.footer-p2{border-top:2px solid rgba(29,159,169,0.3);padding:14px 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(11,26,30,0.97)}
+.fp2-contact{font-size:11px;color:var(--dark-mid);line-height:1.6}
+.fp2-contact a{color:var(--teal);text-decoration:none}
+.fp2-legal{font-size:9px;color:rgba(148,179,187,0.55);max-width:360px;text-align:right;line-height:1.5}
+@media print{
+  body{background:white!important;padding:0!important}
+  .print-bar{display:none!important}
+  .page,.page2{box-shadow:none!important;border-radius:0!important;max-width:100%!important;margin:0!important;page-break-after:always}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+@page{margin:.4cm;size:A4}
+</style>
+</head>
+<body>
+<div class="print-bar">
+  <button class="btn-print" onclick="window.print()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 6 2 18 2 18 9"/>
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+      <rect x="6" y="14" width="12" height="8"/>
+    </svg>
+    Descargar / Imprimir PDF
+  </button>
+</div>
+<div class="page">
+  <div class="header">
+    <div class="header-left">
+      <img class="header-logo-platinium" src="${LOGO_PLATINIUM}" alt="Platinium Insurance Group"/>
+      <div class="header-divider"></div>
+      <div class="header-title">Mis <span>Beneficios de Seguro de Vida</span> Planificados</div>
+      <div class="header-subtitle">Ilustración personalizada preparada exclusivamente para usted</div>
+    </div>
+    <div class="header-right">
+      <div class="header-badge">
+        <div class="amount">${fmt(mensual)}</div>
+        <div class="label">Prima Mensual</div>
+      </div>
+    </div>
+  </div>
+  <div class="client-strip">
+    <div class="client-info">
+      <div class="client-avatar">${inicial}</div>
+      <div>
+        <div class="client-name">${nombre}</div>
+        <div class="client-details">${email} &nbsp;·&nbsp; ${telefono} &nbsp;·&nbsp; Edad ${edad}</div>
+      </div>
+    </div>
+    <div>
+      <div class="prepared-by">Preparado el</div>
+      <div class="prepared-date">${hoy}</div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card card-death">
+      <div class="card-inner">
+        <div class="card-icon">
+          <svg class="puzzle-svg" viewBox="0 0 60 60" fill="none"><path d="M10 10h16v6a6 6 0 0 1 0 12v6H10v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.4)"/><path d="M30 10h16v6a6 6 0 0 1 0 12v6H30v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.2)"/></svg>
+          Muerte<br>Prematura
+        </div>
+        <div class="card-left">
+          <div class="card-heading">Si Fallezco Mañana...</div>
+          <div class="card-body">Las personas que he elegido<br>recibirán:</div>
+        </div>
+        <div class="card-right">
+          <div class="death-label">Beneficio por Fallecimiento</div>
+          <div class="death-amount">${fmt(fallecimiento)}</div>
+          <div class="death-sub">Suma Global</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-divider"><div class="divider-dot"></div></div>
+    <div class="card card-cash">
+      <div class="card-inner">
+        <div class="card-icon">
+          <svg class="puzzle-svg" viewBox="0 0 60 60" fill="none"><path d="M10 10h16v6a6 6 0 0 1 0 12v6H10v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.45)"/><path d="M30 10h16v6a6 6 0 0 1 0 12v6H30v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.2)"/></svg>
+          Años de<br>Vida Larga
+        </div>
+        <div class="card-left">
+          <div class="card-heading">Si Necesito Efectivo...</div>
+          <div class="card-body">Puedo tomar un préstamo o retiro<br>del Valor en Efectivo de mi póliza<sup>1</sup>.</div>
+        </div>
+        <div class="chart-area">
+          <div class="chart-title">El Valor en Efectivo proyectado de mi póliza es:</div>
+          <div class="bar-chart">
+            <div class="bar-col">
+              <div class="bar-val">${fmt(acum10)}</div>
+              <div class="bar-rect" style="height:${barH1}px;"></div>
+              <div class="bar-age">Edad ${edad10}</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar-val">${fmt(acum20)}</div>
+              <div class="bar-rect" style="height:${barH2}px;"></div>
+              <div class="bar-age">Edad ${edad20}</div>
+            </div>
+          </div>
+          <div class="bar-axis">Edad Alcanzada</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-divider"><div class="divider-dot"></div></div>
+    <div class="card card-ill">
+      <div class="card-inner">
+        <div class="card-icon">
+          <svg class="puzzle-svg" viewBox="0 0 60 60" fill="none"><path d="M10 10h16v6a6 6 0 0 1 0 12v6H10v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.45)"/><path d="M30 10h16v6a6 6 0 0 1 0 12v6H30v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.2)"/><path d="M10 34h16v6a6 6 0 0 1 0 12v6H10v-6a6 6 0 0 1 0-12Z" fill="rgba(29,159,169,.2)"/></svg>
+          Me<br>Enfermo
+        </div>
+        <div class="card-left">
+          <div class="card-heading">Si Me Enfermo...</div>
+          <div class="card-body">Puedo acceder a una parte<br>de mi Beneficio por Fallecimiento.</div>
+        </div>
+        <div class="benefits-area">
+          <div class="benefits-title">Valores proyectados del Rider de Beneficios Anticipados<sup>2</sup> a los 65 años:</div>
+          <table class="benefits-table">
+            <tr><td>Beneficio por Enfermedad Terminal:</td><td>${fmt(terminal)} Suma Global</td></tr>
+            <tr><td>Beneficio por Enfermedad Crónica:</td><td>${fmt(cronica)} Por Mes</td></tr>
+            <tr class="hl-row"><td>Beneficio por Enfermedad Crítica:</td><td>Hasta ${fmt(critica)} Suma Global</td></tr>
+            <tr class="hl-row"><td>Beneficio por Lesión Crítica:</td><td>Hasta ${fmt(critica)} Suma Global</td></tr>
+            <tr><td>Beneficio por Enfermedad de Alzheimer:</td><td>${fmt(alzheimer)} Suma Global</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-p1">
+    <div class="footer-note">
+      <sup>1</sup> Los préstamos y retiros pueden reducir el beneficio por fallecimiento y el valor en efectivo.<br>
+      <sup>2</sup> Los valores del Rider de Beneficios Anticipados son proyecciones y no están garantizados.<br>
+      Esta ilustración no es un contrato. Los valores son solo para fines informativos.
+    </div>
+    <div>
+      <div class="footer-brand">Platinium Insurance Group</div>
+      <div class="footer-date">${hoy}</div>
+    </div>
+  </div>
+</div>
+<div class="page page2">
+  <div class="p2-header">
+    <div class="p2-header-inner">
+      <div class="p2-header-left">
+        <div class="p2-eyebrow">Por qué confiar en nosotros</div>
+        <div class="p2-title">Nuestra Historia &amp; <span>Fortaleza</span></div>
+        <div class="p2-subtitle">Respaldados por uno de los grupos de seguros más confiables de América — cumpliendo promesas desde 1848.</div>
+        <div class="p2-intro"><p>En <strong>National Life Group</strong>, somos una empresa con propósito. Nuestra causa es simple: brindar estabilidad y tranquilidad a las personas — en buenos y malos tiempos. Desde 1848, hemos cumplido nuestras promesas.</p></div>
+      </div>
+      <div class="p2-logos">
+        <img class="p2-logo-platinium" src="${LOGO_PLATINIUM}" alt="Platinium Insurance Group"/>
+        <div class="p2-logos-divider"></div>
+        <div class="p2-logo-nlg-wrap"><img class="p2-logo-nlg" src="${LOGO_NLG}" alt="National Life Group"/></div>
+        <div class="nlg-tagline">Powered by National Life Group®</div>
+      </div>
+    </div>
+  </div>
+  <div class="p2-section">
+    <div class="p2-section-title">Solidez Financiera (2024)</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-number">$57B</div><div class="stat-label">Total de Activos</div></div>
+      <div class="stat-card"><div class="stat-number">$3.9B</div><div class="stat-label">Beneficios y Promesas Cumplidas</div></div>
+      <div class="stat-card"><div class="stat-number">$635M</div><div class="stat-label">Nuevas Primas de Seguro de Vida</div></div>
+    </div>
+    <div class="p2-section-title">Calificaciones Financieras Independientes</div>
+    <div class="ratings-grid">
+      <div class="rating-card"><div class="rating-grade">A+</div><div class="rating-agency">A.M. Best</div><div class="rating-desc">Superior · 2.º más alto de 16</div></div>
+      <div class="rating-card"><div class="rating-grade">A+</div><div class="rating-agency">Standard &amp; Poor's</div><div class="rating-desc">Sólida · 5.º más alto de 21</div></div>
+      <div class="rating-card"><div class="rating-grade">A1</div><div class="rating-agency">Moody's</div><div class="rating-desc">Buena · 5.º más alto de 21</div></div>
+    </div>
+    <div class="p2-section-title">Nuestro Propósito</div>
+    <div class="pillars-row">
+      <div class="pillar-card"><div class="pillar-icon">🎯</div><div class="pillar-title">Misión</div><div class="pillar-text">Cumplir nuestras promesas — cada póliza, cada reclamación, cada día.</div></div>
+      <div class="pillar-card"><div class="pillar-icon">🌟</div><div class="pillar-title">Visión</div><div class="pillar-text">Brindar tranquilidad a todas las personas con las que estamos en contacto.</div></div>
+      <div class="pillar-card"><div class="pillar-icon">💚</div><div class="pillar-title">Valores</div><div class="pillar-text">Hacer el bien. Ser buenos. Realizar buenas acciones en cada comunidad.</div></div>
+    </div>
+    <div class="p2-section-title">Por qué no tiene que morir para usar este seguro</div>
+    <div class="benefits-row">
+      <div class="benefit-item"><div class="benefit-dot"></div><div class="benefit-text"><strong>Muerte Prematura</strong>Sus seres queridos reciben el beneficio completo como suma global — protección financiera inmediata.</div></div>
+      <div class="benefit-item"><div class="benefit-dot"></div><div class="benefit-text"><strong>Años de Vida Larga</strong>Acceda al valor en efectivo para jubilación, educación o emergencias mediante préstamos o retiros.</div></div>
+      <div class="benefit-item"><div class="benefit-dot"></div><div class="benefit-text"><strong>Me Enfermo</strong>Riders de beneficios anticipados para enfermedades terminales, crónicas, críticas y Alzheimer.</div></div>
+    </div>
+    <div class="issuer-note">
+      Productos emitidos por <strong>National Life Insurance Company®</strong> · Fundada en Montpelier, VT en 1848 &nbsp;|&nbsp;
+      <strong>Life Insurance Company of the Southwest®</strong> · Establecida en Addison, TX en 1955<br>
+      Cada compañía es la única responsable de su propio estado financiero y de sus obligaciones contractuales.
+    </div>
+  </div>
+  <div class="footer-p2">
+    <div class="fp2-contact">
+      <strong style="color:white;">Platinium Insurance Group</strong><br>
+      <a href="https://platiniuminsuranceusa.com">platiniuminsuranceusa.com</a> &nbsp;|&nbsp; 800-732-8939
+    </div>
+    <div class="fp2-legal">Calificaciones al 31 dic. 2024. Las garantías dependen de la capacidad de pago de la compañía emisora. Esta declaración es válida por 30 días. Serie 2026.</div>
+  </div>
+</div>
+</body>
+</html>`;
+
+
+// ══════════════════════════════════════════════════════
+//  B) HTML_EMAIL — compatible Gmail / Outlook
+//  100% inline CSS, table-based, sin JS, sin CSS vars
+// ══════════════════════════════════════════════════════
+const html_email = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tu Cotización – ${nombre}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#F0F6F7;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F0F6F7;padding:24px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+
+  <!-- ═══ HEADER ═══ -->
+  <tr>
+    <td style="background:linear-gradient(135deg,#0B1A1E,#0E3A42);border-radius:16px 16px 0 0;padding:28px 32px 24px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td>
+            <img src="${LOGO_PLATINIUM}" height="42" alt="Platinium Insurance Group" style="display:block;height:42px;width:auto;margin-bottom:14px;"/>
+            <p style="margin:0 0 4px;font-family:Georgia,serif;color:#ffffff;font-size:20px;font-weight:bold;line-height:1.25;">
+              Mis <span style="color:#1d9fa9;">Beneficios de Seguro de Vida</span> Planificados
+            </p>
+            <p style="margin:0;color:#94B3BB;font-size:11px;font-weight:300;">Ilustración personalizada preparada exclusivamente para usted</p>
+          </td>
+          <td align="right" valign="middle" style="padding-left:20px;">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="background:rgba(29,159,169,0.2);border:1px solid rgba(29,159,169,0.4);border-radius:12px;padding:10px 18px;text-align:center;">
+                  <p style="margin:0;font-family:Georgia,serif;font-size:26px;font-weight:bold;color:#ffffff;line-height:1;">${fmt(mensual)}</p>
+                  <p style="margin:4px 0 0;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#94B3BB;">Prima Mensual</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ CLIENTE ═══ -->
+  <tr>
+    <td style="background:#F0F6F7;border-left:1px solid rgba(29,159,169,0.15);border-right:1px solid rgba(29,159,169,0.15);padding:14px 32px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td>
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td width="40" style="vertical-align:middle;">
+                  <div style="width:40px;height:40px;background:linear-gradient(135deg,#0E6B73,#1d9fa9);border-radius:50%;text-align:center;line-height:40px;color:white;font-family:Georgia,serif;font-size:17px;font-weight:bold;">${inicial}</div>
+                </td>
+                <td style="padding-left:12px;vertical-align:middle;">
+                  <p style="margin:0;font-size:15px;font-weight:bold;color:#0E6B73;">${nombre}</p>
+                  <p style="margin:2px 0 0;font-size:11px;color:#7A9BA3;">${email} · ${telefono} · Edad ${edad}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td align="right" valign="middle">
+            <p style="margin:0;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#7A9BA3;">Preparado el</p>
+            <p style="margin:2px 0 0;font-size:12px;font-weight:bold;color:#4A6B73;">${hoy}</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ CARD 1: FALLECIMIENTO ═══ -->
+  <tr>
+    <td style="padding:0 0 2px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-left:1px solid rgba(29,159,169,0.15);border-right:1px solid rgba(29,159,169,0.15);">
+        <tr>
+          <td width="72" style="background:#0B1A1E;padding:16px 8px;text-align:center;vertical-align:middle;border-right:none;">
+            <p style="margin:0;font-size:9px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.8);line-height:1.4;">Muerte<br>Prematura</p>
+          </td>
+          <td style="background:#F5EEFF;padding:16px 20px;vertical-align:middle;">
+            <p style="margin:0 0 4px;font-family:Georgia,serif;font-size:17px;font-weight:bold;color:#0E6B73;">Si Fallezco Mañana...</p>
+            <p style="margin:0;font-size:12px;color:#4A6B73;font-weight:300;">Las personas que he elegido recibirán:</p>
+          </td>
+          <td style="background:linear-gradient(135deg,#0B1A1E,#0E3A42);padding:16px 20px;text-align:center;vertical-align:middle;min-width:160px;">
+            <p style="margin:0 0 4px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#94B3BB;">Beneficio por Fallecimiento</p>
+            <p style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:bold;color:#1d9fa9;line-height:1;">${fmt(fallecimiento)}</p>
+            <p style="margin:4px 0 0;font-size:10px;color:#94B3BB;">Suma Global</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ CARD 2: EFECTIVO ═══ -->
+  <tr>
+    <td style="padding:2px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-left:1px solid rgba(29,159,169,0.15);border-right:1px solid rgba(29,159,169,0.15);">
+        <tr>
+          <td width="72" style="background:#0E6B73;padding:16px 8px;text-align:center;vertical-align:middle;">
+            <p style="margin:0;font-size:9px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.9);line-height:1.4;">Años de<br>Vida Larga</p>
+          </td>
+          <td style="background:#F0F6F7;padding:16px 20px;vertical-align:middle;width:200px;">
+            <p style="margin:0 0 4px;font-family:Georgia,serif;font-size:17px;font-weight:bold;color:#0E6B73;">Si Necesito Efectivo...</p>
+            <p style="margin:0;font-size:12px;color:#4A6B73;font-weight:300;">Puedo tomar un préstamo o retiro del Valor en Efectivo de mi póliza.</p>
+          </td>
+          <td style="background:#F0F6F7;padding:14px 20px;vertical-align:top;border-left:1px solid rgba(29,159,169,0.12);">
+            <p style="margin:0 0 12px;font-size:10px;color:#7A9BA3;text-align:center;padding-bottom:8px;border-bottom:1px solid rgba(29,159,169,0.15);">El Valor en Efectivo proyectado de mi póliza es:</p>
+            <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+              <tr valign="bottom">
+                <td align="center" style="padding:0 12px;">
+                  <p style="margin:0 0 5px;font-size:12px;font-weight:bold;color:#0E6B73;white-space:nowrap;">${fmt(acum10)}</p>
+                  <div style="width:50px;height:${barH1}px;background:linear-gradient(180deg,#1d9fa9,#0E6B73);border-radius:4px 4px 0 0;"></div>
+                  <p style="margin:5px 0 0;font-size:10px;color:#7A9BA3;">Edad ${edad10}</p>
+                </td>
+                <td align="center" style="padding:0 12px;">
+                  <p style="margin:0 0 5px;font-size:12px;font-weight:bold;color:#0E6B73;white-space:nowrap;">${fmt(acum20)}</p>
+                  <div style="width:50px;height:${barH2}px;background:linear-gradient(180deg,#1d9fa9,#0E6B73);border-radius:4px 4px 0 0;"></div>
+                  <p style="margin:5px 0 0;font-size:10px;color:#7A9BA3;">Edad ${edad20}</p>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:8px 0 0;font-size:10px;color:#7A9BA3;text-align:center;border-top:1px solid rgba(29,159,169,0.12);padding-top:6px;">Edad Alcanzada</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ CARD 3: ENFERMEDAD ═══ -->
+  <tr>
+    <td style="padding:2px 0 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-left:1px solid rgba(29,159,169,0.15);border-right:1px solid rgba(29,159,169,0.15);">
+        <tr>
+          <td width="72" style="background:#0B3A40;padding:16px 8px;text-align:center;vertical-align:middle;">
+            <p style="margin:0;font-size:9px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.9);line-height:1.4;">Me<br>Enfermo</p>
+          </td>
+          <td style="background:#F0F6F7;padding:16px 20px;vertical-align:middle;width:180px;">
+            <p style="margin:0 0 4px;font-family:Georgia,serif;font-size:17px;font-weight:bold;color:#0E6B73;">Si Me Enfermo...</p>
+            <p style="margin:0;font-size:12px;color:#4A6B73;font-weight:300;">Puedo acceder a una parte de mi Beneficio por Fallecimiento.</p>
+          </td>
+          <td style="background:#F0F6F7;padding:14px 20px;vertical-align:top;border-left:1px solid rgba(29,159,169,0.12);">
+            <p style="margin:0 0 10px;font-size:10px;color:#7A9BA3;text-align:center;">Valores proyectados del Rider de Beneficios Anticipados a los 65 años:</p>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr style="border-bottom:1px solid rgba(29,159,169,0.12);">
+                <td style="font-size:11px;color:#4A6B73;padding:5px 0;">Beneficio por Enfermedad Terminal:</td>
+                <td align="right" style="font-size:11px;font-weight:bold;color:#0E6B73;padding:5px 0;white-space:nowrap;">${fmt(terminal)} Suma Global</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(29,159,169,0.12);">
+                <td style="font-size:11px;color:#4A6B73;padding:5px 0;">Beneficio por Enfermedad Crónica:</td>
+                <td align="right" style="font-size:11px;font-weight:bold;color:#0E6B73;padding:5px 0;white-space:nowrap;">${fmt(cronica)} Por Mes</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(29,159,169,0.12);background:rgba(29,159,169,0.05);">
+                <td style="font-size:11px;color:#4A6B73;padding:5px 3px;">Beneficio por Enfermedad Crítica:</td>
+                <td align="right" style="font-size:11px;font-weight:bold;color:#0E6B73;padding:5px 0;white-space:nowrap;">Hasta ${fmt(critica)} S.G.</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(29,159,169,0.12);background:rgba(29,159,169,0.05);">
+                <td style="font-size:11px;color:#4A6B73;padding:5px 3px;">Beneficio por Lesión Crítica:</td>
+                <td align="right" style="font-size:11px;font-weight:bold;color:#0E6B73;padding:5px 0;white-space:nowrap;">Hasta ${fmt(critica)} S.G.</td>
+              </tr>
+              <tr>
+                <td style="font-size:11px;color:#4A6B73;padding:5px 0;">Beneficio por Alzheimer:</td>
+                <td align="right" style="font-size:11px;font-weight:bold;color:#0E6B73;padding:5px 0;white-space:nowrap;">${fmt(alzheimer)} Suma Global</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ NOTA PIE ═══ -->
+  <tr>
+    <td style="background:#ffffff;border:1px solid rgba(29,159,169,0.15);border-top:none;padding:14px 32px;">
+      <p style="margin:0;font-size:9.5px;color:#7A9BA3;line-height:1.6;">
+        ¹ Los préstamos y retiros pueden reducir el beneficio por fallecimiento y el valor en efectivo.<br>
+        ² Los valores del Rider de Beneficios Anticipados son proyecciones y no están garantizados.<br>
+        Esta ilustración no es un contrato. Los valores son solo para fines informativos.
+      </p>
+    </td>
+  </tr>
+
+  <!-- ═══ SPACER ═══ -->
+  <tr><td style="height:16px;"></td></tr>
+
+  <!-- ═══ EMPRESA ═══ -->
+  <tr>
+    <td style="background:#0B1A1E;border-radius:16px 16px 0 0;padding:24px 32px 20px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td>
+            <p style="margin:0 0 4px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#1d9fa9;font-weight:bold;">Por qué confiar en nosotros</p>
+            <p style="margin:0 0 6px;font-family:Georgia,serif;color:#ffffff;font-size:20px;font-weight:bold;">Nuestra Historia &amp; <span style="color:#1d9fa9;font-style:italic;">Fortaleza</span></p>
+            <p style="margin:0 0 12px;font-size:11.5px;color:#94B3BB;line-height:1.5;">Respaldados por uno de los grupos de seguros más confiables de América — cumpliendo promesas desde 1848.</p>
+            <table cellpadding="0" cellspacing="0" border="0" style="border-left:3px solid #1d9fa9;background:rgba(29,159,169,0.08);border-radius:0 8px 8px 0;">
+              <tr><td style="padding:10px 14px;font-size:11.5px;color:#E4EEF0;line-height:1.5;">
+                En <strong style="color:#1d9fa9;">National Life Group</strong>, somos una empresa con propósito. Desde 1848 brindamos estabilidad y tranquilidad — en buenos y malos tiempos.
+              </td></tr>
+            </table>
+          </td>
+          <td align="right" valign="top" style="padding-left:24px;white-space:nowrap;">
+            <img src="${LOGO_PLATINIUM}" height="38" alt="Platinium" style="display:block;height:38px;margin-bottom:10px;"/>
+            <table cellpadding="0" cellspacing="0" border="0" style="margin-left:auto;"><tr><td style="height:1px;background:rgba(29,159,169,0.3);width:120px;"></td></tr></table>
+            <div style="margin-top:10px;">
+              <img src="${LOGO_NLG}" height="30" alt="National Life Group" style="display:block;height:30px;"/>
+              <p style="margin:4px 0 0;font-size:8.5px;color:rgba(255,255,255,0.35);text-align:right;">Powered by National Life Group®</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ STATS ═══ -->
+  <tr>
+    <td style="background:#0F2229;padding:18px 32px;">
+      <p style="margin:0 0 14px;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#1d9fa9;font-weight:bold;">Solidez Financiera (2024)</p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td width="33%" style="text-align:center;padding:0 6px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.2);border-radius:10px;">
+              <tr><td style="padding:12px 8px;text-align:center;">
+                <p style="margin:0 0 3px;font-family:Georgia,serif;font-size:22px;font-weight:bold;color:#1d9fa9;">$57B</p>
+                <p style="margin:0;font-size:9px;color:#94B3BB;text-transform:uppercase;letter-spacing:0.5px;">Total de Activos</p>
+              </td></tr>
+            </table>
+          </td>
+          <td width="33%" style="text-align:center;padding:0 6px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.2);border-radius:10px;">
+              <tr><td style="padding:12px 8px;text-align:center;">
+                <p style="margin:0 0 3px;font-family:Georgia,serif;font-size:22px;font-weight:bold;color:#1d9fa9;">$3.9B</p>
+                <p style="margin:0;font-size:9px;color:#94B3BB;text-transform:uppercase;letter-spacing:0.5px;">Beneficios Cumplidos</p>
+              </td></tr>
+            </table>
+          </td>
+          <td width="33%" style="text-align:center;padding:0 6px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.2);border-radius:10px;">
+              <tr><td style="padding:12px 8px;text-align:center;">
+                <p style="margin:0 0 3px;font-family:Georgia,serif;font-size:22px;font-weight:bold;color:#1d9fa9;">$635M</p>
+                <p style="margin:0;font-size:9px;color:#94B3BB;text-transform:uppercase;letter-spacing:0.5px;">Nuevas Primas</p>
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ RATINGS ═══ -->
+  <tr>
+    <td style="background:#0F2229;padding:0 32px 18px;">
+      <p style="margin:0 0 14px;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:#1d9fa9;font-weight:bold;">Calificaciones Independientes</p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td width="33%" style="padding:0 6px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.2);border-radius:10px;">
+              <tr><td style="padding:12px 8px;text-align:center;">
+                <p style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:bold;color:#1d9fa9;">A+</p>
+                <p style="margin:3px 0 0;font-size:10px;font-weight:bold;color:white;">A.M. Best</p>
+                <p style="margin:2px 0 0;font-size:9px;color:#94B3BB;">Superior · 2.º de 16</p>
+              </td></tr>
+            </table>
+          </td>
+          <td width="33%" style="padding:0 6px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.2);border-radius:10px;">
+              <tr><td style="padding:12px 8px;text-align:center;">
+                <p style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:bold;color:#1d9fa9;">A+</p>
+                <p style="margin:3px 0 0;font-size:10px;font-weight:bold;color:white;">Standard &amp; Poor's</p>
+                <p style="margin:2px 0 0;font-size:9px;color:#94B3BB;">Sólida · 5.º de 21</p>
+              </td></tr>
+            </table>
+          </td>
+          <td width="33%" style="padding:0 6px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:rgba(15,34,41,0.8);border:1px solid rgba(29,159,169,0.2);border-radius:10px;">
+              <tr><td style="padding:12px 8px;text-align:center;">
+                <p style="margin:0;font-family:Georgia,serif;font-size:28px;font-weight:bold;color:#1d9fa9;">A1</p>
+                <p style="margin:3px 0 0;font-size:10px;font-weight:bold;color:white;">Moody's</p>
+                <p style="margin:2px 0 0;font-size:9px;color:#94B3BB;">Buena · 5.º de 21</p>
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ═══ FOOTER ═══ -->
+  <tr>
+    <td style="background:#0B1A1E;border-top:2px solid rgba(29,159,169,0.3);border-radius:0 0 16px 16px;padding:16px 32px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td>
+            <p style="margin:0;font-size:12px;font-weight:bold;color:white;">Platinium Insurance Group</p>
+            <p style="margin:3px 0 0;font-size:11px;color:#94B3BB;">
+              <a href="https://platiniuminsuranceusa.com" style="color:#1d9fa9;text-decoration:none;">platiniuminsuranceusa.com</a>
+              &nbsp;·&nbsp; +16893082809
+            </p>
+          </td>
+          <td align="right" valign="middle">
+            <p style="margin:0;font-size:9px;color:rgba(148,179,187,0.5);text-align:right;line-height:1.5;max-width:240px;">
+              Calificaciones al 31 dic. 2024. Las garantías dependen de la capacidad de pago de la compañía emisora.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>
