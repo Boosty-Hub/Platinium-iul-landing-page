@@ -219,8 +219,11 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
   const { rc, kommo, horario } = ctx;
 
   // Load lead with full snapshot for Realtime broadcast payload
+  // OJO: la tabla leads NO tiene columna `edad` (solo `anio_nacimiento`). Seleccionar
+  // `edad` hacía fallar TODA la query → lead=null → "sin_telefono" en cada lead.
+  // El pop-up del asesor deriva la edad de anio_nacimiento, así que no hace falta `edad`.
   const { data: lead } = await admin.from("leads").select(
-    "id, telefono, nombre, interes, anio_nacimiento, edad, ahorro_semanal, city, fuente, utm_source"
+    "id, telefono, nombre, interes, anio_nacimiento, ahorro_semanal, city, fuente, utm_source"
   ).eq("id", item.lead_id).single();
   const client = normalizePhone(lead?.telefono);
   if (!client) { await setQueue(admin, item.id, { estado: "failed", ultimo_resultado: "sin_telefono" }); return { lead: item.lead_id, action: "failed_no_phone" }; }
@@ -320,7 +323,7 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
             nombre: lead?.nombre ?? null,
             telefono: lead?.telefono ?? null,
             interes: lead?.interes ?? null,
-            edad: lead?.edad ?? null,
+            edad: lead?.anio_nacimiento ? new Date().getFullYear() - Number(lead.anio_nacimiento) : null,
             anio_nacimiento: lead?.anio_nacimiento ?? null,
             ahorro_semanal: lead?.ahorro_semanal ?? null,
             city: lead?.city ?? null,
