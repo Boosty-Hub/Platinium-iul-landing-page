@@ -150,6 +150,8 @@ export default function CockpitPage() {
     if (!RC_CLIENT_ID) return; // RC no configurado → no escuchamos
 
     function onMsg(e: MessageEvent) {
+      // Solo confiamos en mensajes del widget de RingCentral.
+      if (e.origin !== "https://apps.ringcentral.com") return;
       const d = e.data;
       if (d && typeof d === "object" && d.type === "rc-login-status-notify") {
         setSoftphoneReady(!!d.loggedIn);

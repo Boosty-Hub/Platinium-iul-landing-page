@@ -16,6 +16,9 @@ import { fmtRelative, fmtRelativeAny } from "@/lib/labels";
 import DispositionSheet from "@/components/asesor/DispositionSheet";
 import LeadDetailSheet from "@/components/asesor/LeadDetailSheet";
 
+// Origen del widget de RingCentral Embeddable — para validar postMessage entrante/saliente.
+const RC_WIDGET_ORIGIN = "https://apps.ringcentral.com";
+
 // ── Status config ────────────────────────────────────────────────────────────
 const ESTADO_CONFIG: Record<string, { label: string; color: string; dot: string }> = {
   pending:      { label: "Por contactar", color: "bg-yellow-500/15 text-yellow-400 border-yellow-500/25",   dot: "bg-yellow-400" },
@@ -137,6 +140,8 @@ export default function MisLeadsPage() {
   // "¿Cómo fue la llamada?" para el lead que llamó.
   useEffect(() => {
     function onCallEnd(e: MessageEvent) {
+      // Solo confiamos en mensajes del widget de RingCentral (no de cualquier origen).
+      if (e.origin !== RC_WIDGET_ORIGIN) return;
       const d = e.data;
       if (d && typeof d === "object" && d.type === "rc-call-end-notify" && pendingCallRef.current) {
         const p = pendingCallRef.current;
@@ -257,7 +262,7 @@ export default function MisLeadsPage() {
     }
     frame.contentWindow.postMessage(
       { type: "rc-adapter-new-call", phoneNumber: tel, toCall: true },
-      "*",
+      RC_WIDGET_ORIGIN,
     );
     // "Registrar resultado" se abre solo al COLGAR (evento rc-call-end-notify),
     // para no tapar el softphone mientras hablan.
