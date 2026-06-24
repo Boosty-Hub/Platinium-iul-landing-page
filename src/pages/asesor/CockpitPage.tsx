@@ -1,13 +1,16 @@
-// CockpitPage — Slice 2: presence toggle, heartbeat, Realtime pop-up.
-// Slice 3 will add RC Embeddable softphone (task 3.8).
+// CockpitPage — Slice 2 (presence, heartbeat, Realtime) + Slice 3 (RC Embeddable).
+// Slice 3: RC Embeddable softphone injected via useEffect when VITE_RC_CLIENT_ID is set.
+// Graceful gating: if clientId is missing, renders a friendly config card instead.
 import { useEffect, useRef, useState } from "react";
-import { Radio, WifiOff } from "lucide-react";
+import { Radio, WifiOff, PhoneOff, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentAsesorId, updatePresence } from "@/lib/asesorApi";
 import IncomingCallPopup from "@/components/asesor/IncomingCallPopup";
 import type { IncomingCallPayload } from "@/components/asesor/IncomingCallPopup";
 
 const HEARTBEAT_INTERVAL_MS = 30_000;
+const RC_CLIENT_ID = import.meta.env.VITE_RC_CLIENT_ID as string | undefined;
+const RC_ADAPTER_SCRIPT = "https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/adapter.js";
 
 export default function CockpitPage() {
   const [asesorId, setAsesorId] = useState<string | null>(null);
@@ -76,6 +79,24 @@ export default function CockpitPage() {
       supabase.removeChannel(channel);
     };
   }, [asesorId]);
+
+  // ── RC Embeddable: inject adapter script once (Slice 3) ───────────────────
+  // Only injected when VITE_RC_CLIENT_ID is non-empty.
+  // Script appended to body once; RC widget renders as an iframe overlay.
+  useEffect(() => {
+    if (!RC_CLIENT_ID) return;
+    if (document.querySelector(`script[data-rc-embeddable]`)) return; // already injected
+
+    const script = document.createElement("script");
+    script.src = `${RC_ADAPTER_SCRIPT}?clientId=${encodeURIComponent(RC_CLIENT_ID)}&appServer=https://platform.ringcentral.com`;
+    script.async = true;
+    script.setAttribute("data-rc-embeddable", "true");
+    document.body.appendChild(script);
+
+    return () => {
+      // Do NOT remove on unmount — RC Embeddable manages its own lifecycle
+    };
+  }, []); // run once
 
   // ── Toggle availability ───────────────────────────────────────────────────
   const handleToggle = async () => {
@@ -149,11 +170,54 @@ export default function CockpitPage() {
         </p>
       </div>
 
-      {/* RC Embeddable softphone placeholder (Slice 3 — task 3.8) */}
-      <div className="bg-[#0F2229] border border-[#1d9fa9]/10 rounded-2xl p-6 opacity-60">
-        <p className="text-sm font-semibold text-[#94B3BB] mb-1">Softphone RingCentral</p>
-        <p className="text-xs text-[#6A8E98]">Disponible en Slice 3 — requiere configuración de RC Client ID.</p>
-      </div>
+      {/* RC Embeddable softphone (Slice 3) */}
+      {RC_CLIENT_ID ? (
+        /* RC widget renders itself as a floating iframe; this card is informational */
+        <div className="bg-[#0F2229] border border-[#1d9fa9]/20 rounded-2xl p-6">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1d9fa9]/15 flex items-center justify-center">
+              <Radio className="w-4 h-4 text-[#1d9fa9]" />
+            </div>
+            <div className="space-y-1 min-w-0">
+              <p className="text-sm font-semibold text-[#E4EEF0]">Softphone RingCentral</p>
+              <p className="text-xs text-[#6A8E98]">
+                El widget de RingCentral está activo. Busca el icono flotante de RC en la esquina
+                de la pantalla. La primera vez debes iniciar sesión con tu cuenta RC (un solo paso).
+              </p>
+              <p className="text-xs text-[#94B3BB] mt-2">
+                Cuando el sistema marque a un cliente y seleccione tu extensión, recibirás la
+                llamada entrante directamente en el widget.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Graceful fallback when VITE_RC_CLIENT_ID is absent */
+        <div className="bg-[#0F2229] border border-[#1d9fa9]/10 rounded-2xl p-6">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center">
+              <PhoneOff className="w-4 h-4 text-orange-400" />
+            </div>
+            <div className="space-y-1 min-w-0">
+              <p className="text-sm font-semibold text-[#94B3BB]">
+                Softphone: pendiente de configurar el Client ID de RingCentral
+              </p>
+              <p className="text-xs text-[#6A8E98]">
+                Para activar el softphone integrado, un administrador debe configurar{" "}
+                <code className="text-[#1d9fa9]">VITE_RC_CLIENT_ID</code> en las variables de
+                entorno del despliegue y volver a publicar la aplicación.
+              </p>
+              <a
+                href="/admin/configuracion"
+                className="inline-flex items-center gap-1 text-xs text-[#1d9fa9]/70 hover:text-[#1d9fa9] transition-colors mt-1"
+              >
+                <ExternalLink className="w-3 h-3" />
+                Ir a Configuración
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Incoming call pop-up (rendered over the layout when call arrives) */}
       {incomingCall && (

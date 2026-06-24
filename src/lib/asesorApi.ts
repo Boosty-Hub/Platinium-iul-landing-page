@@ -105,6 +105,22 @@ export async function getMyHistory(): Promise<MyCallAttempt[]> {
   return (data as MyCallAttempt[]) ?? [];
 }
 
+// ── Recording playback (Slice 3) ─────────────────────────────────────────────
+
+/**
+ * Returns a time-limited signed URL for a recording owned by the current asesor.
+ * The edge function validates ownership; non-owner → 403.
+ */
+export async function getMyRecordingUrl(attempt_id: string): Promise<string> {
+  const { data, error } = await (supabase as any).functions.invoke("get-recording", {
+    body: { attempt_id },
+  });
+  if (error) throw new Error(error.message ?? "Error invocando get-recording");
+  const result = data as { ok: boolean; url?: string; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "get-recording devolvió error");
+  return result.url!;
+}
+
 // ── Notes (via kommo-note edge fn) ───────────────────────────────────────────
 
 export async function submitCallNote(

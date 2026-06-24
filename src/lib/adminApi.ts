@@ -285,3 +285,47 @@ export async function deactivateAsesorUser(user_id: string): Promise<void> {
   const result = data as { ok: boolean; error?: string };
   if (!result.ok) throw new Error(result.error ?? "manage-users devolvió error");
 }
+
+// ── Scorecard (Slice 3) ──────────────────────────────────────────────────────
+
+export interface AdvisorScorecard {
+  asesor_id: string;
+  from: string;
+  to: string;
+  dials: number;
+  advisor_answer_rate: number;
+  client_contact_rate: number;
+  avg_ring_sec: number;
+  avg_talk_sec: number;
+  calls_by_hour: Record<string, number>;
+  unique_leads_contacted: number;
+  recordings_count: number;
+  notes_rate: number;
+  quality_score: number;
+}
+
+export async function getAdvisorScorecard(
+  asesor_id: string,
+  from: string,
+  to: string
+): Promise<AdvisorScorecard> {
+  const { data, error } = await (supabase as any).rpc("advisor_scorecard", {
+    p_asesor_id: asesor_id,
+    p_from: from,
+    p_to: to,
+  });
+  if (error) throw new Error(error.message ?? "Error en advisor_scorecard");
+  return data as AdvisorScorecard;
+}
+
+// ── Recording URL (admin path) (Slice 3) ──────────────────────────────────────
+
+export async function getRecordingUrl(attempt_id: string): Promise<string> {
+  const { data, error } = await (supabase as any).functions.invoke("get-recording", {
+    body: { attempt_id },
+  });
+  if (error) throw new Error(error.message ?? "Error invocando get-recording");
+  const result = data as { ok: boolean; url?: string; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "get-recording devolvió error");
+  return result.url!;
+}

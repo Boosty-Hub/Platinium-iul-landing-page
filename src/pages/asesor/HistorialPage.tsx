@@ -1,8 +1,8 @@
-// HistorialPage — advisor's own call history (Slice 2).
-// Slice 3 will add recording playback (task 3.7).
+// HistorialPage — advisor's own call history (Slice 2 + Slice 3).
+// Slice 3: "Reproducir" button on attempts with recording_storage_path.
 import { useEffect, useState } from "react";
-import { RefreshCw, CheckCircle, XCircle, Voicemail, AlertCircle, Clock } from "lucide-react";
-import { getMyHistory } from "@/lib/asesorApi";
+import { RefreshCw, CheckCircle, XCircle, Voicemail, AlertCircle, Clock, Play, X } from "lucide-react";
+import { getMyHistory, getMyRecordingUrl } from "@/lib/asesorApi";
 import type { MyCallAttempt } from "@/lib/asesorApi";
 
 const OUTCOME_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string }> = {
@@ -34,10 +34,70 @@ function fmtSec(sec: number | null): string {
   return `${m}m ${s}s`;
 }
 
+// ── Recording player modal ────────────────────────────────────────────────────
+interface RecordingModalProps {
+  attemptId: string;
+  onClose: () => void;
+}
+
+function RecordingModal({ attemptId, onClose }: RecordingModalProps) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    getMyRecordingUrl(attemptId)
+      .then((u) => { if (active) { setUrl(u); setLoading(false); } })
+      .catch((e) => { if (active) { setError((e as Error).message); setLoading(false); } });
+    return () => { active = false; };
+  }, [attemptId]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="bg-[#0F2229] border border-[#1d9fa9]/30 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-[#E4EEF0]">Grabación de llamada</h3>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-[#94B3BB] hover:text-white hover:bg-[#1d9fa9]/10 transition-colors"
+            aria-label="Cerrar"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {loading && (
+          <p className="text-sm text-[#6A8E98] text-center py-4">Cargando grabación...</p>
+        )}
+        {error && (
+          <p className="text-sm text-red-400 text-center py-4">
+            Error: {error}
+          </p>
+        )}
+        {url && (
+          <audio
+            controls
+            autoPlay={false}
+            src={url}
+            className="w-full rounded-lg"
+            style={{ colorScheme: "dark" }}
+          />
+        )}
+        <p className="text-[11px] text-[#6A8E98] text-center">
+          El enlace expira en 5 minutos. Descarga el audio si necesitas guardarlo.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
 export default function HistorialPage() {
   const [history, setHistory] = useState<MyCallAttempt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [playingAttemptId, setPlayingAttemptId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -99,6 +159,7 @@ export default function HistorialPage() {
                   <th className="text-left px-4 py-3 font-semibold">T. timbre</th>
                   <th className="text-left px-4 py-3 font-semibold">T. conversación</th>
                   <th className="text-left px-4 py-3 font-semibold">Nota</th>
+                  <th className="text-left px-4 py-3 font-semibold">Grabación</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#1d9fa9]/10">
@@ -141,6 +202,20 @@ export default function HistorialPage() {
                         <span className="text-xs text-[#6A8E98]">—</span>
                       )}
                     </td>
+                    <td className="px-4 py-3">
+                      {attempt.recording_storage_path ? (
+                        <button
+                          onClick={() => setPlayingAttemptId(attempt.id)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1d9fa9]/15 border border-[#1d9fa9]/30 text-[#1d9fa9] text-xs font-medium hover:bg-[#1d9fa9]/25 transition-colors"
+                          title="Reproducir grabación"
+                        >
+                          <Play className="w-3 h-3" />
+                          Reproducir
+                        </button>
+                      ) : (
+                        <span className="text-xs text-[#6A8E98]">—</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -152,6 +227,14 @@ export default function HistorialPage() {
       <p className="text-xs text-[#6A8E98]">
         {history.length} intento{history.length !== 1 ? "s" : ""} (últimos 200).
       </p>
+
+      {/* Recording player modal */}
+      {playingAttemptId && (
+        <RecordingModal
+          attemptId={playingAttemptId}
+          onClose={() => setPlayingAttemptId(null)}
+        />
+      )}
     </div>
   );
 }
