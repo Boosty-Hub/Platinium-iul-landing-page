@@ -194,6 +194,26 @@ interface QueueItem {
   client_attempts: number; next_asesor_idx: number; advisor_round: number;
 }
 
+// Extensiones que están EN una llamada ahora mismo (no se les marca).
+// Un solo request a RingCentral devuelve el estado telefónico de todas.
+// Falla "abierto": si no se puede leer, no salta a nadie (mejor marcar que no marcar).
+async function rcBusyExtensions(rc: RCCfg, token: string): Promise<Set<string>> {
+  try {
+    const res = await fetch(`${rc.server_url}/restapi/v1.0/account/~/presence?detailedTelephonyState=true&perPage=250`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return new Set();
+    const data = await res.json();
+    const busy = new Set<string>();
+    for (const r of (data?.records ?? [])) {
+      const ext = r?.extension?.extensionNumber;
+      const tel = r?.telephonyStatus; // NoCall | CallConnected | Ringing | OnHold | ...
+      if (ext && tel && tel !== "NoCall") busy.add(String(ext));
+    }
+    return busy;
+  } catch { return new Set(); }
+}
+
 async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: KommoCfg | null; horario: Horario }) {
   const { rc, kommo, horario } = ctx;
 
@@ -234,6 +254,8 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
 
   await setQueue(admin, item.id, { estado: "in_progress" });
   const token = await rcAuth(rc);
+  // Snapshot de qué asesores están en llamada ahora (no se les marca).
+  const busyExt = await rcBusyExtensions(rc, token);
   const advisorPoll = Math.min(horario.advisor_ring_timeout_sec || 18, 18);
   const clientPoll = Math.min(Math.max(horario.advisor_ring_timeout_sec || 30, 25), 30);
   const BUDGET_MS = 55_000;
@@ -251,6 +273,12 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
     // Skip advisor if they are explicitly offline
     if (offlineIds.has(asesor.id)) {
       console.log(`presence gate: skipping advisor ${asesor.nombre} (offline or unavailable)`);
+      continue;
+    }
+
+    // Saltar al asesor que YA está en una llamada (estado telefónico en RingCentral).
+    if (asesor.rc_extension && busyExt.has(String(asesor.rc_extension))) {
+      console.log(`busy gate: skipping advisor ${asesor.nombre} (en llamada)`);
       continue;
     }
 
