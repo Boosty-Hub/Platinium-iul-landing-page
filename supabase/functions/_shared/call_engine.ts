@@ -192,6 +192,7 @@ async function updAttempt(admin: Admin, id: string | null, patch: Record<string,
 interface QueueItem {
   id: string; lead_id: string; kommo_lead_id: string | null;
   client_attempts: number; next_asesor_idx: number; advisor_round: number;
+  solo_asesor_id: string | null;
 }
 
 // Extensiones que están EN una llamada ahora mismo (no se les marca).
@@ -224,7 +225,19 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
   const client = normalizePhone(lead?.telefono);
   if (!client) { await setQueue(admin, item.id, { estado: "failed", ultimo_resultado: "sin_telefono" }); return { lead: item.lead_id, action: "failed_no_phone" }; }
 
-  const { data: asesores } = await admin.from("asesores").select("*").eq("activo", true).order("orden", { ascending: true });
+  let { data: asesores } = await admin.from("asesores").select("*").eq("activo", true).order("orden", { ascending: true });
+
+  // ── Recontacto fijado a un asesor (solo_asesor_id) ──────────────────────
+  if (item.solo_asesor_id) {
+    const pinned = (asesores ?? []).filter((a) => a.id === item.solo_asesor_id);
+    if (pinned.length > 0) {
+      asesores = pinned; // llama SOLO al asesor asignado
+    } else {
+      // Asesor inactivo → rotación normal (log + fall-through)
+      console.log(`solo_asesor_id ${item.solo_asesor_id} no está activo — rotación normal`);
+    }
+  }
+
   if (!asesores?.length) { await setQueue(admin, item.id, { estado: "scheduled", scheduled_at: plusMin(2), ultimo_resultado: "sin_asesores" }); return { lead: item.lead_id, action: "no_advisors" }; }
 
   // ── TASK 2.2: Presence gate ───────────────────────────────────────────────
@@ -314,6 +327,7 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
             fuente: lead?.fuente ?? null,
             utm_source: lead?.utm_source ?? null,
             ts: nowIso(),
+            es_seguimiento: !!item.solo_asesor_id,
           },
         });
         await admin.removeChannel(ch);
@@ -422,8 +436,51 @@ export async function processCallQueueTick(admin: Admin, opts: { maxItems?: numb
   const horario = parseHorario((horarioI?.config as Record<string, unknown>) ?? {});
   const hstatus = horarioStatus(horario, new Date());
 
+  // ── Reminder sweep: avisar seguimientos que vencen en los próximos 5 min ──
+  try {
+    const now = new Date();
+    const in5min = new Date(now.getTime() + 5 * 60_000).toISOString();
+    const { data: dueSegs } = await admin
+      .from("seguimientos")
+      .select("id, lead_id, asesor_id, programado_para, nota, leads(nombre)")
+      .eq("estado", "pendiente")
+      .not("programado_para", "is", null)
+      .gte("programado_para", now.toISOString())
+      .lte("programado_para", in5min);
+
+    if (dueSegs && dueSegs.length > 0) {
+      // Marcar como avisados antes de broadcast (evita doble aviso si tick demora)
+      const ids = dueSegs.map((s) => s.id);
+      await admin.from("seguimientos").update({ estado: "avisado" }).in("id", ids);
+
+      for (const seg of dueSegs) {
+        if (!seg.asesor_id) continue;
+        void (async () => {
+          try {
+            const ch = admin.channel("advisor:" + seg.asesor_id);
+            await ch.subscribe();
+            await ch.send({
+              type: "broadcast",
+              event: "seguimiento_reminder",
+              payload: {
+                seguimiento_id: seg.id,
+                lead_id: seg.lead_id,
+                nombre: (seg.leads as { nombre?: string } | null)?.nombre ?? null,
+                programado_para: seg.programado_para,
+                nota: seg.nota,
+              },
+            });
+            await admin.removeChannel(ch);
+          } catch (e) { console.error("broadcast seguimiento_reminder", e); }
+        })();
+      }
+    }
+  } catch (e) {
+    console.error("reminder sweep", (e as Error).message);
+  }
+
   const { data: items } = await admin.from("call_queue")
-    .select("id, lead_id, kommo_lead_id, client_attempts, next_asesor_idx, advisor_round")
+    .select("id, lead_id, kommo_lead_id, client_attempts, next_asesor_idx, advisor_round, solo_asesor_id")
     .in("estado", ["pending", "scheduled"])
     .lte("scheduled_at", nowIso())
     .order("scheduled_at", { ascending: true })
