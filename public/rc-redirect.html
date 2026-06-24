@@ -8,11 +8,19 @@
   <body>
     <!--
       Redirect de OAuth del softphone RingCentral Embeddable, servido desde NUESTRO
-      dominio (first-party). Esto evita el "Login failed due to internal errors":
-      el popup de login vuelve a esta página (mismo dominio que la app) y redirect.js
-      le pasa la sesión al widget sin problemas de cookies/ventanas de terceros.
-      Hay que registrar esta URL como Redirect URI en el app de RC (XAECTYxr...).
+      dominio (first-party) para evitar el "Login failed due to internal errors".
+      Contenido OFICIAL de RingCentral (config/redirect-uri): solo pasa el callback al
+      widget por postMessage; el token exchange lo hace el widget con el MISMO redirectUri
+      (si en vez de esto cargáramos redirect.js, daría OAU-109 "Redirect URIs do not match").
+      Esta URL debe estar registrada como Redirect URI en el app de RC (XAECTYxr...).
     -->
-    <script src="https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/redirect.js"></script>
+    <script>
+      // origin = dominio de la librería Embeddable (el adapter.js es de apps.ringcentral.com)
+      var origin = "https://apps.ringcentral.com";
+      if (window.opener) {
+        window.opener.postMessage({ callbackUri: window.location.href }, origin);
+        window.close();
+      }
+    </script>
   </body>
 </html>
