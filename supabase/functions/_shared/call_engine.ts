@@ -424,11 +424,17 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
 
 // ── Tick del motor (lo dispara el cron o submit-lead) ─────────────────────────
 export async function processCallQueueTick(admin: Admin, opts: { maxItems?: number } = {}) {
-  const [rcI, kommoI, horarioI] = await Promise.all([
+  const [rcI, kommoI, horarioI, marcadoI] = await Promise.all([
     getIntegracion(admin, "ringcentral"),
     getIntegracion(admin, "kommo"),
     getIntegracion(admin, "horario"),
+    getIntegracion(admin, "marcado"),
   ]);
+  // Switch maestro de "Marcado automático" (Configuración). Default OFF si la fila
+  // no existe → el motor NO marca hasta que un admin lo encienda explícitamente.
+  // Desacopla "pausar marcado" de "RC configurado": RC puede quedar encendido
+  // (softphone/entrantes/presencia siguen) y el marcado saliente, en pausa.
+  if (!marcadoI?.activo) return { skipped: "marcado_pausado" };
   if (!rcI?.activo) return { skipped: "rc_inactivo" };
 
   const rc = rcI.config as unknown as RCCfg;

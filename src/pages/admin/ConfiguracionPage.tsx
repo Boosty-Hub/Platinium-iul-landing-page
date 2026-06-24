@@ -5,6 +5,7 @@ import {
   Horario,
   KommoMetadata,
   getIntegraciones,
+  upsertIntegracion,
   getKommoMetadata,
   listAsesores,
   getHorario,
@@ -18,7 +19,7 @@ import HorarioConfig from "@/components/admin/config/HorarioConfig";
 import ResendConfig from "@/components/admin/config/ResendConfig";
 import UsuariosPage from "@/pages/admin/UsuariosPage";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Phone } from "lucide-react";
 
 function StatusBadge({ activo }: { activo: boolean }) {
   return (
@@ -72,6 +73,7 @@ export default function ConfiguracionPage() {
   const [horario, setHorario] = useState<Horario | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [marcadoToggling, setMarcadoToggling] = useState(false);
 
   // Kommo metadata — shared between KommoConexion and KommoMapeo
   const [kommoMeta, setKommoMeta] = useState<KommoMetadata | null>(null);
@@ -125,6 +127,30 @@ export default function ConfiguracionPage() {
   const kommo = getIntegracion("kommo");
   const ringcentral = getIntegracion("ringcentral");
   const resend = getIntegracion("resend");
+  const marcado = getIntegracion("marcado");
+
+  // Switch maestro de marcado automático. Encenderlo arranca las llamadas (en horario).
+  const toggleMarcado = async () => {
+    if (!marcado) return;
+    const next = !marcado.activo;
+    if (
+      next &&
+      !window.confirm(
+        "¿Encender el marcado automático? El sistema empezará a llamar a los leads pendientes en horario laboral. Verificá que RingCentral esté encendido.",
+      )
+    )
+      return;
+    setMarcadoToggling(true);
+    setError(null);
+    try {
+      await upsertIntegracion("marcado", marcado.nombre || "Marcado automático", marcado.config ?? {}, next);
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "No se pudo cambiar el marcado.");
+    } finally {
+      setMarcadoToggling(false);
+    }
+  };
 
   const responsableEnums =
     kommoMeta?.leadFields.find((f) => f.name.toLowerCase() === "responsable")?.enums ?? [];
@@ -165,7 +191,46 @@ export default function ConfiguracionPage() {
       )}
 
       {!loading && !error && (
-        <Tabs defaultValue="ringcentral">
+        <>
+          {marcado && (
+            <div
+              className={`mb-5 rounded-xl border px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                marcado.activo
+                  ? "border-emerald-500/30 bg-emerald-500/10"
+                  : "border-amber-500/25 bg-amber-500/[0.06]"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    marcado.activo ? "bg-emerald-500/15" : "bg-amber-500/10"
+                  }`}
+                >
+                  <Phone className={`w-5 h-5 ${marcado.activo ? "text-emerald-400" : "text-amber-400"}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#E4EEF0]">Marcado automático</p>
+                  <p className="text-xs text-[#94B3BB] mt-0.5 max-w-xl">
+                    {marcado.activo
+                      ? "Encendido — el sistema llama a los leads pendientes en horario laboral."
+                      : "Pausado — no se hacen llamadas automáticas. Encendelo cuando el equipo esté listo para recibirlas."}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={toggleMarcado}
+                disabled={marcadoToggling}
+                className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50 flex-shrink-0 ${
+                  marcado.activo
+                    ? "bg-emerald-600 hover:bg-emerald-500 text-white"
+                    : "bg-[#0B1A1E] border border-amber-500/40 text-amber-300 hover:border-amber-400 hover:text-amber-200"
+                }`}
+              >
+                {marcadoToggling ? "Guardando…" : marcado.activo ? "Pausar marcado" : "Encender marcado"}
+              </button>
+            </div>
+          )}
+          <Tabs defaultValue="ringcentral">
           <TabsList className="bg-[#0B1A1E] border border-[#1d9fa9]/20 rounded-xl p-1 h-auto">
             <TabsTrigger
               value="ringcentral"
@@ -306,6 +371,7 @@ export default function ConfiguracionPage() {
             </div>
           </TabsContent>
         </Tabs>
+        </>
       )}
     </div>
   );
