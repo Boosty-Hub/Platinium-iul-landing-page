@@ -15,6 +15,7 @@ import KommoMapeo from "@/components/admin/config/KommoMapeo";
 import RingCentralConfig from "@/components/admin/config/RingCentralConfig";
 import AsesoresConfig from "@/components/admin/config/AsesoresConfig";
 import HorarioConfig from "@/components/admin/config/HorarioConfig";
+import ResendConfig from "@/components/admin/config/ResendConfig";
 import UsuariosPage from "@/pages/admin/UsuariosPage";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { RefreshCw } from "lucide-react";
@@ -123,6 +124,7 @@ export default function ConfiguracionPage() {
 
   const kommo = getIntegracion("kommo");
   const ringcentral = getIntegracion("ringcentral");
+  const resend = getIntegracion("resend");
 
   const responsableEnums =
     kommoMeta?.leadFields.find((f) => f.name.toLowerCase() === "responsable")?.enums ?? [];
@@ -280,7 +282,26 @@ export default function ConfiguracionPage() {
 
           {/* Sistema tab */}
           <TabsContent value="sistema">
-            <div className="mt-4">
+            <div className="mt-4 space-y-4">
+              <CollapsibleCard
+                title="Email (Resend)"
+                subtitle="Configuración de envío de cotizaciones por email"
+                defaultOpen={false}
+                actualizado_en={resend?.actualizado_en}
+                summary={
+                  <div className="flex items-center gap-2">
+                    <StatusBadge activo={resend?.activo ?? false} />
+                    {resend?.config?.from_email && (
+                      <span className="text-xs text-[#6A8E98] font-mono">
+                        {resend.config.from_email}
+                      </span>
+                    )}
+                  </div>
+                }
+              >
+                <ResendConfig data={resend} onSaved={load} />
+              </CollapsibleCard>
+
               <UsuariosPage />
             </div>
           </TabsContent>
