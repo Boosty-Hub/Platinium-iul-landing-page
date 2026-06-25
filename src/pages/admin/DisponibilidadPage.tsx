@@ -3,8 +3,10 @@
 // Datos: tabla advisor_availability_daily (cron suma 1 min por asesor disponible).
 import { useEffect, useMemo, useState } from "react";
 import { RefreshCw, Clock } from "lucide-react";
-import { listAsesores, getAvailabilityDaily } from "@/lib/adminApi";
-import type { Asesor, AvailabilityRow } from "@/lib/adminApi";
+import { listAsesorUsers, getAvailabilityDaily } from "@/lib/adminApi";
+import type { AvailabilityRow } from "@/lib/adminApi";
+
+interface Advisor { id: string; nombre: string; }
 
 // Fecha YYYY-MM-DD en horario de Chicago (igual que guarda el cron).
 function chicagoDate(d: Date): string {
@@ -38,7 +40,7 @@ function colDate(fecha: string): { dow: string; dm: string } {
 }
 
 export default function DisponibilidadPage() {
-  const [asesores, setAsesores] = useState<Asesor[]>([]);
+  const [asesores, setAsesores] = useState<Advisor[]>([]);
   const [rows, setRows] = useState<AvailabilityRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,11 +52,16 @@ export default function DisponibilidadPage() {
     setLoading(true);
     setError(null);
     try {
-      const [list, avail] = await Promise.all([
-        listAsesores(),
+      const [users, avail] = await Promise.all([
+        listAsesorUsers(),
         getAvailabilityDaily(days[0], days[days.length - 1]),
       ]);
-      setAsesores(list.filter((a) => a.activo));
+      // Solo asesores reales (con login rol=asesor activo) — los admins no aparecen.
+      const advisors = users
+        .filter((u) => u.rol === "asesor" && u.activo && u.asesor_id && u.asesores)
+        .map((u) => ({ id: u.asesor_id as string, nombre: u.asesores!.nombre }))
+        .sort((a, b) => a.nombre.localeCompare(b.nombre));
+      setAsesores(advisors);
       setRows(avail);
     } catch (e) {
       setError((e as Error).message);
