@@ -20,8 +20,6 @@ const SeguroSinExamen = lazy(() => import("./pages/SeguroSinExamen.tsx"));
 const BeneficiosEnVida = lazy(() => import("./pages/BeneficiosEnVida.tsx"));
 const PoliticaPrivacidad = lazy(() => import("./pages/PoliticaPrivacidad.tsx"));
 const Links = lazy(() => import("./pages/Links.tsx"));
-const FormPanel = lazy(() => import("./pages/FormPanel.tsx"));
-const AnalyticsPanel = lazy(() => import("./pages/AnalyticsPanel.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
 const Asesor = lazy(() => import("./pages/Asesor.tsx"));
 const Cotiza = lazy(() => import("./pages/Cotiza.tsx"));
