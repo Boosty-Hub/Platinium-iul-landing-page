@@ -470,6 +470,7 @@ export async function processCallQueueTick(admin: Admin, opts: { maxItems?: numb
   const { data: items } = await admin.from("call_queue")
     .select("id, lead_id, kommo_lead_id, client_attempts, next_asesor_idx, advisor_round, solo_asesor_id")
     .in("estado", ["pending", "scheduled"])
+    .eq("auto_marcar", true) // solo auto-marcamos los leads habilitados (los migrados quedan manuales)
     .lte("scheduled_at", nowIso())
     .order("scheduled_at", { ascending: true })
     .limit(opts.maxItems ?? 1);
