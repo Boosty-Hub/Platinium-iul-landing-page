@@ -86,27 +86,52 @@ export async function setDisposicion(
     .update({ disposicion_actual: disposicion })
     .eq("id", lead_id);
 
-  // 5) Si hay fecha → UPSERT call_queue (recontacto fijado al asesor)
-  if (tienePrograma) {
-    // Leer kommo_lead_id actual (si existe)
+  // 5) Finalizar/reprogramar call_queue según la disposición.
+  //    El motor (modelo click-to-call) deja el lead en in_progress; acá se CIERRA o
+  //    se REPROGRAMA. Sin esto quedaría atascado en in_progress y nunca se recllama.
+  {
     const { data: qRow } = await admin
       .from("call_queue")
-      .select("kommo_lead_id")
+      .select("kommo_lead_id, client_attempts")
       .eq("lead_id", lead_id)
       .maybeSingle();
+    const kommoLeadId0 = qRow?.kommo_lead_id ?? null;
+    const plusMin = (m: number) => new Date(Date.now() + m * 60_000).toISOString();
 
-    await admin.from("call_queue").upsert(
-      {
-        lead_id,
-        estado: "scheduled",
-        scheduled_at: programar_para,
-        solo_asesor_id: asesor_id,
-        next_asesor_idx: 0,
-        client_attempts: 0,
-        kommo_lead_id: qRow?.kommo_lead_id ?? null,
-      },
-      { onConflict: "lead_id" },
-    );
+    if (tienePrograma) {
+      // Recontacto agendado por el asesor → fijado a él.
+      await admin.from("call_queue").upsert(
+        { lead_id, estado: "scheduled", scheduled_at: programar_para, solo_asesor_id: asesor_id, next_asesor_idx: 0, client_attempts: 0, kommo_lead_id: kommoLeadId0 },
+        { onConflict: "lead_id" },
+      );
+    } else if (disposicion === "no_contesto") {
+      // Cliente no contestó → reintento automático. El gate de horario del motor
+      // empuja el reintento a mañana si está cerrado. Tras max intentos → no contactado.
+      const horarioI = await getIntegracion(admin, "horario");
+      const hcfg = (horarioI?.config ?? {}) as Record<string, unknown>;
+      const maxAttempts = Number(hcfg.max_client_attempts) || 3;
+      let delays = [5, 15, 30];
+      try {
+        const d = typeof hcfg.client_retry_delays_min === "string"
+          ? JSON.parse(hcfg.client_retry_delays_min as string)
+          : hcfg.client_retry_delays_min;
+        if (Array.isArray(d) && d.length) delays = d.map(Number);
+      } catch { /* usa el default */ }
+      const attempts = (qRow?.client_attempts ?? 0) + 1;
+      if (attempts < maxAttempts) {
+        const delay = delays[Math.min(attempts - 1, delays.length - 1)] ?? 30;
+        await admin.from("call_queue").upsert(
+          { lead_id, estado: "scheduled", scheduled_at: plusMin(delay), solo_asesor_id: null, next_asesor_idx: 0, client_attempts: attempts, ultimo_resultado: "cliente_no_contesto_reintento", kommo_lead_id: kommoLeadId0 },
+          { onConflict: "lead_id" },
+        );
+      } else {
+        await admin.from("call_queue").update({ estado: "no_contactado", client_attempts: attempts, ultimo_resultado: "no_contactado_max" }).eq("lead_id", lead_id);
+      }
+    } else {
+      // Disposición terminal → cerrar la cola (no se vuelve a marcar sola).
+      const negativa = disposicion === "no_interesado" || disposicion === "numero_equivocado";
+      await admin.from("call_queue").update({ estado: negativa ? "no_contactado" : "contactado", ultimo_resultado: disposicion }).eq("lead_id", lead_id);
+    }
   }
 
   // 6) Kommo — best-effort (log + continue si falla)
