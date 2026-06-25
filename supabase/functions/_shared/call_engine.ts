@@ -285,7 +285,9 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
 
   await setQueue(admin, item.id, { estado: "in_progress" });
   // Cuánto esperamos a que el asesor toque "Contestar" antes de pasar al siguiente.
-  const ACCEPT_WAIT_SEC = Math.min(Math.max(horario.advisor_ring_timeout_sec || 18, 12), 25);
+  // Respeta el valor configurado (Configuración → Tiempo de ring del asesor),
+  // con piso 10s y techo 45s (el presupuesto de 55s de la función lo cubre).
+  const ACCEPT_WAIT_SEC = Math.min(Math.max(horario.advisor_ring_timeout_sec || 18, 10), 45);
   const BUDGET_MS = 55_000;
   const t0 = Date.now();
 
