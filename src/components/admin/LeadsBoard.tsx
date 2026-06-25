@@ -92,9 +92,6 @@ export default function LeadsBoard() {
         if (status === "SUBSCRIBED") {
           setConnState("connected");
           reconnectAttemptsRef.current = 0;
-          if (wasConnectedRef.current) {
-            toast({ title: "Conexión restaurada", description: "Recibiendo leads en vivo otra vez." });
-          }
           wasConnectedRef.current = true;
           resync(true);
         } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {

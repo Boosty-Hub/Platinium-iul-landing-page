@@ -96,9 +96,6 @@ export default function FormPanel() {
         if (status === "SUBSCRIBED") {
           setConnState("connected");
           reconnectAttemptsRef.current = 0;
-          if (wasConnectedRef.current) {
-            toast({ title: "Conexión restaurada", description: "Recibiendo leads en vivo otra vez." });
-          }
           wasConnectedRef.current = true;
           // Catch up on anything we missed
           resync(true);
