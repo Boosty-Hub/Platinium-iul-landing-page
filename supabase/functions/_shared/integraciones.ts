@@ -193,8 +193,18 @@ export async function kommoMetadata(cfg: KommoCfg) {
 // ── RingCentral ──────────────────────────────────────────────────────────────
 export interface RCCfg { server_url: string; client_id: string; client_secret: string; jwt_token: string; from_number: string; }
 
+// Cache del token en memoria del isolate. El access_token de RC vive ~1h; el
+// endpoint de auth (JWT-bearer) está fuertemente rate-limiteado (CMN-301). Un
+// isolate caliente (cron cada minuto) reusa el token en vez de pedir uno nuevo
+// en cada invocación → de ~1 auth/llamada a ~1 auth/hora.
+let rcTokenCache: { token: string; exp: number } | null = null;
+
 export async function rcAuth(cfg: RCCfg): Promise<string> {
   if (!cfg.client_id || !cfg.client_secret || !cfg.jwt_token) throw new Error("Faltan credenciales de RingCentral.");
+  // Reusar token cacheado si le quedan más de 60s de vida.
+  if (rcTokenCache && rcTokenCache.exp > Date.now() + 60_000) {
+    return rcTokenCache.token;
+  }
   const basic = btoa(`${cfg.client_id}:${cfg.client_secret}`);
   const body = new URLSearchParams({
     grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
@@ -207,7 +217,12 @@ export async function rcAuth(cfg: RCCfg): Promise<string> {
   });
   const txt = await res.text();
   if (!res.ok) throw new Error(`RingCentral auth ${res.status}: ${txt.slice(0, 200)}`);
-  return JSON.parse(txt).access_token as string;
+  const parsed = JSON.parse(txt);
+  const token = parsed.access_token as string;
+  // Guardar con un colchón de 5 min antes del vencimiento real.
+  const expiresIn = Number(parsed.expires_in) || 3600;
+  rcTokenCache = { token, exp: Date.now() + (expiresIn - 300) * 1000 };
+  return token;
 }
 
 export async function rcRingOut(cfg: RCCfg, toNumber: string) {

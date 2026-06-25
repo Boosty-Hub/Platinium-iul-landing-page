@@ -2,7 +2,7 @@
 // Ring tone generated via Web Audio API oscillator (no mp3 asset required).
 import { useEffect, useRef, useState } from "react";
 import { Phone, X, ExternalLink, Send } from "lucide-react";
-import { submitCallNote } from "@/lib/asesorApi";
+import { submitCallNote, acceptLead } from "@/lib/asesorApi";
 
 export interface IncomingCallPayload {
   attempt_id: string | null;
@@ -86,14 +86,22 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, o
     onClose();
   };
 
-  // Contestar: atiende la llamada entrante directamente en el softphone del asesor.
-  const answerCall = () => {
-    const frame = document.querySelector("#rc-widget-adapter-frame") as HTMLIFrameElement | null;
-    frame?.contentWindow?.postMessage(
-      { type: "rc-adapter-control-call", callAction: "answer" },
-      "https://apps.ringcentral.com",
-    );
+  // Contestar (modelo click-to-call): al aceptar el lead, el softphone del asesor
+  // MARCA al cliente —mismo mecanismo que el "Llamar" manual que ya funciona— y le
+  // avisamos al motor que aceptamos (deja de ofrecer el lead a otros asesores).
+  const answerCall = async () => {
+    const tel = payload.telefono;
+    if (tel) {
+      const frame = document.querySelector("#rc-widget-adapter-frame") as HTMLIFrameElement | null;
+      frame?.contentWindow?.postMessage(
+        { type: "rc-adapter-new-call", phoneNumber: tel, toCall: true },
+        "https://apps.ringcentral.com",
+      );
+    }
     stopRingRef.current?.(); // el softphone toma el audio; cortamos nuestro tono
+    if (payload.attempt_id) {
+      try { await acceptLead(payload.attempt_id); } catch { /* el softphone ya marcó; no bloqueamos */ }
+    }
   };
 
   const handleSaveNote = async () => {

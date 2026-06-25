@@ -137,8 +137,12 @@ export async function kommoUpdateLead(
 // ── RingCentral RingOut (from/to explícitos) ──────────────────────────────────
 // fromExt: si se pasa la extensión del asesor, el RingOut suena en SU extensión
 // (incluido el softphone del navegador), no en un número personal.
-async function rcRingOutCreate(rc: RCCfg, token: string, from: string, to: string, fromExt?: string | null): Promise<string> {
-  const fromObj = fromExt ? { phoneNumber: from, extensionNumber: String(fromExt) } : { phoneNumber: from };
+async function rcRingOutCreate(rc: RCCfg, token: string, from: string, to: string): Promise<string> {
+  // `from` es el DirectNumber de la extensión del asesor (ej: +16893082874 = ext 110),
+  // así que marcar a ese phoneNumber hace sonar SU softphone/extensión — NO un número
+  // personal. NO se pasa extensionNumber: RingOut lo rechaza (CMN-101 "no es válido")
+  // y no hace falta, el número ya identifica la extensión.
+  const fromObj = { phoneNumber: from };
   const res = await fetch(`${rc.server_url}/restapi/v1.0/account/~/extension/~/ring-out`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -179,11 +183,13 @@ async function pollLeg(rc: RCCfg, token: string, id: string, leg: "caller" | "ca
 async function setQueue(admin: Admin, id: string, patch: Record<string, unknown>) {
   await admin.from("call_queue").update(patch).eq("id", id);
 }
-async function logAttempt(admin: Admin, item: { id: string; lead_id: string }, asesorId: string, ringoutId: string): Promise<string> {
-  const { data } = await admin.from("call_attempts").insert({
+async function logAttempt(admin: Admin, item: { id: string; lead_id: string }, asesorId: string, ringoutId: string | null): Promise<string> {
+  const row: Record<string, unknown> = {
     call_queue_id: item.id, lead_id: item.lead_id, asesor_id: asesorId,
-    tipo: "queue_ring", rc_ringout_id: ringoutId, estado: "initiated",
-  }).select("id").single();
+    tipo: "queue_ring", estado: "initiated",
+  };
+  if (ringoutId) row.rc_ringout_id = ringoutId;
+  const { data } = await admin.from("call_attempts").insert(row).select("id").single();
   return data?.id as string;
 }
 async function updAttempt(admin: Admin, id: string | null, patch: Record<string, unknown>) {
@@ -233,7 +239,7 @@ async function rcBusyExtensions(rc: RCCfg, token: string): Promise<Set<string>> 
 }
 
 async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: KommoCfg | null; horario: Horario }) {
-  const { rc, kommo, horario } = ctx;
+  const { kommo, horario } = ctx;
 
   // Load lead with full snapshot for Realtime broadcast payload
   // OJO: la tabla leads NO tiene columna `edad` (solo `anio_nacimiento`). Seleccionar
@@ -260,37 +266,26 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
 
   if (!asesores?.length) { await setQueue(admin, item.id, { estado: "scheduled", scheduled_at: plusMin(2), ultimo_resultado: "sin_asesores" }); return { lead: item.lead_id, action: "no_advisors" }; }
 
-  // ── TASK 2.2: Presence gate ───────────────────────────────────────────────
-  // Fetch advisor_presence ONCE, outside the per-advisor loop, to keep it cheap.
-  // CRITICAL DEFAULT (avoids the engine going silent on cold start):
-  //   - An advisor with NO presence row at all is treated as AVAILABLE and will be rung.
-  //   - An advisor is SKIPPED only if they have a presence row that explicitly has
-  //     disponible=false OR last_seen_at older than 90 seconds.
-  // This means the engine keeps working even before any advisor has ever logged in.
+  // ── Presence gate (modelo click-to-call) ──────────────────────────────────
+  // El asesor DEBE estar presente (app abierta + Disponible + heartbeat < 90s) para
+  // poder ACEPTAR el lead y que su softphone marque al cliente. Por eso solo se
+  // ofrece a quienes están realmente disponibles. Ya NO hay cold-start "todos
+  // disponibles": si nadie está presente, no se ofrece a nadie y se reencola.
   const { data: presenceRows } = await admin
     .from("advisor_presence")
     .select("asesor_id, disponible, last_seen_at");
 
-  // Build a Set of advisor IDs that are EXPLICITLY offline
-  // (only populated if at least one presence row exists)
-  const offlineIds = new Set<string>();
-  if (presenceRows && presenceRows.length > 0) {
-    const threshold = new Date(Date.now() - 90_000).toISOString();
-    for (const row of presenceRows) {
-      if (!row.disponible || row.last_seen_at < threshold) {
-        offlineIds.add(row.asesor_id as string);
-      }
+  const availableIds = new Set<string>();
+  const freshThreshold = new Date(Date.now() - 90_000).toISOString();
+  for (const row of (presenceRows ?? [])) {
+    if (row.disponible && (row.last_seen_at as string) >= freshThreshold) {
+      availableIds.add(row.asesor_id as string);
     }
   }
-  // If presenceRows is empty (no advisor has ever registered), offlineIds stays empty
-  // and all advisors are treated as available (cold-start safe behavior).
 
   await setQueue(admin, item.id, { estado: "in_progress" });
-  const token = await rcAuth(rc);
-  // Snapshot de qué asesores están en llamada ahora (no se les marca).
-  const busyExt = await rcBusyExtensions(rc, token);
-  const advisorPoll = Math.min(horario.advisor_ring_timeout_sec || 18, 18);
-  const clientPoll = Math.min(Math.max(horario.advisor_ring_timeout_sec || 30, 25), 30);
+  // Cuánto esperamos a que el asesor toque "Contestar" antes de pasar al siguiente.
+  const ACCEPT_WAIT_SEC = Math.min(Math.max(horario.advisor_ring_timeout_sec || 18, 12), 25);
   const BUDGET_MS = 55_000;
   const t0 = Date.now();
 
@@ -300,27 +295,14 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
       return { lead: item.lead_id, action: "budget_pause", resumeIdx: i };
     }
     const asesor = asesores[i];
-    const from = normalizePhone(asesor.telefono);
-    if (!from) continue;
 
-    // Skip advisor if they are explicitly offline
-    if (offlineIds.has(asesor.id)) {
-      console.log(`presence gate: skipping advisor ${asesor.nombre} (offline or unavailable)`);
+    // Solo ofrecemos a asesores presentes (Disponible + heartbeat fresco).
+    if (!availableIds.has(asesor.id)) {
+      console.log(`presence gate: skipping advisor ${asesor.nombre} (no presente)`);
       continue;
     }
 
-    // Saltar al asesor que YA está en una llamada (estado telefónico en RingCentral).
-    if (asesor.rc_extension && busyExt.has(String(asesor.rc_extension))) {
-      console.log(`busy gate: skipping advisor ${asesor.nombre} (en llamada)`);
-      continue;
-    }
-
-    let ringoutId: string;
-    // from = número del asesor + su extensión → suena en SU softphone/extensión.
-    try { ringoutId = await rcRingOutCreate(rc, token, from, client, asesor.rc_extension); }
-    catch (e) { console.error("ringout create", (e as Error).message); continue; }
-
-    const attemptId = await logAttempt(admin, item, asesor.id, ringoutId);
+    const attemptId = await logAttempt(admin, item, asesor.id, null);
 
     // ── Broadcast on ring ──────────────────────────────────────────────────
     // Fire-and-forget: NUNCA bloquea el loop (presupuesto 55s). Incluye
@@ -355,95 +337,54 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
       } catch (e) { console.error("broadcast incoming_call", e); }
     })();
 
-    // ── TASK 2.4: Capture timings ─────────────────────────────────────────
+    // ── Esperar a que el asesor ACEPTE (toque "Contestar" en su app) ──────────
+    // Al aceptar, SU softphone marca al cliente (rc-adapter-new-call). El motor solo
+    // necesita la señal: call_attempts.accepted_at, que pone el endpoint
+    // asesor-accept-lead.
     const ringStartIso = nowIso();
+    let accepted = false;
+    const deadline = Date.now() + ACCEPT_WAIT_SEC * 1000;
+    while (Date.now() < deadline) {
+      await sleep(1500);
+      const { data: a } = await admin.from("call_attempts").select("accepted_at").eq("id", attemptId).maybeSingle();
+      if (a?.accepted_at) { accepted = true; break; }
+    }
 
-    // ¿contesta el asesor?
-    const adv = await pollLeg(rc, token, ringoutId, "caller", advisorPoll);
-    if (adv !== "Success") {
-      await rcRingOutCancel(rc, token, ringoutId);
-      // Compute ring_time_sec as wall-clock since dial started
+    if (!accepted) {
       const ringTimeSec = Math.round((Date.now() - new Date(ringStartIso).getTime()) / 1000);
       await updAttempt(admin, attemptId, {
-        estado: "no_answer",
-        notas: "asesor_no_contesto",
-        fin_at: nowIso(),
-        outcome: "advisor_no_answer",
-        ring_time_sec: ringTimeSec,
+        estado: "no_answer", notas: "asesor_no_acepto", fin_at: nowIso(),
+        outcome: "advisor_no_answer", ring_time_sec: ringTimeSec,
       });
-      // Cerrale el pop-up a ESTE asesor (no contestó); el motor pasa al siguiente.
+      // Cerrale el pop-up a ESTE asesor; el motor ofrece al siguiente.
       broadcastCancel(admin, asesor.id, attemptId, item.lead_id);
       continue; // siguiente asesor
     }
 
-    // Advisor answered
-    const answeredAt = nowIso();
-    const ringTimeSec = Math.round((new Date(answeredAt).getTime() - new Date(ringStartIso).getTime()) / 1000);
+    // ── El asesor aceptó → su softphone está marcando al cliente ──────────────
+    // El resultado real (contactado / no contactó / agendó) lo registra la
+    // DISPOSICIÓN del asesor al colgar (asesor-set-disposicion → setDisposicion),
+    // que finaliza la cola. El motor solo deja el lead "en curso" con su dueño.
+    const acceptedAt = nowIso();
+    const ringTimeSec = Math.round((new Date(acceptedAt).getTime() - new Date(ringStartIso).getTime()) / 1000);
     await updAttempt(admin, attemptId, {
-      estado: "advisor_answered",
-      answered_at: answeredAt,
-      ring_time_sec: ringTimeSec,
+      estado: "advisor_answered", answered_at: acceptedAt,
+      ring_time_sec: ringTimeSec, outcome: "en_curso",
     });
-    await setQueue(admin, item.id, { asesor_id: asesor.id });
-    if (kommo && item.kommo_lead_id) {
-      kommoUpdateLead(kommo, item.kommo_lead_id, { statusCallEnumId: statusCallEnum(kommo, "calling") }).catch((e) => console.error("kommo calling", e));
-    }
-
-    // ¿contesta el cliente?
-    const cli = await pollLeg(rc, token, ringoutId, "callee", clientPoll);
-    if (cli === "Success") {
-      const clientAnsweredAt = nowIso();
-      const talkTimeSec = Math.round((new Date(clientAnsweredAt).getTime() - new Date(answeredAt).getTime()) / 1000);
-      await updAttempt(admin, attemptId, {
-        estado: "completed",
-        fin_at: nowIso(),
-        rc_session_id: ringoutId,
-        client_answered_at: clientAnsweredAt,
-        talk_time_sec: talkTimeSec,
-        outcome: "contactado",
-      });
-      await setQueue(admin, item.id, { estado: "contactado", asesor_id: asesor.id, next_asesor_idx: 0, ultimo_resultado: "contactado" });
-      if (kommo && item.kommo_lead_id) {
-        kommoUpdateLead(kommo, item.kommo_lead_id, {
-          responsableEnumId: asesor.kommo_responsable_enum_id,
-          responsibleUserId: asesor.kommo_user_id,
-          statusCallEnumId: statusCallEnum(kommo, "completed"),
-        }).catch((e) => console.error("kommo assign", e));
-      }
-      return { lead: item.lead_id, action: "contactado", asesor: asesor.nombre };
-    }
-
-    // asesor contestó pero el cliente no → el intento terminó, cerrale su pop-up
-    await rcRingOutCancel(rc, token, ringoutId);
-    broadcastCancel(admin, asesor.id, attemptId, item.lead_id);
-    const voicemail = cli === "Voicemail";
-    await updAttempt(admin, attemptId, {
-      estado: voicemail ? "voicemail" : "no_answer",
-      fin_at: nowIso(),
-      notas: "cliente_no_contesto",
-      outcome: voicemail ? "voicemail" : "client_no_answer",
-    });
-    const attempts = (item.client_attempts ?? 0) + 1;
-    if (attempts < horario.max_client_attempts) {
-      const delays = horario.client_retry_delays_min;
-      const delay = delays[Math.min(attempts - 1, delays.length - 1)] ?? 15;
-      await setQueue(admin, item.id, { estado: "scheduled", scheduled_at: plusMin(delay), client_attempts: attempts, next_asesor_idx: 0, asesor_id: asesor.id, ultimo_resultado: "cliente_no_contesto_reintento" });
-      if (kommo && item.kommo_lead_id) kommoUpdateLead(kommo, item.kommo_lead_id, { statusCallEnumId: statusCallEnum(kommo, "rescheduled") }).catch(() => {});
-      return { lead: item.lead_id, action: "requeue_client", attempt: attempts, delayMin: delay };
-    }
-    await setQueue(admin, item.id, { estado: "no_contactado", client_attempts: attempts, ultimo_resultado: "no_contactado_max" });
+    await setQueue(admin, item.id, { estado: "in_progress", asesor_id: asesor.id, next_asesor_idx: 0, ultimo_resultado: "asesor_atendio" });
     if (kommo && item.kommo_lead_id) {
       kommoUpdateLead(kommo, item.kommo_lead_id, {
-        statusCallEnumId: statusCallEnum(kommo, "no_answer"),
-        stageStatusId: (kommo as unknown as { status_no_contactado_id?: string }).status_no_contactado_id,
-      }).catch(() => {});
+        responsableEnumId: asesor.kommo_responsable_enum_id,
+        responsibleUserId: asesor.kommo_user_id,
+        statusCallEnumId: statusCallEnum(kommo, "calling"),
+      }).catch((e) => console.error("kommo calling", e));
     }
-    return { lead: item.lead_id, action: "no_contactado" };
+    return { lead: item.lead_id, action: "asesor_atendio", asesor: asesor.nombre };
   }
 
-  // ningún asesor contestó → reencolar (no cuenta como intento de cliente)
-  await setQueue(admin, item.id, { estado: "scheduled", scheduled_at: plusMin(2), next_asesor_idx: 0, advisor_round: (item.advisor_round ?? 0) + 1, ultimo_resultado: "ningun_asesor_contesto" });
-  return { lead: item.lead_id, action: "no_advisor_answered" };
+  // Nadie aceptó → reencolar (no cuenta como intento de cliente).
+  await setQueue(admin, item.id, { estado: "scheduled", scheduled_at: plusMin(2), next_asesor_idx: 0, advisor_round: (item.advisor_round ?? 0) + 1, ultimo_resultado: "ningun_asesor_acepto" });
+  return { lead: item.lead_id, action: "no_advisor_accepted" };
 }
 
 // ── Tick del motor (lo dispara el cron o submit-lead) ─────────────────────────

@@ -151,6 +151,17 @@ export async function submitCallNote(
   if (!result.ok) throw new Error(result.error ?? "kommo-note devolvió error");
 }
 
+// El asesor ACEPTA un lead entrante (tocó "Contestar"): avisa al motor para que
+// deje de ofrecerlo a otros. El softphone ya está marcando al cliente en paralelo.
+export async function acceptLead(attempt_id: string): Promise<void> {
+  const { data, error } = await (supabase as any).functions.invoke("asesor-accept-lead", {
+    body: { attempt_id },
+  });
+  if (error) throw new Error(error.message ?? "Error invocando asesor-accept-lead");
+  const result = data as { ok: boolean; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "asesor-accept-lead devolvió error");
+}
+
 // ── Direct call + stage management ───────────────────────────────────────────
 
 export interface KommoStage {

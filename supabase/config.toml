@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.ingest-event]
 verify_jwt = false
+
+[functions.asesor-accept-lead]
+verify_jwt = false
