@@ -2,7 +2,7 @@
 // Accountability: detecta de un vistazo quién no se conectó un día.
 // Datos: tabla advisor_availability_daily (cron suma 1 min por asesor disponible).
 import { useEffect, useMemo, useState } from "react";
-import { RefreshCw, Clock, AlertTriangle } from "lucide-react";
+import { RefreshCw, Clock } from "lucide-react";
 import { listAsesores, getAvailabilityDaily } from "@/lib/adminApi";
 import type { Asesor, AvailabilityRow } from "@/lib/adminApi";
 
@@ -95,11 +95,6 @@ export default function DisponibilidadPage() {
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           Recargar
         </button>
-      </div>
-
-      <div className="flex items-center gap-2 text-xs text-[#6A8E98]">
-        <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-        Se registra solo desde que se activó esta función — los días anteriores no tienen datos.
       </div>
 
       {error && (
