@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyNombre } from "@/lib/asesorApi";
+import AsesorSessionProvider from "@/components/asesor/AsesorSessionProvider";
 import CambiarPasswordModal from "@/components/asesor/CambiarPasswordModal";
 import { Monitor, Users, Clock, LogOut, Menu, X, KeyRound } from "lucide-react";
 
@@ -84,6 +85,7 @@ export default function AsesorLayout() {
   );
 
   return (
+    <AsesorSessionProvider>
     <div className="min-h-screen bg-[#0B1A1E] text-[#E4EEF0] flex">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-56 xl:w-60 flex-shrink-0 bg-[#0F2229] border-r border-[#1d9fa9]/20 sticky top-0 h-screen overflow-y-auto">
@@ -139,5 +141,6 @@ export default function AsesorLayout() {
 
       {pwOpen && <CambiarPasswordModal onClose={() => setPwOpen(false)} />}
     </div>
+    </AsesorSessionProvider>
   );
 }

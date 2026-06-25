@@ -1,60 +1,27 @@
-// CockpitPage — Slice 2 (presence, heartbeat, Realtime) + Slice 3 (RC Embeddable).
-// Slice 3: RC Embeddable softphone injected via useEffect when VITE_RC_CLIENT_ID is set.
-// Graceful gating: if clientId is missing, renders a friendly config card instead.
+// CockpitPage — panel de estado del asesor.
 //
-// Tareas adicionales:
-//   T1: detecta si el softphone tiene sesión iniciada vía window.postMessage (rc-login-status-notify)
-//   T2: tarjeta "¿Listo para recibir llamadas?" con 3 chequeos visuales
-//   T3: onboarding cálido de primera vez (PrimerosPasos)
-//   T4: errores en cristiano — nunca se muestra el mensaje crudo al asesor
-import { useEffect, useRef, useState } from "react";
-import { Radio, WifiOff, CheckCircle2, AlertCircle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { getCurrentAsesorId, updatePresence, getMyNombre } from "@/lib/asesorApi";
-import IncomingCallPopup from "@/components/asesor/IncomingCallPopup";
-import type { IncomingCallPayload } from "@/components/asesor/IncomingCallPopup";
-import SeguimientoReminder from "@/components/asesor/SeguimientoReminder";
-import type { SeguimientoReminderPayload } from "@/components/asesor/SeguimientoReminder";
-import LeadDetailSheet from "@/components/asesor/LeadDetailSheet";
-import DispositionSheet from "@/components/asesor/DispositionSheet";
+// La "sesión viva" (softphone, presencia, Realtime, pop-up entrante, avisos) vive
+// ahora en AsesorSessionProvider (montado en el layout), así sigue activa en TODAS
+// las páginas y en segundo plano. Esta página solo MUESTRA el estado y deja
+// ponerse Disponible / activar avisos.
+import { useEffect, useState } from "react";
+import { Radio, WifiOff, CheckCircle2, AlertCircle, Bell } from "lucide-react";
+import { getMyNombre } from "@/lib/asesorApi";
+import { useAsesorSession } from "@/components/asesor/AsesorSessionProvider";
 import PrimerosPasos, { haVistoPrimerosPasos } from "@/components/asesor/PrimerosPasos";
 
-const HEARTBEAT_INTERVAL_MS = 30_000;
-const RC_CLIENT_ID = import.meta.env.VITE_RC_CLIENT_ID as string | undefined;
-const RC_ADAPTER_SCRIPT = "https://apps.ringcentral.com/integration/ringcentral-embeddable/latest/adapter.js";
-
-// Mensaje amigable para el asesor cuando algo falla (nunca el texto técnico)
-const ERROR_DISPONIBILIDAD =
-  "No pudimos actualizar tu disponibilidad. Probá de nuevo en un momento.";
-
 export default function CockpitPage() {
-  const [asesorId, setAsesorId] = useState<string | null>(null);
-  const [disponible, setDisponible] = useState(true);
-  const [toggling, setToggling] = useState(false);
-  const [incomingCall, setIncomingCall] = useState<IncomingCallPayload | null>(null);
-  const [presenceError, setPresenceError] = useState<string | null>(null);
-  const [seguimientoReminder, setSeguimientoReminder] = useState<SeguimientoReminderPayload | null>(null);
-  const [openLeadId, setOpenLeadId] = useState<string | null>(null);
-  const [dispositionLead, setDispositionLead] = useState<{ id: string; nombre: string } | null>(null);
-
-  // Al colgar en el softphone (rc-call-end-notify) cerramos el pop-up entrante y abrimos
-  // "¿Cómo fue la llamada?" — igual que el flujo manual.
-  const incomingCallRef = useRef<IncomingCallPayload | null>(null);
-  useEffect(() => { incomingCallRef.current = incomingCall; }, [incomingCall]);
-  useEffect(() => {
-    function onCallEnd(e: MessageEvent) {
-      if (e.origin !== "https://apps.ringcentral.com") return;
-      if (!e.data || (e.data as { type?: string }).type !== "rc-call-end-notify") return;
-      const cur = incomingCallRef.current;
-      if (cur?.lead_id) setDispositionLead({ id: cur.lead_id, nombre: cur.nombre ?? "este lead" });
-      setIncomingCall(null);
-    }
-    window.addEventListener("message", onCallEnd);
-    return () => window.removeEventListener("message", onCallEnd);
-  }, []);
-
-  // T1: null = aún no sabemos / true = con sesión / false = sin sesión
-  const [softphoneReady, setSoftphoneReady] = useState<boolean | null>(null);
+  const {
+    asesorId,
+    disponible,
+    toggling,
+    toggleDisponible,
+    presenceError,
+    rcConfigurado,
+    softphoneReady,
+    notifPermission,
+    requestNotif,
+  } = useAsesorSession();
 
   // Nombre de la asesora — para saludarla y que vea que es SU panel.
   const [nombre, setNombre] = useState<string | null>(null);
@@ -63,150 +30,16 @@ export default function CockpitPage() {
   }, []);
   const primerNombre = nombre?.split(" ")[0] ?? null;
 
-  // T3: onboarding
-  const [mostrarOnboarding, setMostrarOnboarding] = useState<boolean>(
-    !haVistoPrimerosPasos()
-  );
+  const [mostrarOnboarding, setMostrarOnboarding] = useState<boolean>(!haVistoPrimerosPasos());
 
-  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-
-  // ── Init: resolve asesor ID and set initial presence ──────────────────────
-  useEffect(() => {
-    let active = true;
-    async function init() {
-      try {
-        const id = await getCurrentAsesorId();
-        if (!active || !id) return;
-        setAsesorId(id);
-        await updatePresence(true);
-        setDisponible(true);
-      } catch (e) {
-        console.error("cockpit init:", e);
-      }
-    }
-    init();
-    return () => { active = false; };
-  }, []);
-
-  // ── Heartbeat: send presence every 30 s while mounted ────────────────────
-  useEffect(() => {
-    if (!asesorId) return;
-    heartbeatRef.current = setInterval(async () => {
-      try {
-        await updatePresence(disponible);
-      } catch (e) {
-        console.error("presence heartbeat:", e);
-      }
-    }, HEARTBEAT_INTERVAL_MS);
-    return () => {
-      if (heartbeatRef.current) clearInterval(heartbeatRef.current);
-    };
-  }, [asesorId, disponible]);
-
-  // ── Realtime: subscribe to incoming_call broadcasts ───────────────────────
-  useEffect(() => {
-    if (!asesorId) return;
-
-    const channel = supabase.channel(`advisor:${asesorId}`, {
-      config: { broadcast: { self: false } },
-    });
-
-    channel.on("broadcast", { event: "incoming_call" }, ({ payload }) => {
-      setIncomingCall(payload as IncomingCallPayload);
-    });
-
-    // El motor avisa que esta llamada ya no es para este asesor (no contestó →
-    // pasó al siguiente, o el intento terminó): cerramos su pop-up.
-    channel.on("broadcast", { event: "call_cancelled" }, ({ payload }) => {
-      const p = payload as { attempt_id: string | null; lead_id: string | null };
-      setIncomingCall((cur) =>
-        cur && (cur.attempt_id === p.attempt_id || cur.lead_id === p.lead_id) ? null : cur,
-      );
-    });
-
-    channel.on("broadcast", { event: "seguimiento_reminder" }, ({ payload }) => {
-      setSeguimientoReminder(payload as SeguimientoReminderPayload);
-    });
-
-    channel.subscribe((status) => {
-      if (status === "CHANNEL_ERROR") {
-        console.error("Realtime channel error for advisor:", asesorId);
-      }
-    });
-
-    channelRef.current = channel;
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [asesorId]);
-
-  // ── RC Embeddable: inject adapter script once (Slice 3) ───────────────────
-  useEffect(() => {
-    if (!RC_CLIENT_ID) return;
-    if (document.querySelector(`script[data-rc-embeddable]`)) return;
-
-    // Config ESTÁNDAR soportada por RingCentral: librería + redirect ambos en
-    // apps.ringcentral.com (mismo dominio, requisito de RC). El redirect propio solo
-    // funciona si se self-hostea TODA la librería — ver docs/CONFIGURACION-RINGCENTRAL.md.
-    const script = document.createElement("script");
-    script.src = `${RC_ADAPTER_SCRIPT}?clientId=${encodeURIComponent(RC_CLIENT_ID)}&appServer=https://platform.ringcentral.com`;
-    script.async = true;
-    script.setAttribute("data-rc-embeddable", "true");
-    document.body.appendChild(script);
-
-    return () => {
-      // Do NOT remove on unmount — RC Embeddable manages its own lifecycle
-    };
-  }, []);
-
-  // ── T1: Detectar si el softphone tiene sesión vía postMessage ────────────
-  useEffect(() => {
-    if (!RC_CLIENT_ID) return; // RC no configurado → no escuchamos
-
-    function onMsg(e: MessageEvent) {
-      // Solo confiamos en mensajes del widget de RingCentral.
-      if (e.origin !== "https://apps.ringcentral.com") return;
-      const d = e.data;
-      if (d && typeof d === "object" && d.type === "rc-login-status-notify") {
-        setSoftphoneReady(!!d.loggedIn);
-      }
-    }
-    window.addEventListener("message", onMsg);
-    return () => window.removeEventListener("message", onMsg);
-  }, []);
-
-  // ── Toggle availability ───────────────────────────────────────────────────
-  const handleToggle = async () => {
-    const next = !disponible;
-    setToggling(true);
-    setPresenceError(null);
-    try {
-      await updatePresence(next);
-      setDisponible(next);
-    } catch (e) {
-      // T4: log técnico en consola, mensaje humano en UI
-      console.error("toggle presencia:", e);
-      setPresenceError(ERROR_DISPONIBILIDAD);
-    } finally {
-      setToggling(false);
-    }
-  };
-
-  // ── T2: Determinar estado de cada chequeo ────────────────────────────────
+  // ── Estado de cada chequeo ────────────────────────────────────────────────
   const sistemaOk = !!asesorId;
-
-  // El teléfono aplica solo cuando RC está configurado
-  const rcConfigurado = !!RC_CLIENT_ID;
-  // softphoneOk: true cuando RC está configurado Y el asesor inició sesión
   const softphoneOk = rcConfigurado && softphoneReady === true;
-
   const disponibilidadOk = disponible;
+  const avisosOk = notifPermission === "granted" || notifPermission === "unsupported";
 
-  // Banner global: todo OK cuando sistema + disponibilidad están OK
-  // (si RC no está configurado, no bloqueamos el estado "todo listo")
-  const todoListo = sistemaOk && disponibilidadOk && (!rcConfigurado || softphoneOk);
+  const todoListo =
+    sistemaOk && disponibilidadOk && (!rcConfigurado || softphoneOk);
 
   return (
     <div className="space-y-6">
@@ -218,19 +51,17 @@ export default function CockpitPage() {
         <p className="text-sm text-[#94B3BB] mt-1">Tu centro de llamadas</p>
       </div>
 
-      {/* T3: Onboarding de primera vez */}
-      {mostrarOnboarding && (
-        <PrimerosPasos onCerrar={() => setMostrarOnboarding(false)} />
-      )}
+      {/* Onboarding de primera vez */}
+      {mostrarOnboarding && <PrimerosPasos onCerrar={() => setMostrarOnboarding(false)} />}
 
-      {/* T2: Tarjeta "¿Listo para recibir llamadas?" */}
+      {/* Tarjeta "¿Listo para recibir llamadas?" */}
       <div className="bg-[#0F2229] border border-[#1d9fa9]/20 rounded-2xl p-6 space-y-5">
         {/* Banner de estado global */}
         {todoListo ? (
           <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3">
             <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
             <p className="text-sm font-semibold text-emerald-300">
-              Todo listo. Las llamadas van a sonar acá y en tu teléfono.
+              Todo listo. Las llamadas suenan acá, en tu teléfono y aunque estés en otra pestaña.
             </p>
           </div>
         ) : (
@@ -243,21 +74,12 @@ export default function CockpitPage() {
         )}
 
         {/* Chequeo 1: Sistema */}
-        <div className="flex items-start gap-3">
-          {sistemaOk ? (
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-          ) : (
-            <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-          )}
-          <div>
-            <p className="text-sm font-semibold text-[#E4EEF0]">Sistema</p>
-            <p className="text-xs text-[#94B3BB] mt-0.5">
-              {sistemaOk
-                ? "Estás conectado."
-                : "Conectando con el sistema…"}
-            </p>
-          </div>
-        </div>
+        <Check
+          ok={sistemaOk}
+          title="Sistema"
+          okText="Estás conectado."
+          pendingText="Conectando con el sistema…"
+        />
 
         {/* Chequeo 2: Teléfono */}
         <div className="flex items-start gap-3">
@@ -271,9 +93,7 @@ export default function CockpitPage() {
           <div>
             <p className="text-sm font-semibold text-[#E4EEF0]">Tu teléfono</p>
             {!rcConfigurado ? (
-              <p className="text-xs text-[#6A8E98] mt-0.5">
-                Lo activa un administrador.
-              </p>
+              <p className="text-xs text-[#6A8E98] mt-0.5">Lo activa un administrador.</p>
             ) : softphoneOk ? (
               <p className="text-xs text-[#94B3BB] mt-0.5">
                 Sesión iniciada. Tu teléfono está listo para recibir llamadas.
@@ -286,7 +106,45 @@ export default function CockpitPage() {
           </div>
         </div>
 
-        {/* Chequeo 3: Disponibilidad — integrado con el toggle */}
+        {/* Chequeo 3: Avisos del sistema — para que suene en otra pestaña */}
+        <div className="flex items-start gap-3">
+          {avisosOk ? (
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+          ) : (
+            <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+          )}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-[#E4EEF0]">Avisos del sistema</p>
+            {notifPermission === "granted" ? (
+              <p className="text-xs text-[#94B3BB] mt-0.5">
+                Activados. Te avisamos aunque estés en Kommo u otra pestaña.
+              </p>
+            ) : notifPermission === "unsupported" ? (
+              <p className="text-xs text-[#6A8E98] mt-0.5">
+                Tu navegador no soporta avisos del sistema.
+              </p>
+            ) : notifPermission === "denied" ? (
+              <p className="text-xs text-amber-300/80 mt-0.5 leading-relaxed">
+                Están bloqueados. Activálos en el candado 🔒 de la barra de direcciones → Notificaciones → Permitir, para que te suene aunque estés en otra pestaña.
+              </p>
+            ) : (
+              <div className="mt-2">
+                <p className="text-xs text-amber-300/80 mb-2 leading-relaxed">
+                  Activá los avisos para que te suene aunque estés en otra pestaña (Kommo, etc.).
+                </p>
+                <button
+                  onClick={requestNotif}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1d9fa9] hover:bg-[#1d9fa9]/80 text-white font-semibold text-sm transition-colors"
+                >
+                  <Bell className="w-4 h-4" />
+                  Activar avisos
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Chequeo 4: Disponibilidad — integrado con el toggle */}
         <div className="flex items-start gap-3">
           {disponibilidadOk ? (
             <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
@@ -301,10 +159,9 @@ export default function CockpitPage() {
               </p>
             )}
 
-            {/* Toggle inline */}
             <div className="mt-3">
               <button
-                onClick={handleToggle}
+                onClick={toggleDisponible}
                 disabled={toggling || !asesorId}
                 className={`flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                   disponible
@@ -320,10 +177,7 @@ export default function CockpitPage() {
               </button>
             </div>
 
-            {/* T4: mensaje de error amigable (nunca el texto crudo) */}
-            {presenceError && (
-              <p className="mt-2 text-xs text-amber-300/80">{presenceError}</p>
-            )}
+            {presenceError && <p className="mt-2 text-xs text-amber-300/80">{presenceError}</p>}
           </div>
         </div>
 
@@ -339,51 +193,32 @@ export default function CockpitPage() {
           </span>
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Incoming call pop-up */}
-      {incomingCall && (
-        <IncomingCallPopup
-          payload={incomingCall}
-          onClose={() => {
-            const lid = incomingCall.lead_id;
-            const nombre = incomingCall.nombre ?? "este lead";
-            setIncomingCall(null);
-            if (lid) setDispositionLead({ id: lid, nombre });
-          }}
-          onVerHistorial={(lead_id) => {
-            setIncomingCall(null);
-            setOpenLeadId(lead_id);
-          }}
-        />
+function Check({
+  ok,
+  title,
+  okText,
+  pendingText,
+}: {
+  ok: boolean;
+  title: string;
+  okText: string;
+  pendingText: string;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      {ok ? (
+        <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+      ) : (
+        <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
       )}
-
-      {/* Seguimiento reminder pop-up */}
-      {seguimientoReminder && (
-        <SeguimientoReminder
-          payload={seguimientoReminder}
-          onClose={() => setSeguimientoReminder(null)}
-          onVerLead={(lead_id) => setOpenLeadId(lead_id)}
-        />
-      )}
-
-      {/* Lead detail drawer (opened from reminder or incoming call) */}
-      {openLeadId && (
-        <LeadDetailSheet
-          leadId={openLeadId}
-          onClose={() => setOpenLeadId(null)}
-          onRefresh={() => {}}
-        />
-      )}
-
-      {/* Registrar resultado — se abre al terminar la llamada entrante */}
-      {dispositionLead && (
-        <DispositionSheet
-          leadId={dispositionLead.id}
-          nombre={dispositionLead.nombre}
-          onClose={() => setDispositionLead(null)}
-          onSuccess={() => setDispositionLead(null)}
-        />
-      )}
+      <div>
+        <p className="text-sm font-semibold text-[#E4EEF0]">{title}</p>
+        <p className="text-xs text-[#94B3BB] mt-0.5">{ok ? okText : pendingText}</p>
+      </div>
     </div>
   );
 }
