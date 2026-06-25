@@ -34,9 +34,15 @@ export async function getMyNombre(): Promise<string | null> {
  * Updates advisor presence.
  * @param disponible - true = available, false = unavailable. Omit to just refresh heartbeat.
  */
-export async function updatePresence(disponible?: boolean): Promise<void> {
+export async function updatePresence(
+  disponible?: boolean,
+  softphoneOk?: boolean | null,
+  notifOk?: boolean | null,
+): Promise<void> {
   const { error } = await (supabase as any).rpc("update_presence", {
     p_disponible: disponible ?? null,
+    p_softphone_ok: softphoneOk ?? null,
+    p_notif_ok: notifOk ?? null,
   });
   if (error) throw new Error(error.message);
 }

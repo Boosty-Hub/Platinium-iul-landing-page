@@ -450,3 +450,22 @@ export async function getAvailabilityDaily(from: string, to: string): Promise<Av
   if (error) throw new Error(error.message ?? "Error cargando disponibilidad");
   return (data ?? []) as AvailabilityRow[];
 }
+
+// ── Estado de la app del asesor (presencia + softphone + avisos) ─────────────
+export interface AppPresence {
+  asesor_id: string;
+  disponible: boolean | null;
+  last_seen_at: string | null;
+  softphone_ok: boolean | null;
+  notif_ok: boolean | null;
+}
+
+export async function getAdvisorAppPresence(): Promise<Record<string, AppPresence>> {
+  const { data, error } = await (supabase as any)
+    .from("advisor_presence")
+    .select("asesor_id, disponible, last_seen_at, softphone_ok, notif_ok");
+  if (error) throw new Error(error.message ?? "Error cargando estado de la app");
+  const m: Record<string, AppPresence> = {};
+  for (const r of (data ?? []) as AppPresence[]) m[r.asesor_id] = r;
+  return m;
+}

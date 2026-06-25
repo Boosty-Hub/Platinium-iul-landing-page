@@ -153,6 +153,17 @@ export default function AsesorSessionProvider({ children }: { children: ReactNod
 
   useEffect(() => () => stopAlerts(), [stopAlerts]);
 
+  // Reportamos también el estado real (softphone + avisos) en cada presencia, vía
+  // refs, para no reiniciar los timers cuando esos valores cambian.
+  const softphoneReadyRef = useRef<boolean | null>(softphoneReady);
+  useEffect(() => { softphoneReadyRef.current = softphoneReady; }, [softphoneReady]);
+  const notifPermissionRef = useRef<NotifPermission>(notifPermission);
+  useEffect(() => { notifPermissionRef.current = notifPermission; }, [notifPermission]);
+  const reportPresence = useCallback(
+    (disp?: boolean) => updatePresence(disp, softphoneReadyRef.current === true, notifPermissionRef.current === "granted"),
+    [],
+  );
+
   // ── Init: resolver el id del asesor y marcar presencia inicial ────────────
   useEffect(() => {
     let active = true;
@@ -161,7 +172,7 @@ export default function AsesorSessionProvider({ children }: { children: ReactNod
         const id = await getCurrentAsesorId();
         if (!active || !id) return;
         setAsesorId(id);
-        await updatePresence(true);
+        await reportPresence(true);
         setDisponible(true);
       } catch (e) {
         console.error("asesor session init:", e);
@@ -176,7 +187,7 @@ export default function AsesorSessionProvider({ children }: { children: ReactNod
     if (!asesorId) return;
     heartbeatRef.current = setInterval(async () => {
       try {
-        await updatePresence(disponible);
+        await reportPresence(disponible);
       } catch (e) {
         console.error("presence heartbeat:", e);
       }
@@ -191,7 +202,7 @@ export default function AsesorSessionProvider({ children }: { children: ReactNod
     if (!asesorId) return;
     const onVisible = () => {
       if (document.visibilityState === "visible") {
-        updatePresence(disponible).catch(() => {});
+        reportPresence(disponible).catch(() => {});
       }
     };
     document.addEventListener("visibilitychange", onVisible);
@@ -277,7 +288,7 @@ export default function AsesorSessionProvider({ children }: { children: ReactNod
       requestNotif();
     }
     try {
-      await updatePresence(next);
+      await reportPresence(next);
       setDisponible(next);
     } catch (e) {
       console.error("toggle presencia:", e);

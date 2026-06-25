@@ -13,10 +13,12 @@ import {
   Asesor,
   KommoEnum,
   PresenceInfo,
+  AppPresence,
   listAsesores,
   upsertAsesor,
   deleteAsesor,
   getAsesoresPresence,
+  getAdvisorAppPresence,
 } from "@/lib/adminApi";
 import { toast } from "@/hooks/use-toast";
 
@@ -40,6 +42,41 @@ function PresenceBadge({ p }: { p?: PresenceInfo | null }) {
     <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border ${cls}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
       {label}
+    </span>
+  );
+}
+
+// Badge del estado de la APP del asesor (presencia + softphone + avisos).
+// Dice si está listo para recibir o qué le falta — complementa el "Estado RC".
+function AppStateBadge({ p }: { p?: AppPresence | null }) {
+  const fresh = !!p?.last_seen_at && Date.now() - new Date(p.last_seen_at).getTime() < 90_000;
+  if (!fresh) {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border bg-[#6A8E98]/15 text-[#6A8E98] border-[#6A8E98]/25">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#6A8E98]" />
+        App cerrada
+      </span>
+    );
+  }
+  const faltan: string[] = [];
+  if (p?.softphone_ok === false) faltan.push("teléfono");
+  if (p?.notif_ok === false) faltan.push("avisos");
+  if (!p?.disponible) faltan.push("disponible");
+  if (faltan.length === 0) {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border bg-green-500/15 text-green-400 border-green-500/25">
+        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+        Listo
+      </span>
+    );
+  }
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border bg-yellow-500/15 text-yellow-400 border-yellow-500/25"
+      title={`Le falta: ${faltan.join(", ")}`}
+    >
+      <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+      Falta: {faltan.join(", ")}
     </span>
   );
 }
@@ -107,6 +144,7 @@ function AsesorRow({
   asesor,
   responsableEnums,
   presence,
+  appPresence,
   isFirst,
   isLast,
   onSaved,
@@ -117,6 +155,7 @@ function AsesorRow({
   asesor: Asesor;
   responsableEnums: KommoEnum[];
   presence?: PresenceInfo | null;
+  appPresence?: AppPresence | null;
   isFirst: boolean;
   isLast: boolean;
   onSaved: () => void;
@@ -240,6 +279,9 @@ function AsesorRow({
           <PresenceBadge p={presence} />
         </td>
         <td className="px-4 py-3">
+          <AppStateBadge p={appPresence} />
+        </td>
+        <td className="px-4 py-3">
           <div className="flex items-center gap-2">
             <Switch checked={asesor.activo} onCheckedChange={handleToggleActivo} disabled={toggling} />
             <span className={`text-xs ${asesor.activo ? "text-green-400" : "text-[#6A8E98]"}`}>
@@ -319,6 +361,7 @@ function AsesorRow({
           className="bg-[#0B1A1E] border-[#1d9fa9]/20 text-[#E4EEF0] placeholder:text-[#6A8E98] focus:border-[#1d9fa9] h-8 text-sm"
         />
       </td>
+      <td className="px-4 py-2.5" />
       <td className="px-4 py-2.5">
         <Switch
           checked={form.activo}
@@ -423,6 +466,7 @@ function AddRow({
           className="bg-[#0B1A1E] border-[#1d9fa9]/30 text-[#E4EEF0] placeholder:text-[#6A8E98] focus:border-[#1d9fa9] h-8 text-sm"
         />
       </td>
+      <td className="px-4 py-2.5" />
       <td className="px-4 py-2.5">
         <Switch
           checked={form.activo}
@@ -457,13 +501,15 @@ function AddRow({
 export default function AsesoresConfig({ responsableEnums }: Props) {
   const [asesores, setAsesores] = useState<Asesor[]>([]);
   const [presence, setPresence] = useState<Record<string, PresenceInfo>>({});
+  const [appPresence, setAppPresence] = useState<Record<string, AppPresence>>({});
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
 
   const refreshPresence = async () => {
     try {
-      const data = await getAsesoresPresence();
-      setPresence(data);
+      const [rc, app] = await Promise.all([getAsesoresPresence(), getAdvisorAppPresence()]);
+      setPresence(rc);
+      setAppPresence(app);
     } catch {
       // keep previous presence — do NOT clear
     }
@@ -571,6 +617,7 @@ export default function AsesoresConfig({ responsableEnums }: Props) {
                   <th className="text-left px-4 py-2.5 text-[#6A8E98] font-medium">Ext. RC</th>
                   <th className="text-left px-4 py-2.5 text-[#6A8E98] font-medium">Responsable (Kommo)</th>
                   <th className="text-left px-4 py-2.5 text-[#6A8E98] font-medium">Estado RC</th>
+                  <th className="text-left px-4 py-2.5 text-[#6A8E98] font-medium">Estado app</th>
                   <th className="text-left px-4 py-2.5 text-[#6A8E98] font-medium">Activo</th>
                   <th className="w-20 px-4 py-2.5" />
                 </tr>
@@ -589,7 +636,7 @@ export default function AsesoresConfig({ responsableEnums }: Props) {
                 )}
                 {sortedAsesores.length === 0 && !adding ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-[#6A8E98] text-sm">
+                    <td colSpan={8} className="px-4 py-8 text-center text-[#6A8E98] text-sm">
                       No hay asesores configurados. Agregá el primero.
                     </td>
                   </tr>
@@ -600,6 +647,7 @@ export default function AsesoresConfig({ responsableEnums }: Props) {
                       asesor={a}
                       responsableEnums={responsableEnums}
                       presence={presence[a.rc_extension ?? ""] ?? null}
+                      appPresence={appPresence[a.id] ?? null}
                       isFirst={idx === 0}
                       isLast={idx === sortedAsesores.length - 1}
                       onSaved={load}
