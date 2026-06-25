@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyNombre } from "@/lib/asesorApi";
 import AsesorSessionProvider from "@/components/asesor/AsesorSessionProvider";
+import EstadoBar from "@/components/asesor/EstadoBar";
 import CambiarPasswordModal from "@/components/asesor/CambiarPasswordModal";
 import { Monitor, Users, Clock, LogOut, Menu, X, KeyRound } from "lucide-react";
 
@@ -135,6 +136,7 @@ export default function AsesorLayout() {
       <main className="flex-1 min-w-0 flex flex-col">
         <div className="lg:hidden h-14 flex-shrink-0" aria-hidden="true" />
         <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6 max-w-7xl w-full mx-auto">
+          <EstadoBar />
           <Outlet />
         </div>
       </main>

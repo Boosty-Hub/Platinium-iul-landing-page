@@ -23,7 +23,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentAsesorId, updatePresence } from "@/lib/asesorApi";
 import IncomingCallPopup from "@/components/asesor/IncomingCallPopup";
-import type { IncomingCallPayload } from "@/components/asesor/IncomingCallPopup";
+import type { IncomingCallPayload, RingTone } from "@/components/asesor/IncomingCallPopup";
 import SeguimientoReminder from "@/components/asesor/SeguimientoReminder";
 import type { SeguimientoReminderPayload } from "@/components/asesor/SeguimientoReminder";
 import LeadDetailSheet from "@/components/asesor/LeadDetailSheet";
@@ -37,6 +37,7 @@ const RC_WIDGET_ORIGIN = "https://apps.ringcentral.com";
 
 const ERROR_DISPONIBILIDAD =
   "No pudimos actualizar tu disponibilidad. Probá de nuevo en un momento.";
+const BASE_TITLE = "Platinium IUL — Asesor";
 
 type NotifPermission = "granted" | "denied" | "default" | "unsupported";
 
@@ -54,6 +55,10 @@ interface AsesorSession {
   notifPermission: NotifPermission;
   /** Pedir permiso de notificaciones (debe llamarse desde un gesto del usuario) */
   requestNotif: () => void;
+  /** true cuando el asesor está realmente en línea para recibir llamadas */
+  ready: boolean;
+  /** Si NO está listo, qué le falta (para mostrarlo en cualquier página) */
+  notReadyReason: string | null;
 }
 
 const Ctx = createContext<AsesorSession | null>(null);
@@ -76,6 +81,7 @@ export default function AsesorSessionProvider({ children }: { children: ReactNod
   const [presenceError, setPresenceError] = useState<string | null>(null);
   const [softphoneReady, setSoftphoneReady] = useState<boolean | null>(null);
   const [notifPermission, setNotifPermission] = useState<NotifPermission>(initialNotifPermission);
+  const [sonido, setSonido] = useState<{ tono?: RingTone; volumen?: number }>({});
 
   const [incomingCall, setIncomingCall] = useState<IncomingCallPayload | null>(null);
   const [seguimientoReminder, setSeguimientoReminder] = useState<SeguimientoReminderPayload | null>(null);
@@ -86,9 +92,22 @@ export default function AsesorSessionProvider({ children }: { children: ReactNod
   const incomingCallRef = useRef<IncomingCallPayload | null>(null);
   const notifRef = useRef<Notification | null>(null);
   const titleFlashRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const origTitleRef = useRef<string>(typeof document !== "undefined" ? document.title : "");
+  const origTitleRef = useRef<string>(BASE_TITLE);
 
   useEffect(() => { incomingCallRef.current = incomingCall; }, [incomingCall]);
+
+  // Sonido de llamada configurado por el admin (tono + volumen).
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await (supabase as unknown as { rpc: (n: string) => Promise<{ data: unknown }> }).rpc("get_sonido_config");
+        const c = data as { tono?: string; volumen?: string } | null;
+        if (c && typeof c === "object") {
+          setSonido({ tono: c.tono as RingTone, volumen: c.volumen != null ? Number(c.volumen) : undefined });
+        }
+      } catch { /* si falla, el pop-up usa el default */ }
+    })();
+  }, []);
 
   // ── Avisos en segundo plano (notificación del sistema + título parpadeante) ──
   const stopAlerts = useCallback(() => {
@@ -268,16 +287,39 @@ export default function AsesorSessionProvider({ children }: { children: ReactNod
     }
   }, [disponible, requestNotif]);
 
+  // ── Estado "listo para recibir" (visible en cualquier página/pestaña) ──────
+  const rcConfigurado = !!RC_CLIENT_ID;
+  const softphoneOk = rcConfigurado ? softphoneReady === true : true;
+  const ready = !!asesorId && disponible && softphoneOk;
+  const notReadyReason = ready
+    ? null
+    : !asesorId
+      ? "Conectando con el sistema…"
+      : rcConfigurado && softphoneReady !== true
+        ? "Iniciá sesión en tu teléfono: botón redondo abajo a la derecha."
+        : !disponible
+          ? 'Activá "Disponible" para recibir llamadas.'
+          : "Revisá tu conexión.";
+
+  // El título de la pestaña refleja el estado, así se ve aunque estés en otra
+  // pestaña (Kommo, etc.). El flash de llamada entrante tiene prioridad.
+  useEffect(() => {
+    if (incomingCall) return;
+    document.title = ready ? BASE_TITLE : "🔴 No recibís llamadas · Platinium";
+  }, [ready, incomingCall]);
+
   const value: AsesorSession = {
     asesorId,
     disponible,
     toggling,
     toggleDisponible,
     presenceError,
-    rcConfigurado: !!RC_CLIENT_ID,
+    rcConfigurado,
     softphoneReady,
     notifPermission,
     requestNotif,
+    ready,
+    notReadyReason,
   };
 
   return (
@@ -288,6 +330,7 @@ export default function AsesorSessionProvider({ children }: { children: ReactNod
       {incomingCall && (
         <IncomingCallPopup
           payload={incomingCall}
+          sonido={sonido}
           onClose={() => {
             const lid = incomingCall.lead_id;
             const nombre = incomingCall.nombre ?? "este lead";

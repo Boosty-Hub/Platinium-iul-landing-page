@@ -27,38 +27,63 @@ interface Props {
   kommoSubdominio?: string | null;
   onClose: () => void;
   onVerHistorial?: (lead_id: string) => void;
+  /** Sonido de llamada configurado por el admin (tono + volumen). */
+  sonido?: { tono?: RingTone; volumen?: number };
 }
 
 // ── Imports for seguimiento badge ────────────────────────────────────────────
 import { History } from "lucide-react";
 
-// ── Web Audio ring generator ─────────────────────────────────────────────────
-function startRing(): () => void {
+// ── Web Audio ring generator (configurable + fuerte) ─────────────────────────
+export type RingTone = "clasico" | "urgente" | "campana" | "sirena";
+
+// Genera el tono de llamada vía Web Audio (sin assets mp3). Onda cuadrada =
+// más penetrante/fuerte. `volumen` 0..1. Devuelve una función para detenerlo.
+export function startRing(tono: RingTone = "urgente", volumen = 0.9): () => void {
   let ctx: AudioContext | null = null;
   let stopped = false;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  const vol = Math.max(0, Math.min(1, volumen));
 
-  function beep() {
+  function tone(freq: number, start: number, dur: number, peak = 1) {
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = "square"; // más "duro" que sine
+    osc.frequency.value = freq;
+    const t = ctx.currentTime + start;
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, vol * peak), t + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.start(t);
+    osc.stop(t + dur + 0.03);
+  }
+
+  // Cada preset suena un ciclo y devuelve cuántos segundos hasta repetir.
+  function cycle(): number {
+    if (tono === "clasico") { tone(880, 0, 0.4); return 1.2; }
+    if (tono === "campana") { tone(660, 0, 0.7); tone(990, 0, 0.7, 0.5); return 1.5; }
+    if (tono === "sirena") { tone(700, 0, 0.4); tone(1050, 0.4, 0.4); return 1.0; }
+    // urgente (default): triple beep rápido y fuerte
+    tone(950, 0, 0.18); tone(950, 0.26, 0.18); tone(950, 0.52, 0.18);
+    return 1.15;
+  }
+
+  function ring() {
     if (stopped) return;
     try {
       if (!ctx) ctx = new AudioContext();
       // Si el navegador suspendió el audio (política de autoplay), reanudarlo.
       // Funciona porque el asesor ya interactuó con la página (tocó "Disponible").
       if (ctx.state === "suspended") ctx.resume().catch(() => {});
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = 880; // A5 — distinct, loud-ish
-      gain.gain.setValueAtTime(0.6, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.4);
+      const period = cycle();
+      if (!stopped) timeoutId = setTimeout(ring, period * 1000);
     } catch { /* AudioContext may be unavailable in some environments */ }
-    if (!stopped) timeoutId = setTimeout(beep, 1200); // beep every 1.2 s
   }
 
-  beep();
+  ring();
 
   return () => {
     stopped = true;
@@ -68,7 +93,7 @@ function startRing(): () => void {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, onVerHistorial }: Props) {
+export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, onVerHistorial, sonido }: Props) {
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -78,8 +103,9 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, o
 
   // Start ringing on mount, stop on unmount
   useEffect(() => {
-    stopRingRef.current = startRing();
+    stopRingRef.current = startRing(sonido?.tono, sonido?.volumen);
     return () => { stopRingRef.current?.(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleClose = () => {

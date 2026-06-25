@@ -17,6 +17,7 @@ import RingCentralConfig from "@/components/admin/config/RingCentralConfig";
 import AsesoresConfig from "@/components/admin/config/AsesoresConfig";
 import HorarioConfig from "@/components/admin/config/HorarioConfig";
 import ResendConfig from "@/components/admin/config/ResendConfig";
+import SonidoConfig from "@/components/admin/SonidoConfig";
 import UsuariosPage from "@/pages/admin/UsuariosPage";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { RefreshCw, Phone } from "lucide-react";
@@ -128,6 +129,7 @@ export default function ConfiguracionPage() {
   const ringcentral = getIntegracion("ringcentral");
   const resend = getIntegracion("resend");
   const marcado = getIntegracion("marcado");
+  const sonido = getIntegracion("sonido");
 
   // Switch maestro de marcado automático. Encenderlo arranca las llamadas (en horario).
   const toggleMarcado = async () => {
@@ -348,6 +350,20 @@ export default function ConfiguracionPage() {
           {/* Sistema tab */}
           <TabsContent value="sistema">
             <div className="mt-4 space-y-4">
+              <CollapsibleCard
+                title="Sonido de llamada"
+                subtitle="El tono que le suena al asesor para contestar"
+                defaultOpen={false}
+                actualizado_en={sonido?.actualizado_en}
+                summary={
+                  <span className="text-xs text-[#6A8E98] capitalize">
+                    {sonido?.config?.tono ?? "urgente"} · vol {Math.round(Number(sonido?.config?.volumen ?? 0.9) * 100)}%
+                  </span>
+                }
+              >
+                <SonidoConfig data={sonido} onSaved={load} />
+              </CollapsibleCard>
+
               <CollapsibleCard
                 title="Email (Resend)"
                 subtitle="Configuración de envío de cotizaciones por email"
