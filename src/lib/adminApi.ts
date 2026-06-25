@@ -432,3 +432,21 @@ export async function getRecordingUrl(attempt_id: string): Promise<string> {
   if (!result.ok) throw new Error(result.error ?? "get-recording devolvió error");
   return result.url!;
 }
+
+// ── Disponibilidad de asesores (minutos disponibles por día, Chicago) ────────
+export interface AvailabilityRow {
+  asesor_id: string;
+  fecha: string; // YYYY-MM-DD
+  minutos: number;
+}
+
+export async function getAvailabilityDaily(from: string, to: string): Promise<AvailabilityRow[]> {
+  const { data, error } = await (supabase as any)
+    .from("advisor_availability_daily")
+    .select("asesor_id, fecha, minutos")
+    .gte("fecha", from)
+    .lte("fecha", to)
+    .order("fecha", { ascending: false });
+  if (error) throw new Error(error.message ?? "Error cargando disponibilidad");
+  return (data ?? []) as AvailabilityRow[];
+}

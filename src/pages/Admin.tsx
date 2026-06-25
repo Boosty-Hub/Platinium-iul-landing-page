@@ -10,6 +10,7 @@ const ConfiguracionPage = lazy(() => import("./admin/ConfiguracionPage"));
 const LlamadasPage = lazy(() => import("./admin/LlamadasPage"));
 const UsuariosPage = lazy(() => import("./admin/UsuariosPage"));
 const ScorecardPage = lazy(() => import("./admin/ScorecardPage"));
+const DisponibilidadPage = lazy(() => import("./admin/DisponibilidadPage"));
 const CotizacionesPage = lazy(() => import("./admin/CotizacionesPage"));
 
 export default function Admin() {
@@ -63,6 +64,14 @@ export default function Admin() {
             element={
               <Suspense fallback={<div className="h-48" />}>
                 <ScorecardPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="disponibilidad"
+            element={
+              <Suspense fallback={<div className="h-48" />}>
+                <DisponibilidadPage />
               </Suspense>
             }
           />

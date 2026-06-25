@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, BarChart2, Settings, LogOut, Menu, X, PhoneCall, Star, TableProperties, LayoutDashboard } from "lucide-react";
+import { Users, BarChart2, Settings, LogOut, Menu, X, PhoneCall, Star, TableProperties, LayoutDashboard, Clock } from "lucide-react";
 
 const NAV_ITEMS = [
   { to: "resumen", label: "Resumen", icon: LayoutDashboard },
@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { to: "analytics", label: "Analítica", icon: BarChart2 },
   { to: "llamadas", label: "Llamadas", icon: PhoneCall },
   { to: "scorecard", label: "Scorecard", icon: Star },
+  { to: "disponibilidad", label: "Disponibilidad", icon: Clock },
   { to: "cotizaciones", label: "Cotizaciones", icon: TableProperties },
   { to: "configuracion", label: "Configuración", icon: Settings },
 ] as const;
