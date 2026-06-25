@@ -1,7 +1,7 @@
 // IncomingCallPopup — full-screen impossible-to-miss modal for incoming calls.
 // Ring tone generated via Web Audio API oscillator (no mp3 asset required).
 import { useEffect, useRef, useState } from "react";
-import { Phone, X, ExternalLink, Send } from "lucide-react";
+import { Phone, PhoneOff, X, ExternalLink, Send } from "lucide-react";
 import { submitCallNote, acceptLead } from "@/lib/asesorApi";
 
 export interface IncomingCallPayload {
@@ -73,6 +73,7 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, o
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [inCall, setInCall] = useState(false);
   const stopRingRef = useRef<(() => void) | null>(null);
 
   // Start ringing on mount, stop on unmount
@@ -99,9 +100,21 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, o
       );
     }
     stopRingRef.current?.(); // el softphone toma el audio; cortamos nuestro tono
+    setInCall(true); // el pop-up pasa a panel flotante (deja libre el softphone)
     if (payload.attempt_id) {
       try { await acceptLead(payload.attempt_id); } catch { /* el softphone ya marcó; no bloqueamos */ }
     }
+  };
+
+  // Colgar desde el panel (sin tener que buscar el softphone): le pedimos al widget
+  // de RC que cuelgue. Al colgar (rc-call-end-notify) el provider cierra el panel y
+  // abre "¿Cómo fue la llamada?".
+  const hangUp = () => {
+    const frame = document.querySelector("#rc-widget-adapter-frame") as HTMLIFrameElement | null;
+    frame?.contentWindow?.postMessage(
+      { type: "rc-adapter-control-call", callAction: "hangup" },
+      "https://apps.ringcentral.com",
+    );
   };
 
   const handleSaveNote = async () => {
@@ -130,30 +143,39 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, o
     : null;
 
   return (
-    // Full-screen overlay — z-[9999] ensures it sits above everything including mobile top bar
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-lg bg-[#0F2229] border-2 border-[#1d9fa9] rounded-2xl shadow-2xl overflow-hidden animate-pulse-border">
+    // Entrante → modal a pantalla completa. En llamada → panel flotante arriba a la
+    // izquierda (NO tapa el softphone abajo a la derecha, así se puede colgar).
+    <div className={inCall
+      ? "fixed top-4 left-4 z-[9998] w-[88vw] max-w-xs"
+      : "fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"}>
+      <div className={`relative w-full ${inCall ? "max-w-xs" : "max-w-lg"} bg-[#0F2229] border-2 ${inCall ? "border-emerald-500" : "border-[#1d9fa9]"} rounded-2xl shadow-2xl overflow-hidden ${inCall ? "" : "animate-pulse-border"}`}>
         {/* Animated top bar */}
-        <div className="h-1.5 bg-gradient-to-r from-[#1d9fa9] via-emerald-400 to-[#1d9fa9] animate-shimmer" />
+        <div className={`h-1.5 bg-gradient-to-r ${inCall ? "from-emerald-500 via-emerald-400 to-emerald-500" : "from-[#1d9fa9] via-emerald-400 to-[#1d9fa9] animate-shimmer"}`} />
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#1d9fa9]/30">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#1d9fa9]/20 flex items-center justify-center animate-pulse">
-              <Phone className="w-5 h-5 text-[#1d9fa9]" />
+            <div className={`w-10 h-10 rounded-full ${inCall ? "bg-emerald-500/20" : "bg-[#1d9fa9]/20"} flex items-center justify-center animate-pulse`}>
+              <Phone className={`w-5 h-5 ${inCall ? "text-emerald-400" : "text-[#1d9fa9]"}`} />
             </div>
             <div>
-              <p className="text-xs text-[#6A8E98] uppercase tracking-wider font-semibold">Llamada entrante</p>
-              <p className="text-[11px] text-[#94B3BB]">{new Date(payload.ts).toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" })}</p>
+              <p className="text-xs text-[#6A8E98] uppercase tracking-wider font-semibold">
+                {inCall ? "En llamada" : "Llamada entrante"}
+              </p>
+              <p className="text-[11px] text-[#94B3BB]">
+                {inCall ? "Hablando con el lead" : new Date(payload.ts).toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" })}
+              </p>
             </div>
           </div>
-          <button
-            onClick={handleClose}
-            className="p-2 rounded-lg text-[#94B3BB] hover:text-white hover:bg-[#1d9fa9]/10 transition-colors"
-            aria-label="Cerrar"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          {!inCall && (
+            <button
+              onClick={handleClose}
+              className="p-2 rounded-lg text-[#94B3BB] hover:text-white hover:bg-[#1d9fa9]/10 transition-colors"
+              aria-label="Cerrar"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         {/* Lead info */}
@@ -166,10 +188,10 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, o
                 Recontacto programado
               </div>
             )}
-            <p className="text-3xl font-bold text-[#E4EEF0] leading-tight">
+            <p className={`${inCall ? "text-2xl" : "text-3xl"} font-bold text-[#E4EEF0] leading-tight`}>
               {payload.nombre ?? "Lead desconocido"}
             </p>
-            <p className="text-xl text-[#1d9fa9] font-mono mt-1">
+            <p className={`${inCall ? "text-lg" : "text-xl"} text-[#1d9fa9] font-mono mt-1`}>
               {payload.telefono ?? "—"}
             </p>
           </div>
@@ -186,14 +208,24 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, o
 
         {/* Actions */}
         <div className="px-6 pb-5 space-y-3">
-          {/* Contestar — atiende la llamada en el softphone del asesor */}
-          <button
-            onClick={answerCall}
-            className="flex items-center justify-center gap-2.5 w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base transition-colors shadow-lg shadow-emerald-900/40 animate-pulse"
-          >
-            <Phone className="w-5 h-5" />
-            Contestar
-          </button>
+          {/* Contestar (entrante) → Colgar (en llamada) */}
+          {inCall ? (
+            <button
+              onClick={hangUp}
+              className="flex items-center justify-center gap-2.5 w-full py-4 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-base transition-colors shadow-lg shadow-red-900/40"
+            >
+              <PhoneOff className="w-5 h-5" />
+              Colgar
+            </button>
+          ) : (
+            <button
+              onClick={answerCall}
+              className="flex items-center justify-center gap-2.5 w-full py-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-base transition-colors shadow-lg shadow-emerald-900/40 animate-pulse"
+            >
+              <Phone className="w-5 h-5" />
+              Contestar
+            </button>
+          )}
 
           {/* Kommo link */}
           {kommoLink && (
@@ -243,12 +275,14 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, o
                 Ver historial
               </button>
             )}
-            <button
-              onClick={handleClose}
-              className="px-4 py-2.5 rounded-xl border border-[#1d9fa9]/30 text-[#94B3BB] hover:text-white hover:border-[#1d9fa9]/60 text-sm font-medium transition-colors"
-            >
-              Cerrar
-            </button>
+            {!inCall && (
+              <button
+                onClick={handleClose}
+                className="px-4 py-2.5 rounded-xl border border-[#1d9fa9]/30 text-[#94B3BB] hover:text-white hover:border-[#1d9fa9]/60 text-sm font-medium transition-colors"
+              >
+                Cerrar
+              </button>
+            )}
           </div>
         </div>
       </div>
