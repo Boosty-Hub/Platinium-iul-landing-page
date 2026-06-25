@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState, useCallback, Fragment } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { LeadAlertModal } from "@/components/panel/LeadAlertModal";
 import { LeadDetails } from "@/components/panel/LeadDetails";
 import { OriginBadge } from "@/components/panel/OriginBadge";
 import { Lead, LEAD_SELECT_COLS } from "@/components/panel/types";
 import { getLeadOrigin } from "@/lib/leadOrigin";
-import { toast } from "@/hooks/use-toast";
-import { ChevronDown, Volume2, VolumeX } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 type ConnState = "connected" | "reconnecting" | "disconnected";
 
@@ -14,15 +12,12 @@ const SELECT_COLS = LEAD_SELECT_COLS;
 
 export default function LeadsBoard() {
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [alertQueue, setAlertQueue] = useState<Lead[]>([]);
-  const [audioEnabled, setAudioEnabled] = useState(false);
   const [connState, setConnState] = useState<ConnState>("reconnecting");
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const toggleExpanded = (id: string) => setExpandedId((cur) => (cur === id ? null : id));
 
-  const audioRef = useRef<HTMLAudioElement>(null);
   const seenIdsRef = useRef<Set<string>>(new Set());
   const latestCreatedAtRef = useRef<string | null>(null);
   const lastSyncAtRef = useRef(Date.now());
@@ -44,7 +39,7 @@ export default function LeadsBoard() {
       return [lead, ...prev].slice(0, 200);
     });
     if (!fromInitial) {
-      setAlertQueue((q) => (q.some((l) => l.id === lead.id) ? q : [...q, lead]));
+      // Indicador discreto: resaltamos la fila nueva unos segundos (sin alerta ni sonido).
       setHighlightId(lead.id);
       setTimeout(() => setHighlightId((h) => (h === lead.id ? null : h)), 5000);
     }
@@ -162,34 +157,6 @@ export default function LeadsBoard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const toggleAudio = async () => {
-    if (audioEnabled) {
-      setAudioEnabled(false);
-      return;
-    }
-    const audio = audioRef.current;
-    if (audio) {
-      try {
-        audio.volume = 0;
-        await audio.play();
-        audio.pause();
-        audio.currentTime = 0;
-        audio.volume = 1;
-      } catch {}
-    }
-    try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      await ctx.resume();
-      ctx.close();
-    } catch {}
-    setAudioEnabled(true);
-  };
-
-  const dismissCurrent = () => setAlertQueue((q) => q.slice(1));
-  const dismissAll = () => setAlertQueue([]);
-
-  const currentAlert = alertQueue[0] ?? null;
-
   const dotClass =
     connState === "connected" ? "bg-green-400 animate-pulse"
     : connState === "reconnecting" ? "bg-yellow-400 animate-pulse"
@@ -201,8 +168,6 @@ export default function LeadsBoard() {
 
   return (
     <div>
-      <audio ref={audioRef} src="/alarm.mp3" preload="auto" />
-
       {/* Section header */}
       <div className="flex items-center justify-between mb-5">
         <div>
@@ -217,18 +182,6 @@ export default function LeadsBoard() {
             <div className="text-2xl font-bold text-[#1d9fa9]">{leads.length}</div>
             <div className="text-xs text-[#94B3BB]">leads cargados</div>
           </div>
-          <button
-            onClick={toggleAudio}
-            title={audioEnabled ? "Desactivar alertas de sonido" : "Activar alertas de sonido"}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
-              audioEnabled
-                ? "bg-[#1d9fa9]/20 border-[#1d9fa9]/50 text-[#1d9fa9] hover:bg-[#1d9fa9]/30"
-                : "border-[#1d9fa9]/25 text-[#94B3BB] hover:text-white hover:border-[#1d9fa9]/60"
-            }`}
-          >
-            {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-            <span className="hidden sm:inline">{audioEnabled ? "Sonido activo" : "Sin sonido"}</span>
-          </button>
         </div>
       </div>
 
@@ -374,14 +327,6 @@ export default function LeadsBoard() {
         </div>
       )}
 
-      <LeadAlertModal
-        lead={currentAlert}
-        queueSize={alertQueue.length}
-        onClose={dismissCurrent}
-        onDismissAll={dismissAll}
-        audioRef={audioRef}
-        audioEnabled={audioEnabled}
-      />
     </div>
   );
 }
