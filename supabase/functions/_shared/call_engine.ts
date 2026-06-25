@@ -283,6 +283,16 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
     }
   }
 
+  // Compuerta de "ocupada": un asesor que YA está atendiendo un lead aceptado
+  // (in_progress con asesor_id) no recibe otra oferta hasta cerrar la disposición.
+  // Evita que las ofertas se pierdan con asesores ocupados.
+  const { data: busyRows } = await admin
+    .from("call_queue")
+    .select("asesor_id")
+    .eq("estado", "in_progress")
+    .not("asesor_id", "is", null);
+  const busyIds = new Set<string>((busyRows ?? []).map((r) => r.asesor_id as string));
+
   await setQueue(admin, item.id, { estado: "in_progress" });
   // Cuánto esperamos a que el asesor toque "Contestar" antes de pasar al siguiente.
   // Respeta el valor configurado (Configuración → Tiempo de ring del asesor),
@@ -298,9 +308,14 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
     }
     const asesor = asesores[i];
 
-    // Solo ofrecemos a asesores presentes (Disponible + heartbeat fresco).
+    // Solo ofrecemos a asesores presentes (Disponible + heartbeat fresco)…
     if (!availableIds.has(asesor.id)) {
       console.log(`presence gate: skipping advisor ${asesor.nombre} (no presente)`);
+      continue;
+    }
+    // …y que NO estén atendiendo otro lead ahora mismo.
+    if (busyIds.has(asesor.id)) {
+      console.log(`busy gate: skipping advisor ${asesor.nombre} (atendiendo otro lead)`);
       continue;
     }
 
