@@ -469,3 +469,14 @@ export async function getAdvisorAppPresence(): Promise<Record<string, AppPresenc
   for (const r of (data ?? []) as AppPresence[]) m[r.asesor_id] = r;
   return m;
 }
+
+// Vista previa de la cotización de un lead (el admin puede verla de cualquiera).
+export async function getCotizacionPreview(lead_id: string): Promise<{ html: string; monto: number }> {
+  const { data, error } = await (supabase as any).functions.invoke("preview-cotizacion", {
+    body: { lead_id },
+  });
+  if (error) throw new Error(error.message ?? "Error invocando preview-cotizacion");
+  const result = data as { ok: boolean; html?: string; monto?: number; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "preview-cotizacion devolvió error");
+  return { html: result.html!, monto: result.monto! };
+}

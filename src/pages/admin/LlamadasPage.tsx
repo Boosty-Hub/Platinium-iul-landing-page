@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { PhoneCall, RefreshCw, ChevronDown, ChevronRight, Mic, PhoneIncoming, PhoneOutgoing, Check, Search } from "lucide-react";
-import { listAsesores, getRecordingUrl } from "@/lib/adminApi";
+import { PhoneCall, RefreshCw, ChevronDown, ChevronRight, Mic, PhoneIncoming, PhoneOutgoing, Check, Search, Receipt, X } from "lucide-react";
+import { listAsesores, getRecordingUrl, getCotizacionPreview } from "@/lib/adminApi";
 import { humanUltimoResultado, TIPO_LABELS, fmtDuration } from "@/lib/labels";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -30,6 +30,8 @@ interface LeadInfo {
   telefono: string | null;
   email: string | null;
   created_at: string | null;
+  cotizacion_enviada_at: string | null;
+  cotizacion_monto: number | null;
 }
 
 interface CallQueue {
@@ -74,6 +76,15 @@ const QUEUE_BADGE: Record<QueueEstado, { label: string; cls: string }> = {
   cancelled:     { label: "Cancelada",      cls: "bg-[#6A8E98]/15 text-[#6A8E98] border-[#6A8E98]/25" },
 };
 
+// Buckets de estado para los chips del filtro (agrupan estados afines).
+const ESTADO_BUCKETS: { key: string; label: string; estados: QueueEstado[]; cls: string }[] = [
+  { key: "cola",          label: "En cola",        estados: ["scheduled", "pending"], cls: "text-blue-400 border-blue-500/50 bg-blue-500/15" },
+  { key: "curso",         label: "En curso",       estados: ["in_progress"],          cls: "text-[#1d9fa9] border-[#1d9fa9]/50 bg-[#1d9fa9]/15" },
+  { key: "contactado",    label: "Contactados",    estados: ["contactado"],           cls: "text-green-400 border-green-500/50 bg-green-500/15" },
+  { key: "no_contactado", label: "No contactados", estados: ["no_contactado", "failed"], cls: "text-yellow-400 border-yellow-500/50 bg-yellow-500/15" },
+  { key: "cancelado",     label: "Cancelados",     estados: ["cancelled"],            cls: "text-[#6A8E98] border-[#6A8E98]/50 bg-[#6A8E98]/15" },
+];
+
 const ATTEMPT_BADGE: Record<AttemptEstado, { label: string; cls: string }> = {
   initiated:        { label: "Iniciada",         cls: "bg-blue-500/15 text-blue-400 border-blue-500/25" },
   advisor_answered: { label: "Asesor contestó",  cls: "bg-[#1d9fa9]/15 text-[#1d9fa9] border-[#1d9fa9]/25" },
@@ -91,6 +102,57 @@ function QueueBadge({ estado }: { estado: QueueEstado }) {
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${b.cls}`}>
       {b.label}
     </span>
+  );
+}
+
+function EstadoChip({ active, onClick, label, count, cls }: {
+  active: boolean; onClick: () => void; label: string; count: number; cls: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors flex items-center gap-1.5 ${
+        active ? cls : "border-[#1d9fa9]/15 text-[#94B3BB] hover:text-white hover:border-[#1d9fa9]/40"
+      }`}
+    >
+      {label}
+      <span className={`px-1.5 rounded-full text-[10px] ${active ? "bg-black/25" : "bg-[#1d9fa9]/10"}`}>{count}</span>
+    </button>
+  );
+}
+
+// Modal que muestra la cotización del lead (la genera preview-cotizacion).
+function CotizacionModal({ leadId, nombre, onClose }: { leadId: string; nombre: string; onClose: () => void }) {
+  const [html, setHtml] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState<string | null>(null);
+  useEffect(() => {
+    getCotizacionPreview(leadId)
+      .then((r) => setHtml(r.html))
+      .catch((e) => setErr((e as Error).message))
+      .finally(() => setLoading(false));
+  }, [leadId]);
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={onClose}>
+      <div className="relative w-full max-w-2xl max-h-[88vh] bg-white rounded-2xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[#1d9fa9]/20 bg-[#0F2229]">
+          <div className="flex items-center gap-2 text-[#E4EEF0]">
+            <Receipt className="w-4 h-4 text-[#1d9fa9]" />
+            <span className="font-semibold text-sm">Cotización — {nombre}</span>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-lg text-[#94B3BB] hover:text-white hover:bg-white/10 transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        {loading ? (
+          <div className="p-12 text-center text-[#6A8E98]">Cargando cotización…</div>
+        ) : err ? (
+          <div className="p-12 text-center text-red-500 text-sm">No se pudo cargar la cotización: {err}</div>
+        ) : (
+          <iframe title="Cotización" srcDoc={html ?? ""} className="w-full h-[72vh] border-0 bg-white" />
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -279,8 +341,17 @@ export default function LlamadasPage() {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
   const [timeFilter, setTimeFilter] = useState<"todo" | "hoy" | "7d" | "30d">("todo");
+  const [estadoFilter, setEstadoFilter] = useState<string>("todos");
+  const [cotizacionLead, setCotizacionLead] = useState<{ id: string; nombre: string } | null>(null);
 
-  // Filtro por nombre/teléfono + rango de fecha (sobre la última actualización).
+  // Conteo por estado (para los chips).
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { todos: queue.length };
+    for (const b of ESTADO_BUCKETS) c[b.key] = queue.filter((i) => b.estados.includes(i.estado)).length;
+    return c;
+  }, [queue]);
+
+  // Filtro por estado + nombre/teléfono + rango de fecha (sobre la última actualización).
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     let cutoff = 0;
@@ -289,7 +360,9 @@ export default function LlamadasPage() {
       const d = new Date(); d.setHours(0, 0, 0, 0); cutoff = d.getTime();
     } else if (timeFilter === "7d") cutoff = now - 7 * 86400_000;
     else if (timeFilter === "30d") cutoff = now - 30 * 86400_000;
+    const bucket = ESTADO_BUCKETS.find((b) => b.key === estadoFilter);
     return queue.filter((item) => {
+      if (bucket && !bucket.estados.includes(item.estado)) return false;
       if (cutoff && new Date(item.updated_at).getTime() < cutoff) return false;
       if (q) {
         const nombre = (item.leads?.nombre ?? "").toLowerCase();
@@ -298,7 +371,7 @@ export default function LlamadasPage() {
       }
       return true;
     });
-  }, [queue, search, timeFilter]);
+  }, [queue, search, timeFilter, estadoFilter]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -307,7 +380,7 @@ export default function LlamadasPage() {
       const [{ data, error: err }, asesoresList] = await Promise.all([
         (supabase as any)
           .from("call_queue")
-          .select("*, leads(nombre,telefono,email,created_at)")
+          .select("*, leads(nombre,telefono,email,created_at,cotizacion_enviada_at,cotizacion_monto)")
           .order("updated_at", { ascending: false })
           .limit(200),
         listAsesores().catch(() => []),
@@ -363,32 +436,55 @@ export default function LlamadasPage() {
         </button>
       </div>
 
-      {/* Búsqueda + filtros de fecha */}
+      {/* Filtros: estado + búsqueda + fecha */}
       {!loading && !error && queue.length > 0 && (
-        <div className="flex flex-col sm:flex-row gap-3 mb-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6A8E98]" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por nombre o teléfono…"
-              className="w-full pl-9 pr-3 py-2 rounded-lg bg-[#0B1A1E] border border-[#1d9fa9]/25 text-sm text-[#E4EEF0] placeholder-[#6A8E98] focus:outline-none focus:border-[#1d9fa9]/60 transition-colors"
+        <div className="space-y-3 mb-4">
+          {/* Chips de estado */}
+          <div className="flex flex-wrap gap-2">
+            <EstadoChip
+              active={estadoFilter === "todos"}
+              onClick={() => setEstadoFilter("todos")}
+              label="Todos"
+              count={counts.todos}
+              cls="text-[#E4EEF0] border-[#1d9fa9]/60 bg-[#1d9fa9]/20"
             />
-          </div>
-          <div className="flex gap-1.5">
-            {([["todo", "Todo"], ["hoy", "Hoy"], ["7d", "7 días"], ["30d", "30 días"]] as const).map(([val, label]) => (
-              <button
-                key={val}
-                onClick={() => setTimeFilter(val)}
-                className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
-                  timeFilter === val
-                    ? "bg-[#1d9fa9]/20 border-[#1d9fa9]/50 text-[#1d9fa9]"
-                    : "border-[#1d9fa9]/20 text-[#94B3BB] hover:text-white hover:border-[#1d9fa9]/50"
-                }`}
-              >
-                {label}
-              </button>
+            {ESTADO_BUCKETS.map((b) => (
+              <EstadoChip
+                key={b.key}
+                active={estadoFilter === b.key}
+                onClick={() => setEstadoFilter(b.key)}
+                label={b.label}
+                count={counts[b.key]}
+                cls={b.cls}
+              />
             ))}
+          </div>
+          {/* Búsqueda + fecha */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6A8E98]" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar por nombre o teléfono…"
+                className="w-full pl-9 pr-3 py-2 rounded-lg bg-[#0B1A1E] border border-[#1d9fa9]/25 text-sm text-[#E4EEF0] placeholder-[#6A8E98] focus:outline-none focus:border-[#1d9fa9]/60 transition-colors"
+              />
+            </div>
+            <div className="flex gap-1.5">
+              {([["todo", "Todo"], ["hoy", "Hoy"], ["7d", "7 días"], ["30d", "30 días"]] as const).map(([val, label]) => (
+                <button
+                  key={val}
+                  onClick={() => setTimeFilter(val)}
+                  className={`px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                    timeFilter === val
+                      ? "bg-[#1d9fa9]/20 border-[#1d9fa9]/50 text-[#1d9fa9]"
+                      : "border-[#1d9fa9]/20 text-[#94B3BB] hover:text-white hover:border-[#1d9fa9]/50"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -470,6 +566,16 @@ export default function LlamadasPage() {
                           {lead?.telefono && (
                             <div className="text-xs text-[#6A8E98] font-mono mt-0.5">{lead.telefono}</div>
                           )}
+                          {lead?.cotizacion_enviada_at && item.lead_id && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setCotizacionLead({ id: item.lead_id!, nombre: lead.nombre ?? "este lead" }); }}
+                              className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors"
+                              title="Ver la cotización enviada"
+                            >
+                              <Receipt className="w-3 h-3" />
+                              Cotización{lead.cotizacion_monto ? ` $${Number(lead.cotizacion_monto).toLocaleString()}` : ""} · Ver
+                            </button>
+                          )}
                         </td>
                         <td className="px-4 py-3">
                           <QueueBadge estado={item.estado} />
@@ -535,6 +641,15 @@ export default function LlamadasPage() {
                       {lead?.telefono && (
                         <div className="text-xs text-[#6A8E98] font-mono mt-0.5">{lead.telefono}</div>
                       )}
+                      {lead?.cotizacion_enviada_at && item.lead_id && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setCotizacionLead({ id: item.lead_id!, nombre: lead.nombre ?? "este lead" }); }}
+                          className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                        >
+                          <Receipt className="w-3 h-3" />
+                          Cotización{lead.cotizacion_monto ? ` $${Number(lead.cotizacion_monto).toLocaleString()}` : ""} · Ver
+                        </button>
+                      )}
                       <div className="flex items-center gap-3 mt-1.5 text-xs text-[#6A8E98]">
                         <span>{item.client_attempts ?? 0} intento(s)</span>
                         <span>{fmt(item.updated_at)}</span>
@@ -551,6 +666,14 @@ export default function LlamadasPage() {
             })}
           </div>
         </>
+      )}
+
+      {cotizacionLead && (
+        <CotizacionModal
+          leadId={cotizacionLead.id}
+          nombre={cotizacionLead.nombre}
+          onClose={() => setCotizacionLead(null)}
+        />
       )}
     </div>
   );
