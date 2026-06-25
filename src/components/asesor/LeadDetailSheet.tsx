@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   X, Phone, PhoneCall, Clock, Calendar, ThumbsUp, ThumbsDown,
-  CheckCircle2, Send, XCircle, Play, FileText, RefreshCw, Eye,
+  CheckCircle2, Send, XCircle, Play, FileText, RefreshCw, Eye, ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -351,6 +351,17 @@ export default function LeadDetailSheet({ leadId, onClose, onRefresh }: Props) {
                     <Send className="w-3.5 h-3.5" />
                     Enviar cotización
                   </button>
+                  {lead.kommo_lead_id && lead.kommo_subdominio && (
+                    <a
+                      href={`https://${lead.kommo_subdominio}.kommo.com/leads/detail/${lead.kommo_lead_id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0F2229] border border-[#1d9fa9]/25 text-[#94B3BB] text-xs font-medium hover:text-[#E4EEF0] hover:border-[#1d9fa9]/50 transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      Ir a Kommo
+                    </a>
+                  )}
                 </div>
 
                 {/* Timeline */}

@@ -237,7 +237,7 @@ export async function getLeadHistory(
   // 1) Lead data
   const { data: lead, error: leadErr } = await admin
     .from("leads")
-    .select("id, nombre, telefono, email, genero, anio_nacimiento, ahorro_semanal, cotizacion_enviada_at, cotizacion_monto, disposicion_actual")
+    .select("id, nombre, telefono, email, genero, anio_nacimiento, ahorro_semanal, cotizacion_enviada_at, cotizacion_monto, disposicion_actual, kommo_lead_id")
     .eq("id", lead_id)
     .maybeSingle();
 
@@ -307,6 +307,13 @@ export async function getLeadHistory(
     return tb - ta;
   });
 
+  // Subdominio de Kommo (para armar el link "Ir a Kommo" en el detalle).
+  let kommoSubdominio: string | null = null;
+  try {
+    const kommoI = await getIntegracion(admin, "kommo");
+    kommoSubdominio = ((kommoI?.config ?? {}) as { subdominio?: string }).subdominio ?? null;
+  } catch { /* sin Kommo → sin link */ }
+
   return {
     lead: {
       id: lead.id,
@@ -316,6 +323,8 @@ export async function getLeadHistory(
       genero: lead.genero,
       edad,
       disposicion_actual: lead.disposicion_actual,
+      kommo_lead_id: lead.kommo_lead_id ?? null,
+      kommo_subdominio: kommoSubdominio,
     },
     timeline,
   };

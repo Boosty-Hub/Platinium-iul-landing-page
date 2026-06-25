@@ -269,6 +269,8 @@ export interface LeadInfo {
   genero: string | null;
   edad: number | null;
   disposicion_actual: string | null;
+  kommo_lead_id: string | null;
+  kommo_subdominio: string | null;
 }
 
 export interface TimelineEntryBase {
