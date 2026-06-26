@@ -41,6 +41,7 @@ export function humanUltimoResultado(raw: string | null | undefined): string {
   if (!raw) return "—";
   const map: Record<string, string> = {
     contactado:                   "Contactado",
+    contactado_rc_2min:           "Contactado (llamada +2 min)",
     cliente_no_contesto_reintento:"Cliente no contestó · reintentando",
     no_contactado_max:            "No contestó (máx. intentos)",
     recontacto_semanal:           "Recontacto semanal",

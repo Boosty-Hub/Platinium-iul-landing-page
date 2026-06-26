@@ -45,7 +45,7 @@ serve(async (req: Request) => {
 
   const admin = adminClient();
   const body = await req.json().catch(() => ({} as Record<string, unknown>));
-  const WINDOW_MIN = Math.min(Math.max(Number((body as { minutes?: number }).minutes) || 90, 5), 10080); // override p/ backfill
+  const WINDOW_MIN = Math.min(Math.max(Number((body as { minutes?: number }).minutes) || 90, 5), 43200); // override p/ backfill (hasta 30 días)
   const MAX_RECORDINGS_BODY = Number((body as { maxRecordings?: number }).maxRecordings) || 0;
   const MATCH_TOLERANCE_MS = 6 * 60_000; // ±6 min entre el intento y el inicio RC
   const MAX_RECORDINGS = MAX_RECORDINGS_BODY > 0 ? MAX_RECORDINGS_BODY : 8; // tope de grabaciones por corrida
@@ -56,12 +56,26 @@ serve(async (req: Request) => {
     const rc = rcI.config as unknown as RCCfg;
     const token = await rcAuth(rc);
 
-    // ── 1) Call-log de cuenta (Outbound, Detallado, con grabación) ────────────
+    // ── 1) Call-log de cuenta — PAGINADO (Outbound, Detallado, con grabación) ──
+    // Para backfill: maxPages>1 sigue navigation.nextPage. El call-log de RC tiene
+    // rate-limit agresivo (CMN-301); si pega 429 cortamos y seguimos en la próxima
+    // corrida (idempotente, no se pierde nada).
     const dateFrom = new Date(Date.now() - WINDOW_MIN * 60_000).toISOString();
-    const url = `${rc.server_url}/restapi/v1.0/account/~/call-log?direction=Outbound&view=Detailed&withRecording=true&perPage=250&dateFrom=${encodeURIComponent(dateFrom)}`;
-    const logRes = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-    if (!logRes.ok) return json({ ok: false, error: `call-log ${logRes.status}: ${(await logRes.text()).slice(0, 200)}` });
-    const records: Array<Record<string, any>> = (await logRes.json())?.records ?? [];
+    const MAX_PAGES = Math.min(Math.max(Number((body as { maxPages?: number }).maxPages) || 1, 1), 12);
+    let pageUrl: string | null = `${rc.server_url}/restapi/v1.0/account/~/call-log?direction=Outbound&view=Detailed&withRecording=true&perPage=250&dateFrom=${encodeURIComponent(dateFrom)}`;
+    const records: Array<Record<string, any>> = [];
+    let rateLimited = false;
+    for (let p = 0; p < MAX_PAGES && pageUrl; p++) {
+      const logRes = await fetch(pageUrl, { headers: { Authorization: `Bearer ${token}` } });
+      if (logRes.status === 429) { rateLimited = true; break; }
+      if (!logRes.ok) {
+        if (records.length) break;
+        return json({ ok: false, error: `call-log ${logRes.status}: ${(await logRes.text()).slice(0, 200)}` });
+      }
+      const data = await logRes.json();
+      records.push(...((data?.records ?? []) as Array<Record<string, any>>));
+      pageUrl = (data?.navigation?.nextPage?.uri as string | undefined) ?? null;
+    }
 
     // ── 2) Intentos candidatos: SOLO los que REALMENTE marcaron al cliente ─────
     // advisor_answered (aceptó → softphone marcó) o tipo='direct' (llamada manual).
@@ -74,7 +88,7 @@ serve(async (req: Request) => {
       .is("rc_session_id", null)
       .gte("inicio_at", winStart)
       .or("estado.in.(advisor_answered,client_answered,completed),tipo.eq.direct")
-      .limit(1000);
+      .limit(3000);
 
     // Mapa teléfono-cliente normalizado → lista de intentos
     const byPhone = new Map<string, Array<any>>();
@@ -123,22 +137,37 @@ serve(async (req: Request) => {
       if (best) { usedAttemptIds.add(best.id); matched.push({ attempt: best, rec }); }
     }
 
-    // ── 3) Sellar telemetría (rápido, primero — guarda también recording_id) ──
-    let sellados = 0;
+    // ── 3) Sellar telemetría + auto-clasificar ────────────────────────────────
+    // Regla del negocio: una llamada conectada de +2 min ES un contacto real (aunque
+    // la asesora la haya marcado "no contestó"). Marcamos el intento 'contactado' y,
+    // si el lead seguía como "no contactado", lo corregimos.
+    const CONTACT_SEC = 120;
+    let sellados = 0, contactados = 0;
     for (const { attempt, rec } of matched) {
       const result = (rec.result as string) ?? null;
       const dur = Number(rec.duration ?? 0) || 0;
-      const talk = CONNECTED.has(result ?? "") ? dur : 0;
-      const { error: upErr } = await admin.from("call_attempts").update({
+      const connected = CONNECTED.has(result ?? "");
+      const esContacto = connected && dur >= CONTACT_SEC;
+      const patch: Record<string, unknown> = {
         rc_session_id: String(rec.telephonySessionId ?? rec.sessionId ?? rec.id),
         rc_call_start: rec.startTime ?? null,
         rc_result: result,
         duracion_seg: dur,
-        talk_time_sec: talk,
+        talk_time_sec: connected ? dur : 0,
         recording_id: rec?.recording?.id ? String(rec.recording.id) : null,
-      }).eq("id", attempt.id);
+      };
+      if (esContacto) { patch.outcome = "contactado"; patch.client_answered_at = rec.startTime ?? null; }
+      const { error: upErr } = await admin.from("call_attempts").update(patch).eq("id", attempt.id);
       if (upErr) { console.error("sync-call-results telemetry update:", upErr.message); continue; }
       sellados++;
+      if (esContacto) {
+        contactados++;
+        // Corrige el lead si seguía marcado "no contactado": SÍ se le contactó.
+        await admin.from("call_queue").update({ estado: "contactado", ultimo_resultado: "contactado_rc_2min" })
+          .eq("lead_id", attempt.lead_id).eq("estado", "no_contactado");
+        await admin.from("leads").update({ disposicion_actual: "contactado" })
+          .eq("id", attempt.lead_id).is("disposicion_actual", null);
+      }
     }
 
     // ── 4) Bajar grabaciones — DESACOPLADO del sellado y reintentable ──────────
@@ -167,7 +196,7 @@ serve(async (req: Request) => {
       } catch (e) { console.error("sync-call-results recording", (e as Error).message); }
     }
 
-    return json({ ok: true, rc_records: records.length, candidatos: attempts?.length ?? 0, sellados, grabadas });
+    return json({ ok: true, rc_records: records.length, candidatos: attempts?.length ?? 0, sellados, contactados, grabadas, rate_limited: rateLimited });
   } catch (e) {
     console.error("sync-call-results fatal:", (e as Error).message);
     return json({ ok: false, error: (e as Error).message }, 500);
