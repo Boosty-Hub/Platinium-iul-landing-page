@@ -427,6 +427,9 @@ export type AdminOverview = {
     cartera: number;
     cartera_activa: number;
     dials: number;
+    answered: number;        // ofertas aceptadas (diligencia)
+    connected: number;       // llamadas que conectaron (RingCentral)
+    disponible_min: number;  // minutos disponible en el rango
     contactados: number;
     cotizaciones: number;
     ganados: number;

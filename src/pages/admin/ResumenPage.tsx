@@ -41,6 +41,13 @@ function pctOf(num: number, denom: number): string {
   return ((num / denom) * 100).toFixed(1) + "%";
 }
 
+function fmtMin(min: number): string {
+  if (!min) return "0m";
+  const h = Math.floor(min / 60);
+  const m = Math.round(min % 60);
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 interface KpiCardProps {
@@ -319,8 +326,17 @@ export default function ResumenPage() {
                       <th className="text-right px-4 py-3 text-xs text-[#6A8E98] font-medium uppercase tracking-wider">
                         Cartera
                       </th>
-                      <th className="text-right px-4 py-3 text-xs text-[#6A8E98] font-medium uppercase tracking-wider">
-                        Marcaciones
+                      <th className="text-right px-4 py-3 text-xs text-[#6A8E98] font-medium uppercase tracking-wider" title="Tiempo disponible en el período">
+                        Disponible
+                      </th>
+                      <th className="text-right px-4 py-3 text-xs text-[#6A8E98] font-medium uppercase tracking-wider" title="Ofertas de lead recibidas">
+                        Ofertas
+                      </th>
+                      <th className="text-right px-4 py-3 text-xs text-[#6A8E98] font-medium uppercase tracking-wider" title="Ofertas que aceptó (tocó Contestar)">
+                        Aceptó
+                      </th>
+                      <th className="text-right px-4 py-3 text-xs text-[#6A8E98] font-medium uppercase tracking-wider" title="Llamadas que conectaron de verdad (RingCentral)">
+                        Conectaron
                       </th>
                       <th className="text-right px-4 py-3 text-xs text-[#6A8E98] font-medium uppercase tracking-wider">
                         Contactados
@@ -352,8 +368,20 @@ export default function ResumenPage() {
                             <span className="text-[#6A8E98] text-xs"> · {a.cartera_activa} activos</span>
                           )}
                         </td>
+                        <td className="px-4 py-3.5 text-right text-[#94B3BB] whitespace-nowrap">
+                          {fmtMin(a.disponible_min)}
+                        </td>
                         <td className="px-4 py-3.5 text-right text-[#94B3BB]">
                           {a.dials.toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                          <span className={a.dials && a.answered / a.dials < 0.4 ? "text-orange-400 font-medium" : "text-[#E4EEF0]"}>
+                            {a.answered.toLocaleString()}
+                          </span>
+                          {a.dials > 0 && <span className="text-[#6A8E98] text-xs"> · {pctOf(a.answered, a.dials)}</span>}
+                        </td>
+                        <td className="px-4 py-3.5 text-right text-emerald-400">
+                          {a.connected.toLocaleString()}
                         </td>
                         <td className="px-4 py-3.5 text-right text-blue-400">
                           {a.contactados.toLocaleString()}
