@@ -37,14 +37,11 @@ serve(async (req: Request) => {
       });
     }
 
-    let sub: string | null = null;
-    try {
-      const payload = JSON.parse(
-        atob(jwt.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")),
-      );
-      sub = payload.sub ?? null;
-    } catch {
-      return new Response(JSON.stringify({ ok: false, error: "JWT inválido" }), {
+    // Verifica la FIRMA del JWT contra Supabase Auth — no confiar en el payload sin verificar.
+    const { data: userData, error: userErr } = await admin.auth.getUser(jwt);
+    const sub: string | null = userData?.user?.id ?? null;
+    if (userErr || !sub) {
+      return new Response(JSON.stringify({ ok: false, error: "No autorizado" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -53,7 +50,7 @@ serve(async (req: Request) => {
     const { data: caller } = await admin
       .from("usuarios_sistema")
       .select("rol, activo, asesor_id")
-      .eq("user_id", sub!)
+      .eq("user_id", sub)
       .maybeSingle();
 
     if (!caller || !caller.activo) {

@@ -28,13 +28,13 @@ serve(async (req: Request) => {
     const auth = req.headers.get("Authorization") ?? "";
     const jwt = auth.replace(/^Bearer\s+/i, "");
     if (!jwt || jwt.split(".").length !== 3) return json({ ok: false, error: "No autorizado" }, 401);
-    let sub: string | null = null;
-    try {
-      const payload = JSON.parse(atob(jwt.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
-      sub = payload.sub ?? null;
-    } catch { return json({ ok: false, error: "JWT inválido" }, 401); }
+    // Verifica la FIRMA del JWT contra Supabase Auth — NO confiar en el payload sin
+    // verificar (si no, se podría forjar un sub arbitrario).
+    const { data: userData, error: userErr } = await admin.auth.getUser(jwt);
+    const sub = userData?.user?.id ?? null;
+    if (userErr || !sub) return json({ ok: false, error: "No autorizado" }, 401);
     const { data: caller } = await admin
-      .from("usuarios_sistema").select("rol, activo, asesor_id").eq("user_id", sub!).maybeSingle();
+      .from("usuarios_sistema").select("rol, activo, asesor_id").eq("user_id", sub).maybeSingle();
     if (!caller || !caller.activo) return json({ ok: false, error: "No autorizado" }, 403);
     if (caller.rol === "admin") isAdmin = true;
     else if (caller.rol === "asesor" && caller.asesor_id) callerAsesorId = caller.asesor_id as string;
