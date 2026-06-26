@@ -120,18 +120,49 @@ export async function setDisposicion(
       const attempts = (qRow?.client_attempts ?? 0) + 1;
       if (attempts < maxAttempts) {
         const delay = delays[Math.min(attempts - 1, delays.length - 1)] ?? 30;
+        // asesor_id:null → el asesor NO habló con el lead; vuelve sin dueño a la
+        // rotación (no queda "asignado" a quien solo intentó). solo_asesor_id:null
+        // = sin fijar, rota a quien conteste.
         await admin.from("call_queue").upsert(
-          { lead_id, estado: "scheduled", scheduled_at: plusMin(delay), solo_asesor_id: null, next_asesor_idx: 0, client_attempts: attempts, ultimo_resultado: "cliente_no_contesto_reintento", kommo_lead_id: kommoLeadId0 },
+          { lead_id, estado: "scheduled", scheduled_at: plusMin(delay), asesor_id: null, solo_asesor_id: null, next_asesor_idx: 0, client_attempts: attempts, ultimo_resultado: "cliente_no_contesto_reintento", kommo_lead_id: kommoLeadId0 },
           { onConflict: "lead_id" },
         );
       } else {
-        await admin.from("call_queue").update({ estado: "no_contactado", client_attempts: attempts, ultimo_resultado: "no_contactado_max" }).eq("lead_id", lead_id);
+        await admin.from("call_queue").update({ estado: "no_contactado", asesor_id: null, client_attempts: attempts, ultimo_resultado: "no_contactado_max" }).eq("lead_id", lead_id);
       }
     } else {
       // Disposición terminal → cerrar la cola (no se vuelve a marcar sola).
       const negativa = disposicion === "no_interesado" || disposicion === "numero_equivocado";
       await admin.from("call_queue").update({ estado: negativa ? "no_contactado" : "contactado", ultimo_resultado: disposicion }).eq("lead_id", lead_id);
     }
+  }
+
+  // 5b) Sellar el intento del asesor con el RESULTADO REAL del cliente.
+  //     En click-to-call el motor no sabe si el cliente contestó; lo sabe el asesor
+  //     al colgar. Sin esto el intento quedaba "en_curso" para siempre (parecía que
+  //     nadie atendió). Acá lo cerramos con trazabilidad correcta:
+  //       · no_contesto       → client_no_answer ("atendió el asesor, el cliente no")
+  //       · numero_equivocado → failed
+  //       · resto (habló)     → contactado
+  try {
+    const { data: openAtt } = await admin
+      .from("call_attempts")
+      .select("id, answered_at")
+      .eq("lead_id", lead_id)
+      .eq("estado", "advisor_answered")
+      .order("inicio_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (openAtt) {
+      const nowI = new Date().toISOString();
+      const patch: Record<string, unknown> = { fin_at: nowI };
+      if (disposicion === "no_contesto") patch.outcome = "client_no_answer";
+      else if (disposicion === "numero_equivocado") patch.outcome = "failed";
+      else { patch.outcome = "contactado"; patch.client_answered_at = (openAtt.answered_at as string) ?? nowI; }
+      await admin.from("call_attempts").update(patch).eq("id", openAtt.id);
+    }
+  } catch (e) {
+    console.error("setDisposicion/sellar intento:", (e as Error).message);
   }
 
   // 6) Kommo — best-effort (log + continue si falla)

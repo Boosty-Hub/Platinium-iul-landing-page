@@ -238,6 +238,75 @@ async function rcBusyExtensions(rc: RCCfg, token: string): Promise<Set<string>> 
   } catch { return new Set(); }
 }
 
+// ── Claim autoritativo al ACEPTAR (event-driven) ──────────────────────────────
+// Lo invoca asesor-accept-lead cuando el asesor toca "Contestar" (y el motor como
+// backstop). Es la ÚNICA fuente de verdad de "quién tomó el lead": NO depende de
+// que el motor esté vivo polleando. Hace un claim cuasi-atómico (primero gana) para
+// que dos asesores no terminen ambos asignados al mismo lead.
+export async function claimLeadOnAccept(
+  admin: Admin,
+  attempt: { id: string; asesor_id: string; lead_id: string; inicio_at?: string | null; accepted_at?: string | null },
+  kommo: KommoCfg | null,
+): Promise<{ claimed: boolean; reason?: string }> {
+  // ¿La cola ya la tomó OTRO asesor? → este accept llega tarde.
+  const { data: q } = await admin
+    .from("call_queue")
+    .select("id, estado, asesor_id, kommo_lead_id")
+    .eq("lead_id", attempt.lead_id)
+    .maybeSingle();
+  if (q && q.estado === "in_progress" && q.asesor_id && q.asesor_id !== attempt.asesor_id) {
+    await admin.from("call_attempts").update({
+      estado: "no_answer", outcome: "cancelled", fin_at: nowIso(), notas: "otro_asesor_tomo",
+    }).eq("id", attempt.id);
+    return { claimed: false, reason: "otro_asesor" };
+  }
+
+  const acceptedAt = attempt.accepted_at || nowIso();
+  const ringSec = attempt.inicio_at
+    ? Math.min(Math.max(Math.round((new Date(acceptedAt).getTime() - new Date(attempt.inicio_at).getTime()) / 1000), 0), 600)
+    : null;
+
+  // Transición del intento: el asesor SÍ atendió (registra cuánto timbró).
+  // outcome se deja NULL (no existe 'en_curso' en el CHECK de outcome); el resultado
+  // real del cliente lo sella la disposición (client_no_answer / contactado). Chequeamos
+  // el error: un UPDATE que falla en silencio fue justo el bug que dejaba "Llamando…".
+  const { error: attErr } = await admin.from("call_attempts").update({
+    estado: "advisor_answered", accepted_at: acceptedAt, answered_at: acceptedAt,
+    ring_time_sec: ringSec,
+  }).eq("id", attempt.id);
+  if (attErr) console.error("claimLeadOnAccept/attempt update:", attErr.message);
+
+  // Reclamar la cola para este asesor (queda "en curso" hasta la disposición).
+  await admin.from("call_queue").update({
+    estado: "in_progress", asesor_id: attempt.asesor_id, next_asesor_idx: 0, ultimo_resultado: "asesor_atendio",
+  }).eq("lead_id", attempt.lead_id);
+
+  // Cancela cualquier OTRO pop-up vivo del mismo lead (carrera rara: el motor alcanzó
+  // a ofrecérselo a otro asesor justo cuando este aceptó). Evita "Llamando…" huérfanos.
+  await admin.from("call_attempts")
+    .update({ estado: "no_answer", outcome: "cancelled", fin_at: nowIso(), notas: "lead_tomado_por_otro" })
+    .eq("lead_id", attempt.lead_id)
+    .eq("estado", "initiated")
+    .neq("id", attempt.id);
+
+  // Kommo: Responsable + Status Call "calling" (best-effort, no rompe el claim).
+  if (kommo && q?.kommo_lead_id) {
+    try {
+      const { data: asesor } = await admin
+        .from("asesores")
+        .select("kommo_responsable_enum_id, kommo_user_id")
+        .eq("id", attempt.asesor_id)
+        .maybeSingle();
+      await kommoUpdateLead(kommo, q.kommo_lead_id as string, {
+        responsableEnumId: asesor?.kommo_responsable_enum_id ?? null,
+        responsibleUserId: asesor?.kommo_user_id ?? null,
+        statusCallEnumId: statusCallEnum(kommo, "calling"),
+      });
+    } catch (e) { console.error("claimLeadOnAccept/kommo", (e as Error).message); }
+  }
+  return { claimed: true };
+}
+
 async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: KommoCfg | null; horario: Horario }) {
   const { kommo, horario } = ctx;
 
@@ -251,157 +320,138 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
   const client = normalizePhone(lead?.telefono);
   if (!client) { await setQueue(admin, item.id, { estado: "failed", ultimo_resultado: "sin_telefono" }); return { lead: item.lead_id, action: "failed_no_phone" }; }
 
-  let { data: asesores } = await admin.from("asesores").select("*").eq("activo", true).order("orden", { ascending: true });
+  // Cuánto suena el pop-up de un asesor antes de pasar al siguiente (configurable).
+  const ACCEPT_WAIT_SEC = Math.min(Math.max(horario.advisor_ring_timeout_sec || 18, 10), 45);
 
-  // ── Recontacto fijado a un asesor (solo_asesor_id) ──────────────────────
-  if (item.solo_asesor_id) {
-    const pinned = (asesores ?? []).filter((a) => a.id === item.solo_asesor_id);
-    if (pinned.length > 0) {
-      asesores = pinned; // llama SOLO al asesor asignado
+  // ── 1) Resolver el intento ANTERIOR que estaba sonando (event-driven) ──────
+  // El motor NO bloquea esperando el "Contestar": ofrece y vuelve enseguida. La
+  // señal de aceptación la captura asesor-accept-lead (claimLeadOnAccept), viva o
+  // muerta la función. Acá, en el siguiente tick (cuando ya venció el ring porque
+  // scheduled_at = deadline), cerramos el intento previo de ESTE lead:
+  //   · si aceptó → backstop (por si el endpoint no alcanzó a transicionar)
+  //   · si venció sin aceptar → "el asesor no contestó" + rota al siguiente
+  const { data: prev } = await admin
+    .from("call_attempts")
+    .select("id, asesor_id, inicio_at, accepted_at")
+    .eq("call_queue_id", item.id)
+    .eq("estado", "initiated")
+    .order("inicio_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (prev) {
+    if (prev.accepted_at) {
+      const r = await claimLeadOnAccept(admin, {
+        id: prev.id as string, asesor_id: prev.asesor_id as string, lead_id: item.lead_id,
+        inicio_at: prev.inicio_at as string | null, accepted_at: prev.accepted_at as string,
+      }, kommo);
+      if (r.claimed) return { lead: item.lead_id, action: "asesor_atendio_backstop" };
     } else {
-      // Asesor inactivo → rotación normal (log + fall-through)
-      console.log(`solo_asesor_id ${item.solo_asesor_id} no está activo — rotación normal`);
+      const ringSec = prev.inicio_at
+        ? Math.min(Math.round((Date.now() - new Date(prev.inicio_at as string).getTime()) / 1000), 600)
+        : ACCEPT_WAIT_SEC;
+      await updAttempt(admin, prev.id as string, {
+        estado: "no_answer", outcome: "advisor_no_answer", notas: "asesor_no_acepto",
+        fin_at: nowIso(), ring_time_sec: ringSec,
+      });
+      broadcastCancel(admin, prev.asesor_id as string, prev.id as string, item.lead_id);
     }
   }
 
+  // ── 2) Asesores + compuertas (presencia, ocupado, ring activo, pin) ────────
+  let { data: asesores } = await admin.from("asesores").select("*").eq("activo", true).order("orden", { ascending: true });
+  if (item.solo_asesor_id) {
+    const pinned = (asesores ?? []).filter((a) => a.id === item.solo_asesor_id);
+    if (pinned.length > 0) asesores = pinned; // recontacto fijado → SOLO ese asesor
+    else console.log(`solo_asesor_id ${item.solo_asesor_id} no está activo — rotación normal`);
+  }
   if (!asesores?.length) { await setQueue(admin, item.id, { estado: "scheduled", scheduled_at: plusMin(2), ultimo_resultado: "sin_asesores" }); return { lead: item.lead_id, action: "no_advisors" }; }
 
-  // ── Presence gate (modelo click-to-call) ──────────────────────────────────
-  // El asesor DEBE estar presente (app abierta + Disponible + heartbeat < 90s) para
-  // poder ACEPTAR el lead y que su softphone marque al cliente. Por eso solo se
-  // ofrece a quienes están realmente disponibles. Ya NO hay cold-start "todos
-  // disponibles": si nadie está presente, no se ofrece a nadie y se reencola.
-  const { data: presenceRows } = await admin
-    .from("advisor_presence")
-    .select("asesor_id, disponible, last_seen_at");
-
+  // Presentes = Disponible + heartbeat fresco (<90s). Sin presencia no se ofrece.
+  const { data: presenceRows } = await admin.from("advisor_presence").select("asesor_id, disponible, last_seen_at");
   const availableIds = new Set<string>();
   const freshThreshold = new Date(Date.now() - 90_000).toISOString();
   for (const row of (presenceRows ?? [])) {
-    if (row.disponible && (row.last_seen_at as string) >= freshThreshold) {
-      availableIds.add(row.asesor_id as string);
-    }
+    if (row.disponible && (row.last_seen_at as string) >= freshThreshold) availableIds.add(row.asesor_id as string);
   }
 
-  // Compuerta de "ocupada": un asesor que YA está atendiendo un lead aceptado
-  // (in_progress con asesor_id) no recibe otra oferta hasta cerrar la disposición.
-  // Evita que las ofertas se pierdan con asesores ocupados.
-  const { data: busyRows } = await admin
-    .from("call_queue")
-    .select("asesor_id")
-    .eq("estado", "in_progress")
-    .not("asesor_id", "is", null);
+  // Ocupado = ya atendiendo un lead aceptado (in_progress con asesor_id).
+  const { data: busyRows } = await admin.from("call_queue").select("asesor_id").eq("estado", "in_progress").not("asesor_id", "is", null);
   const busyIds = new Set<string>((busyRows ?? []).map((r) => r.asesor_id as string));
+  // …y "sonando" = ya tiene un pop-up activo por OTRO lead (intento initiated sin vencer).
+  // Evita que a un asesor le suenen dos leads a la vez.
+  const ringFresh = new Date(Date.now() - (ACCEPT_WAIT_SEC + 5) * 1000).toISOString();
+  const { data: ringingRows } = await admin
+    .from("call_attempts").select("asesor_id, inicio_at")
+    .eq("estado", "initiated").gte("inicio_at", ringFresh);
+  for (const r of (ringingRows ?? [])) if (r.asesor_id) busyIds.add(r.asesor_id as string);
 
-  await setQueue(admin, item.id, { estado: "in_progress" });
-  // Cuánto esperamos a que el asesor toque "Contestar" antes de pasar al siguiente.
-  // Respeta el valor configurado (Configuración → Tiempo de ring del asesor),
-  // con piso 10s y techo 45s (el presupuesto de 55s de la función lo cubre).
-  const ACCEPT_WAIT_SEC = Math.min(Math.max(horario.advisor_ring_timeout_sec || 18, 10), 45);
-  const BUDGET_MS = 55_000;
-  const t0 = Date.now();
-
-  for (let i = item.next_asesor_idx ?? 0; i < asesores.length; i++) {
-    if (Date.now() - t0 > BUDGET_MS) {
-      await setQueue(admin, item.id, { estado: "scheduled", scheduled_at: nowIso(), next_asesor_idx: i, ultimo_resultado: "continua_rotacion" });
-      return { lead: item.lead_id, action: "budget_pause", resumeIdx: i };
-    }
-    const asesor = asesores[i];
-
-    // Solo ofrecemos a asesores presentes (Disponible + heartbeat fresco)…
-    if (!availableIds.has(asesor.id)) {
-      console.log(`presence gate: skipping advisor ${asesor.nombre} (no presente)`);
-      continue;
-    }
-    // …y que NO estén atendiendo otro lead ahora mismo.
-    if (busyIds.has(asesor.id)) {
-      console.log(`busy gate: skipping advisor ${asesor.nombre} (atendiendo otro lead)`);
-      continue;
-    }
-
-    const attemptId = await logAttempt(admin, item, asesor.id, null);
-
-    // ── Broadcast on ring ──────────────────────────────────────────────────
-    // Fire-and-forget: NUNCA bloquea el loop (presupuesto 55s). Incluye
-    // attempt_id (para que el asesor guarde la nota) y el subdominio de Kommo
-    // (para el link "Abrir en Kommo" del pop-up).
-    void (async () => {
-      try {
-        const ch = admin.channel("advisor:" + asesor.id);
-        await ch.subscribe();
-        await ch.send({
-          type: "broadcast",
-          event: "incoming_call",
-          payload: {
-            attempt_id: attemptId,
-            kommo_subdominio: (kommo as unknown as { subdominio?: string })?.subdominio ?? null,
-            lead_id: item.lead_id,
-            kommo_lead_id: item.kommo_lead_id ?? null,
-            nombre: lead?.nombre ?? null,
-            telefono: lead?.telefono ?? null,
-            interes: lead?.interes ?? null,
-            edad: lead?.anio_nacimiento ? new Date().getFullYear() - Number(lead.anio_nacimiento) : null,
-            anio_nacimiento: lead?.anio_nacimiento ?? null,
-            ahorro_semanal: lead?.ahorro_semanal ?? null,
-            city: lead?.city ?? null,
-            fuente: lead?.fuente ?? null,
-            utm_source: lead?.utm_source ?? null,
-            ts: nowIso(),
-            es_seguimiento: !!item.solo_asesor_id,
-          },
-        });
-        await admin.removeChannel(ch);
-      } catch (e) { console.error("broadcast incoming_call", e); }
-    })();
-
-    // ── Esperar a que el asesor ACEPTE (toque "Contestar" en su app) ──────────
-    // Al aceptar, SU softphone marca al cliente (rc-adapter-new-call). El motor solo
-    // necesita la señal: call_attempts.accepted_at, que pone el endpoint
-    // asesor-accept-lead.
-    const ringStartIso = nowIso();
-    let accepted = false;
-    const deadline = Date.now() + ACCEPT_WAIT_SEC * 1000;
-    while (Date.now() < deadline) {
-      await sleep(1500);
-      const { data: a } = await admin.from("call_attempts").select("accepted_at").eq("id", attemptId).maybeSingle();
-      if (a?.accepted_at) { accepted = true; break; }
-    }
-
-    if (!accepted) {
-      const ringTimeSec = Math.round((Date.now() - new Date(ringStartIso).getTime()) / 1000);
-      await updAttempt(admin, attemptId, {
-        estado: "no_answer", notas: "asesor_no_acepto", fin_at: nowIso(),
-        outcome: "advisor_no_answer", ring_time_sec: ringTimeSec,
-      });
-      // Cerrale el pop-up a ESTE asesor; el motor ofrece al siguiente.
-      broadcastCancel(admin, asesor.id, attemptId, item.lead_id);
-      continue; // siguiente asesor
-    }
-
-    // ── El asesor aceptó → su softphone está marcando al cliente ──────────────
-    // El resultado real (contactado / no contactó / agendó) lo registra la
-    // DISPOSICIÓN del asesor al colgar (asesor-set-disposicion → setDisposicion),
-    // que finaliza la cola. El motor solo deja el lead "en curso" con su dueño.
-    const acceptedAt = nowIso();
-    const ringTimeSec = Math.round((new Date(acceptedAt).getTime() - new Date(ringStartIso).getTime()) / 1000);
-    await updAttempt(admin, attemptId, {
-      estado: "advisor_answered", answered_at: acceptedAt,
-      ring_time_sec: ringTimeSec, outcome: "en_curso",
-    });
-    await setQueue(admin, item.id, { estado: "in_progress", asesor_id: asesor.id, next_asesor_idx: 0, ultimo_resultado: "asesor_atendio" });
-    if (kommo && item.kommo_lead_id) {
-      kommoUpdateLead(kommo, item.kommo_lead_id, {
-        responsableEnumId: asesor.kommo_responsable_enum_id,
-        responsibleUserId: asesor.kommo_user_id,
-        statusCallEnumId: statusCallEnum(kommo, "calling"),
-      }).catch((e) => console.error("kommo calling", e));
-    }
-    return { lead: item.lead_id, action: "asesor_atendio", asesor: asesor.nombre };
+  // ── 3) Elegir el PRÓXIMO asesor elegible por rotación ──────────────────────
+  const startIdx = item.next_asesor_idx ?? 0;
+  let chosen: (typeof asesores)[number] | null = null;
+  let chosenIdx = -1;
+  for (let step = 0; step < asesores.length; step++) {
+    const i = (startIdx + step) % asesores.length;
+    const a = asesores[i];
+    if (availableIds.has(a.id) && !busyIds.has(a.id)) { chosen = a; chosenIdx = i; break; }
   }
 
-  // Nadie aceptó → reencolar (no cuenta como intento de cliente).
-  await setQueue(admin, item.id, { estado: "scheduled", scheduled_at: plusMin(2), next_asesor_idx: 0, advisor_round: (item.advisor_round ?? 0) + 1, ultimo_resultado: "ningun_asesor_acepto" });
-  return { lead: item.lead_id, action: "no_advisor_accepted" };
+  if (!chosen) {
+    // Nadie presente/libre → esperar a que alguien se desocupe (no quema rotación).
+    await setQueue(admin, item.id, { estado: "scheduled", scheduled_at: plusMin(1), ultimo_resultado: prev ? "ningun_asesor_acepto" : "sin_asesores_presentes" });
+    return { lead: item.lead_id, action: "no_eligible" };
+  }
+
+  // Tope suave: tras muchas rondas sin que NADIE acepte, espaciar (no repicar sin fin).
+  const round = item.advisor_round ?? 0;
+  if (round > 8) {
+    await setQueue(admin, item.id, { estado: "scheduled", scheduled_at: plusMin(3), advisor_round: 0, next_asesor_idx: 0, ultimo_resultado: "ningun_asesor_acepto" });
+    return { lead: item.lead_id, action: "backoff_rounds" };
+  }
+
+  // ── 4) Ofrecer (crea intento + broadcast) y volver: el ring corre solo ─────
+  const attemptId = await logAttempt(admin, item, chosen.id, null);
+  void (async () => {
+    try {
+      const ch = admin.channel("advisor:" + chosen!.id);
+      await ch.subscribe();
+      await ch.send({
+        type: "broadcast",
+        event: "incoming_call",
+        payload: {
+          attempt_id: attemptId,
+          kommo_subdominio: (kommo as unknown as { subdominio?: string })?.subdominio ?? null,
+          lead_id: item.lead_id,
+          kommo_lead_id: item.kommo_lead_id ?? null,
+          nombre: lead?.nombre ?? null,
+          telefono: lead?.telefono ?? null,
+          interes: lead?.interes ?? null,
+          edad: lead?.anio_nacimiento ? new Date().getFullYear() - Number(lead.anio_nacimiento) : null,
+          anio_nacimiento: lead?.anio_nacimiento ?? null,
+          ahorro_semanal: lead?.ahorro_semanal ?? null,
+          city: lead?.city ?? null,
+          fuente: lead?.fuente ?? null,
+          utm_source: lead?.utm_source ?? null,
+          ts: nowIso(),
+          es_seguimiento: !!item.solo_asesor_id,
+        },
+      });
+      await admin.removeChannel(ch);
+    } catch (e) { console.error("broadcast incoming_call", e); }
+  })();
+
+  // scheduled_at = deadline del ring: el lead NO se vuelve a tocar hasta que venza,
+  // y al vencer el próximo tick resuelve este intento y rota. estado='scheduled'
+  // (no in_progress) para no marcar al asesor como ocupado mientras solo le suena.
+  const wrapped = chosenIdx + 1 >= asesores.length;
+  await setQueue(admin, item.id, {
+    estado: "scheduled",
+    scheduled_at: new Date(Date.now() + ACCEPT_WAIT_SEC * 1000).toISOString(),
+    next_asesor_idx: (chosenIdx + 1) % asesores.length,
+    advisor_round: round + (wrapped ? 1 : 0),
+    ultimo_resultado: "ofreciendo",
+  });
+  return { lead: item.lead_id, action: "ofrecido", asesor: chosen.nombre };
 }
 
 // ── Tick del motor (lo dispara el cron o submit-lead) ─────────────────────────

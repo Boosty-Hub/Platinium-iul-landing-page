@@ -8,7 +8,9 @@
 // Body: { attempt_id }.  Respuesta 200 siempre (errores de negocio = {ok:false,error}).
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { corsHeaders, adminClient } from "../_shared/integraciones.ts";
+import { corsHeaders, adminClient, getIntegracion } from "../_shared/integraciones.ts";
+import type { KommoCfg } from "../_shared/integraciones.ts";
+import { claimLeadOnAccept } from "../_shared/call_engine.ts";
 
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -54,7 +56,7 @@ serve(async (req: Request) => {
   // Cargar el intento.
   const { data: attempt } = await admin
     .from("call_attempts")
-    .select("id, asesor_id, accepted_at")
+    .select("id, asesor_id, lead_id, inicio_at, accepted_at")
     .eq("id", attempt_id)
     .maybeSingle();
   if (!attempt) return json({ ok: false, error: "Intento no encontrado" });
@@ -64,9 +66,20 @@ serve(async (req: Request) => {
     return json({ ok: false, error: "Este lead no se te está ofreciendo a vos." });
   }
 
-  // Idempotente: si ya estaba aceptado, ok.
-  if (attempt.accepted_at) return json({ ok: true, already: true });
+  // Claim AUTORITATIVO: este endpoint (no el motor) es la fuente de verdad de la
+  // aceptación. Transiciona el intento a advisor_answered, reclama la cola para el
+  // asesor (in_progress) y sincroniza Kommo. Idempotente y a prueba de que el motor
+  // esté vivo o no. claimLeadOnAccept hace el guard anti-doble-asignación.
+  const kommoI = await getIntegracion(admin, "kommo");
+  const kommo = kommoI?.activo ? (kommoI.config as unknown as KommoCfg) : null;
+  const r = await claimLeadOnAccept(admin, {
+    id: attempt.id as string,
+    asesor_id: attempt.asesor_id as string,
+    lead_id: attempt.lead_id as string,
+    inicio_at: attempt.inicio_at as string | null,
+    accepted_at: attempt.accepted_at as string | null,
+  }, kommo);
 
-  await admin.from("call_attempts").update({ accepted_at: new Date().toISOString() }).eq("id", attempt_id);
+  if (!r.claimed) return json({ ok: false, error: "Otro asesor ya tomó este lead." });
   return json({ ok: true });
 });
