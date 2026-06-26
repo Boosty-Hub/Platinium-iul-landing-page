@@ -21,7 +21,8 @@ serve(async (req: Request) => {
   const INTERNAL_SECRET = Deno.env.get("INTERNAL_SECRET") ?? "";
   const xSecret = req.headers.get("x-internal-secret") ?? "";
   const isInternal = INTERNAL_SECRET && xSecret === INTERNAL_SECRET;
-  let isAuthorized = isInternal;
+  let isAdmin = isInternal;                 // el secreto interno actúa como admin
+  let callerAsesorId: string | null = null;
 
   if (!isInternal) {
     const auth = req.headers.get("Authorization") ?? "";
@@ -33,18 +34,28 @@ serve(async (req: Request) => {
       sub = payload.sub ?? null;
     } catch { return json({ ok: false, error: "JWT inválido" }, 401); }
     const { data: caller } = await admin
-      .from("usuarios_sistema").select("rol, activo").eq("user_id", sub!).maybeSingle();
+      .from("usuarios_sistema").select("rol, activo, asesor_id").eq("user_id", sub!).maybeSingle();
     if (!caller || !caller.activo) return json({ ok: false, error: "No autorizado" }, 403);
-    if (caller.rol === "admin" || caller.rol === "asesor") isAuthorized = true;
+    if (caller.rol === "admin") isAdmin = true;
+    else if (caller.rol === "asesor" && caller.asesor_id) callerAsesorId = caller.asesor_id as string;
     else return json({ ok: false, error: "No autorizado" }, 403);
   }
-  if (!isAuthorized) return json({ ok: false, error: "No autorizado" }, 403);
 
   // ── Body ───────────────────────────────────────────────────────────────────
   let body: { lead_id?: string; edad?: number; genero?: string; ahorro_semanal?: number; email?: string };
   try { body = await req.json(); } catch { return json({ ok: false, error: "Body JSON inválido" }); }
   const { lead_id } = body;
   if (!lead_id) return json({ ok: false, error: "Falta lead_id" });
+
+  // ── Pertenencia: el asesor SOLO edita leads que tiene asignados ──────────────
+  // (es suyo si la cola lo tiene como asesor_id —atendiéndolo— o solo_asesor_id
+  // —recontacto fijado a él—). El admin/interno puede editar cualquiera.
+  if (!isAdmin) {
+    const { data: q } = await admin
+      .from("call_queue").select("asesor_id, solo_asesor_id").eq("lead_id", lead_id).maybeSingle();
+    const owns = !!q && (q.asesor_id === callerAsesorId || q.solo_asesor_id === callerAsesorId);
+    if (!owns) return json({ ok: false, error: "Este lead no está asignado a vos." }, 403);
+  }
 
   // ── Construir patch solo con campos válidos ──────────────────────────────────
   const patch: Record<string, unknown> = {};
