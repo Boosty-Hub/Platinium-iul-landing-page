@@ -1,8 +1,8 @@
 // IncomingCallPopup — full-screen impossible-to-miss modal for incoming calls.
 // Ring tone generated via Web Audio API oscillator (no mp3 asset required).
 import { useEffect, useRef, useState } from "react";
-import { Phone, PhoneOff, X, ExternalLink, Send } from "lucide-react";
-import { submitCallNote, acceptLead } from "@/lib/asesorApi";
+import { Phone, PhoneOff, X, ExternalLink, Send, FileText, Check } from "lucide-react";
+import { submitCallNote, acceptLead, updateLead, sendCotizacion } from "@/lib/asesorApi";
 
 export interface IncomingCallPayload {
   attempt_id: string | null;
@@ -14,6 +14,7 @@ export interface IncomingCallPayload {
   interes: string | null;
   edad: number | null;
   anio_nacimiento: number | null;
+  genero: string | null;
   ahorro_semanal: string | null;
   city: string | null;
   fuente: string | null;
@@ -100,6 +101,37 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, o
   const [saveError, setSaveError] = useState<string | null>(null);
   const [inCall, setInCall] = useState(false);
   const stopRingRef = useRef<(() => void) | null>(null);
+
+  // ── Cotización en llamada (editar datos + enviar sin fricción) ──
+  const edadInicial = payload.edad ?? (payload.anio_nacimiento ? new Date().getFullYear() - payload.anio_nacimiento : null);
+  const [cotEdad, setCotEdad] = useState<string>(edadInicial != null ? String(edadInicial) : "");
+  const [cotGenero, setCotGenero] = useState<string>(payload.genero ?? "");
+  const [cotAhorro, setCotAhorro] = useState<string>(payload.ahorro_semanal ?? "");
+  const [cotState, setCotState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [cotMsg, setCotMsg] = useState<string>("");
+
+  const enviarCotizacion = async () => {
+    if (!payload.lead_id) return;
+    setCotState("sending");
+    setCotMsg("");
+    try {
+      // Guardar correcciones de datos si las hay (edad / género / ahorro).
+      const fields: { edad?: number; genero?: string; ahorro_semanal?: number } = {};
+      const edadN = parseInt(cotEdad, 10);
+      if (Number.isFinite(edadN) && edadN >= 18) fields.edad = edadN;
+      if (cotGenero) fields.genero = cotGenero;
+      const ahN = parseInt(cotAhorro, 10);
+      if (Number.isFinite(ahN) && ahN >= 0) fields.ahorro_semanal = ahN;
+      if (Object.keys(fields).length) await updateLead(payload.lead_id, fields);
+      // Enviar la cotización ya con la data actualizada.
+      const r = await sendCotizacion(payload.lead_id);
+      setCotState("sent");
+      setCotMsg(`Cotización de $${r.monto.toLocaleString()} enviada a ${r.to}`);
+    } catch (e) {
+      setCotState("error");
+      setCotMsg((e as Error).message);
+    }
+  };
 
   // Start ringing on mount, stop on unmount
   useEffect(() => {
@@ -264,6 +296,52 @@ export default function IncomingCallPopup({ payload, kommoSubdominio, onClose, o
               <ExternalLink className="w-4 h-4" />
               Abrir en Kommo
             </a>
+          )}
+
+          {/* Datos + cotización en llamada (sin fricción) */}
+          {inCall && payload.lead_id && (
+            <div className="space-y-2 rounded-xl border border-[#1d9fa9]/25 bg-[#0B1A1E]/60 p-3">
+              <div className="flex items-center gap-1.5 text-xs text-[#6A8E98] uppercase tracking-wider font-semibold">
+                <FileText className="w-3.5 h-3.5 text-[#1d9fa9]" /> Datos y cotización
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="space-y-1">
+                  <label className="text-[10px] text-[#6A8E98]">Edad</label>
+                  <input
+                    type="number" min={18} max={100} value={cotEdad}
+                    onChange={(e) => setCotEdad(e.target.value)} disabled={cotState === "sent"}
+                    className="w-full bg-[#0F2229] border border-[#1d9fa9]/30 rounded-lg px-2 py-1.5 text-sm text-[#E4EEF0] focus:outline-none focus:border-[#1d9fa9]/60 disabled:opacity-50"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] text-[#6A8E98]">Género</label>
+                  <select
+                    value={cotGenero} onChange={(e) => setCotGenero(e.target.value)} disabled={cotState === "sent"}
+                    className="w-full bg-[#0F2229] border border-[#1d9fa9]/30 rounded-lg px-2 py-1.5 text-sm text-[#E4EEF0] focus:outline-none focus:border-[#1d9fa9]/60 disabled:opacity-50"
+                  >
+                    <option value="">—</option>
+                    <option value="Masculino">M</option>
+                    <option value="Femenino">F</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] text-[#6A8E98]">Ahorro sem.</label>
+                  <input
+                    type="number" min={0} value={cotAhorro}
+                    onChange={(e) => setCotAhorro(e.target.value)} disabled={cotState === "sent"}
+                    className="w-full bg-[#0F2229] border border-[#1d9fa9]/30 rounded-lg px-2 py-1.5 text-sm text-[#E4EEF0] focus:outline-none focus:border-[#1d9fa9]/60 disabled:opacity-50"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={enviarCotizacion}
+                disabled={cotState === "sending" || cotState === "sent"}
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#1d9fa9] hover:bg-[#1d9fa9]/80 disabled:opacity-50 text-white font-semibold text-sm transition-colors"
+              >
+                {cotState === "sent" ? (<><Check className="w-4 h-4" /> Cotización enviada</>) : (<><FileText className="w-4 h-4" /> {cotState === "sending" ? "Enviando…" : "Enviar cotización"}</>)}
+              </button>
+              {cotMsg && <p className={`text-xs ${cotState === "error" ? "text-red-400" : "text-emerald-400"}`}>{cotMsg}</p>}
+            </div>
           )}
 
           {/* Notes textarea */}

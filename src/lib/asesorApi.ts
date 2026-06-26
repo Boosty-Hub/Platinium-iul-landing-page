@@ -222,6 +222,21 @@ export async function sendCotizacion(
   return { monto: result.monto!, to: result.to! };
 }
 
+// El asesor corrige datos del lead (edad/género/ahorro) durante la llamada para
+// cotizar con la data real. Devuelve los valores aplicados.
+export async function updateLead(
+  lead_id: string,
+  fields: { edad?: number; genero?: string; ahorro_semanal?: number; email?: string },
+): Promise<{ edad?: number; genero?: string; ahorro_semanal?: number }> {
+  const { data, error } = await (supabase as any).functions.invoke("asesor-update-lead", {
+    body: { lead_id, ...fields },
+  });
+  if (error) throw new Error(error.message ?? "Error invocando asesor-update-lead");
+  const result = data as { ok: boolean; edad?: number; genero?: string; ahorro_semanal?: number; error?: string };
+  if (!result.ok) throw new Error(result.error ?? "asesor-update-lead devolvió error");
+  return { edad: result.edad, genero: result.genero, ahorro_semanal: result.ahorro_semanal };
+}
+
 export async function getKommoStages(): Promise<KommoStage[]> {
   const { data, error } = await (supabase as any).functions.invoke("kommo-stages", {
     body: {},
