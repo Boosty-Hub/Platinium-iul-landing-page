@@ -62,6 +62,21 @@ interface CallAttempt {
   recording_storage_path: string | null;
   notas: string | null;
   created_at: string;
+  rc_result: string | null;        // resultado REAL en RingCentral
+}
+
+// Traduce el resultado crudo de RingCentral a algo legible.
+function rcLabel(result: string | null): string | null {
+  if (!result) return null;
+  const m: Record<string, string> = {
+    "Call connected": "Conectó",
+    "Voicemail": "Buzón de voz",
+    "No Answer": "No contestó",
+    "Busy": "Ocupado",
+    "Hang Up": "Colgó",
+    "Rejected": "Rechazada",
+  };
+  return m[result] ?? result;
 }
 
 // ─── Badge helpers ─────────────────────────────────────────────────────────────
@@ -233,7 +248,7 @@ function AttemptsPanel({ leadId, asesores }: { leadId: string; asesores: Record<
     let cancelled = false;
     (supabase as any)
       .from("call_attempts")
-      .select("id,asesor_id,tipo,estado,outcome,inicio_at,ring_time_sec,talk_time_sec,duracion_seg,recording_url,recording_storage_path,notas,created_at")
+      .select("id,asesor_id,tipo,estado,outcome,inicio_at,ring_time_sec,talk_time_sec,duracion_seg,recording_url,recording_storage_path,notas,created_at,rc_result")
       .eq("lead_id", leadId)
       .order("inicio_at", { ascending: true })
       .then(({ data, error }: { data: CallAttempt[] | null; error: Error | null }) => {
@@ -314,9 +329,19 @@ function AttemptsPanel({ leadId, asesores }: { leadId: string; asesores: Record<
                     </span>
                   </td>
                   <td className="px-3 py-2.5 text-[#E4EEF0] whitespace-nowrap">{a.asesor_id ? (asesores[a.asesor_id] ?? "—") : "—"}</td>
-                  <td className={`px-3 py-2.5 font-medium ${r.cls}`}>{r.label}</td>
+                  <td className={`px-3 py-2.5 font-medium ${r.cls}`}>
+                    <div>{r.label}</div>
+                    {a.rc_result && (
+                      <div
+                        className={`mt-0.5 inline-flex items-center gap-1 text-[10px] font-normal ${a.rc_result === "Call connected" ? "text-emerald-400/90" : "text-[#6A8E98]"}`}
+                        title="Resultado real en RingCentral"
+                      >
+                        <PhoneCall className="w-2.5 h-2.5" /> RC: {rcLabel(a.rc_result)}{(a.duracion_seg ?? 0) > 0 ? ` · ${fmtDuration(a.duracion_seg!)}` : ""}
+                      </div>
+                    )}
+                  </td>
                   <td className="px-3 py-2.5 text-[#94B3BB] whitespace-nowrap">{mmss(a.ring_time_sec)}</td>
-                  <td className="px-3 py-2.5 text-[#94B3BB] whitespace-nowrap">{mmss(a.talk_time_sec)}</td>
+                  <td className="px-3 py-2.5 text-[#94B3BB] whitespace-nowrap">{mmss(a.talk_time_sec || a.duracion_seg)}</td>
                   <td className="px-3 py-2.5">
                     <RecordingCell attemptId={a.id} hasRecording={!!a.recording_storage_path || !!a.recording_url} />
                   </td>
