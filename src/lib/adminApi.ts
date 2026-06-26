@@ -327,7 +327,17 @@ export interface AdvisorScorecard {
   from: string;
   to: string;
   dials: number;
-  advisor_answer_rate: number;
+  // ── Diligencia (lo que depende de la asesora) ──
+  offers: number;             // ofertas de lead recibidas
+  answered: number;           // ofertas que aceptó (tocó "Contestar")
+  ignored: number;            // ofertas que dejó pasar
+  available_minutes: number;  // minutos disponible (presencia)
+  advisor_answer_rate: number;// answered / offers
+  // ── Alcance de la llamada (depende del lead) ──
+  connected: number;          // llamadas que conectaron de verdad (RingCentral)
+  connect_rate: number;       // connected / answered
+  total_talk_sec: number;     // total hablado real
+  contacted: number;          // disposiciones "contactado"
   client_contact_rate: number;
   avg_ring_sec: number;
   avg_talk_sec: number;

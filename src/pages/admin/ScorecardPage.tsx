@@ -2,7 +2,7 @@
 // Admin-only: calls advisor_scorecard SECDEF RPC.
 // CSS bar chart for calls_by_hour — no chart library.
 import { useEffect, useState } from "react";
-import { RefreshCw, TrendingUp, Phone, Clock, Star, Mic, FileText, Users } from "lucide-react";
+import { RefreshCw, TrendingUp, Phone, Clock, Star, Mic, FileText, Users, PhoneIncoming, PhoneOff, PhoneCall, Headphones, Timer, CheckCircle2 } from "lucide-react";
 import { listAsesores, getAdvisorScorecard } from "@/lib/adminApi";
 import type { Asesor, AdvisorScorecard } from "@/lib/adminApi";
 
@@ -16,6 +16,29 @@ function fmtSec(sec: number): string {
   const m = Math.floor(sec / 60);
   const s = Math.round(sec % 60);
   return s > 0 ? `${m}m ${s}s` : `${m}m`;
+}
+
+function fmtMin(min: number): string {
+  if (!min) return "0m";
+  const h = Math.floor(min / 60);
+  const m = Math.round(min % 60);
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+// Lectura interpretativa: separa diligencia (la asesora) de alcance (el lead) para
+// que el admin entienda de un vistazo qué pasa.
+function lectura(s: AdvisorScorecard): { txt: string; tone: "emerald" | "orange" | "slate" } | null {
+  if (s.offers < 3) return { txt: "Pocas ofertas en el rango — sin datos suficientes para una lectura confiable.", tone: "slate" };
+  const ans = s.advisor_answer_rate;
+  const conn = s.connect_rate;
+  const availH = s.available_minutes / 60;
+  if (ans < 0.4 && availH >= 2)
+    return { txt: `Estuvo disponible ${fmtMin(s.available_minutes)} pero dejó pasar ${s.ignored} de ${s.offers} ofertas — revisar por qué no contesta.`, tone: "orange" };
+  if (ans >= 0.65 && conn < 0.3)
+    return { txt: "Muy diligente: acepta casi todas las ofertas, pero los leads casi no contestan. No es problema de la asesora.", tone: "emerald" };
+  if (ans >= 0.55 && conn >= 0.35)
+    return { txt: "Trabajando bien: acepta las ofertas y está conectando con los leads.", tone: "emerald" };
+  return { txt: "Rendimiento mixto — ver diligencia vs alcance abajo.", tone: "slate" };
 }
 
 interface MetricCardProps {
@@ -50,7 +73,7 @@ function HourlyBar({ data }: { data: Record<string, number> }) {
       <div className="flex items-center gap-2 mb-4">
         <Clock className="w-4 h-4 text-[#1d9fa9]" />
         <span className="text-xs text-[#6A8E98] font-medium uppercase tracking-wider">
-          Llamadas por hora (horario EST)
+          Llamadas por hora (horario Central)
         </span>
       </div>
       <div className="flex items-end gap-1 h-24">
@@ -260,56 +283,82 @@ export default function ScorecardPage() {
             </span>
           </div>
 
-          {/* Quality score (prominent) */}
-          <QualityScore score={scorecard.quality_score} />
+          {/* Lectura interpretativa */}
+          {(() => {
+            const l = lectura(scorecard);
+            if (!l) return null;
+            const tone =
+              l.tone === "emerald" ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
+              : l.tone === "orange" ? "border-orange-400/30 bg-orange-400/10 text-orange-200"
+              : "border-[#1d9fa9]/20 bg-[#0F2229] text-[#94B3BB]";
+            return (
+              <div className={`rounded-2xl border px-5 py-4 text-sm ${tone}`}>
+                <span className="font-semibold">Lectura: </span>{l.txt}
+              </div>
+            );
+          })()}
 
-          {/* Metric cards grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            <MetricCard
-              label="Total marcaciones"
-              value={String(scorecard.dials)}
-              icon={Phone}
-            />
-            <MetricCard
-              label="Tasa respuesta asesor"
-              value={pct(scorecard.advisor_answer_rate)}
-              sub={`${Math.round(scorecard.advisor_answer_rate * scorecard.dials)} de ${scorecard.dials} marcaciones`}
-              icon={TrendingUp}
-            />
-            <MetricCard
-              label="Tasa contacto cliente"
-              value={pct(scorecard.client_contact_rate)}
-              sub={`${Math.round(scorecard.client_contact_rate * scorecard.dials)} contactados`}
-              icon={TrendingUp}
-              accent="text-emerald-400"
-            />
-            <MetricCard
-              label="Timbrado promedio"
-              value={fmtSec(scorecard.avg_ring_sec)}
-              icon={Clock}
-              accent="text-orange-400"
-            />
-            <MetricCard
-              label="Conversación promedio"
-              value={fmtSec(scorecard.avg_talk_sec)}
-              icon={Clock}
-              accent="text-blue-400"
-            />
-            <MetricCard
-              label="Leads únicos contactados"
-              value={String(scorecard.unique_leads_contacted)}
-              icon={Users}
-            />
-            <MetricCard
-              label="Grabaciones"
-              value={String(scorecard.recordings_count)}
-              icon={Mic}
-              accent="text-purple-400"
-            />
+          {/* ── Diligencia (depende de la asesora) ── */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#1d9fa9]" />
+              <h2 className="text-sm font-semibold text-[#E4EEF0] uppercase tracking-wider">Diligencia · depende de la asesora</h2>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <MetricCard label="Tiempo disponible" value={fmtMin(scorecard.available_minutes)} icon={Timer} accent="text-[#1d9fa9]" />
+              <MetricCard label="Ofertas recibidas" value={String(scorecard.offers)} icon={PhoneIncoming} accent="text-blue-400" />
+              <MetricCard
+                label="Ofertas aceptadas"
+                value={String(scorecard.answered)}
+                sub={`${pct(scorecard.advisor_answer_rate)} de respuesta`}
+                icon={PhoneCall}
+                accent="text-emerald-400"
+              />
+              <MetricCard
+                label="Ofertas ignoradas"
+                value={String(scorecard.ignored)}
+                sub={scorecard.offers ? pct(scorecard.ignored / scorecard.offers) + " dejadas pasar" : undefined}
+                icon={PhoneOff}
+                accent={scorecard.offers && scorecard.ignored / scorecard.offers > 0.5 ? "text-orange-400" : "text-[#94B3BB]"}
+              />
+            </div>
+          </div>
+
+          {/* ── Alcance de la llamada (depende del lead) ── */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-emerald-400" />
+              <h2 className="text-sm font-semibold text-[#E4EEF0] uppercase tracking-wider">Alcance de la llamada · depende del lead</h2>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <MetricCard
+                label="Conectaron (RingCentral)"
+                value={String(scorecard.connected)}
+                sub={`${pct(scorecard.connect_rate)} de ${scorecard.answered} llamadas`}
+                icon={CheckCircle2}
+                accent="text-emerald-400"
+              />
+              <MetricCard label="Total hablado" value={fmtSec(scorecard.total_talk_sec)} icon={Headphones} accent="text-blue-400" />
+              <MetricCard
+                label="Contactados"
+                value={String(scorecard.contacted)}
+                sub={`${pct(scorecard.client_contact_rate)} de las ofertas`}
+                icon={TrendingUp}
+                accent="text-emerald-400"
+              />
+              <MetricCard label="Conversación prom." value={fmtSec(scorecard.avg_talk_sec)} icon={Clock} accent="text-blue-400" />
+            </div>
+          </div>
+
+          {/* ── Calidad + secundarios ── */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <QualityScore score={scorecard.quality_score} />
+            <MetricCard label="Leads únicos" value={String(scorecard.unique_leads_contacted)} icon={Users} />
+            <MetricCard label="Grabaciones" value={String(scorecard.recordings_count)} icon={Mic} accent="text-purple-400" />
             <MetricCard
               label="Tasa de notas"
               value={pct(scorecard.notes_rate)}
-              sub={`${Math.round(scorecard.notes_rate * scorecard.dials)} notas`}
+              sub={`${scorecard.answered ? Math.round(scorecard.notes_rate * scorecard.answered) : 0} notas`}
               icon={FileText}
               accent="text-yellow-400"
             />
