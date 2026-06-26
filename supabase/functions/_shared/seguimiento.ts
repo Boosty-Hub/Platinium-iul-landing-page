@@ -8,7 +8,7 @@
 // ════════════════════════════════════════════════════════════════════════════
 
 import { adminClient, getIntegracion, kommoAddNote } from "./integraciones.ts";
-import { kommoUpdateLead, statusCallEnum } from "./call_engine.ts";
+import { kommoUpdateLead, statusCallEnum, parseHorario, nextRetryAt } from "./call_engine.ts";
 import type { KommoCfg } from "./integraciones.ts";
 
 type Admin = ReturnType<typeof adminClient>;
@@ -96,7 +96,6 @@ export async function setDisposicion(
       .eq("lead_id", lead_id)
       .maybeSingle();
     const kommoLeadId0 = qRow?.kommo_lead_id ?? null;
-    const plusMin = (m: number) => new Date(Date.now() + m * 60_000).toISOString();
 
     if (tienePrograma) {
       // Recontacto agendado por el asesor → fijado a él.
@@ -105,26 +104,27 @@ export async function setDisposicion(
         { onConflict: "lead_id" },
       );
     } else if (disposicion === "no_contesto") {
-      // Cliente no contestó → reintento automático. El gate de horario del motor
-      // empuja el reintento a mañana si está cerrado. Tras max intentos → no contactado.
+      // Cliente no contestó → reintento automático respetando los topes diario/semanal.
+      // Máx intentos = cantidad de reintentos configurados. Agotados: si el recontacto
+      // semanal está activo, sigue 1×/semana hasta contactar; si no → "no contactado".
       const horarioI = await getIntegracion(admin, "horario");
-      const hcfg = (horarioI?.config ?? {}) as Record<string, unknown>;
-      const maxAttempts = Number(hcfg.max_client_attempts) || 3;
-      let delays = [5, 15, 30];
-      try {
-        const d = typeof hcfg.client_retry_delays_min === "string"
-          ? JSON.parse(hcfg.client_retry_delays_min as string)
-          : hcfg.client_retry_delays_min;
-        if (Array.isArray(d) && d.length) delays = d.map(Number);
-      } catch { /* usa el default */ }
+      const horario = parseHorario((horarioI?.config ?? {}) as Record<string, unknown>);
+      const delays = horario.client_retry_delays_min.length ? horario.client_retry_delays_min : [5, 15, 30];
+      const maxAttempts = delays.length;
       const attempts = (qRow?.client_attempts ?? 0) + 1;
+      // asesor_id:null → el asesor NO habló con el lead; vuelve sin dueño a la rotación
+      // (no queda "asignado" a quien solo intentó). solo_asesor_id:null = rota libre.
       if (attempts < maxAttempts) {
-        const delay = delays[Math.min(attempts - 1, delays.length - 1)] ?? 30;
-        // asesor_id:null → el asesor NO habló con el lead; vuelve sin dueño a la
-        // rotación (no queda "asignado" a quien solo intentó). solo_asesor_id:null
-        // = sin fijar, rota a quien conteste.
+        const baseDelay = delays[Math.min(attempts - 1, delays.length - 1)] ?? 30;
+        const next = await nextRetryAt(admin, lead_id, baseDelay, horario);
         await admin.from("call_queue").upsert(
-          { lead_id, estado: "scheduled", scheduled_at: plusMin(delay), asesor_id: null, solo_asesor_id: null, next_asesor_idx: 0, client_attempts: attempts, ultimo_resultado: "cliente_no_contesto_reintento", kommo_lead_id: kommoLeadId0 },
+          { lead_id, estado: "scheduled", scheduled_at: next.at, asesor_id: null, solo_asesor_id: null, next_asesor_idx: 0, client_attempts: attempts, ultimo_resultado: next.reason === "reintento" ? "cliente_no_contesto_reintento" : next.reason, kommo_lead_id: kommoLeadId0 },
+          { onConflict: "lead_id" },
+        );
+      } else if (horario.weekly_recontact) {
+        const next = await nextRetryAt(admin, lead_id, 7 * 24 * 60, horario);
+        await admin.from("call_queue").upsert(
+          { lead_id, estado: "scheduled", scheduled_at: next.at, asesor_id: null, solo_asesor_id: null, next_asesor_idx: 0, client_attempts: attempts, ultimo_resultado: "recontacto_semanal", kommo_lead_id: kommoLeadId0 },
           { onConflict: "lead_id" },
         );
       } else {

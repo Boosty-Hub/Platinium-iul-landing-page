@@ -44,17 +44,25 @@ export interface Horario {
   timezone: string;
   schedule: Record<string, { abre: string; cierra: string; activo: boolean }>;
   client_retry_delays_min: number[];
-  max_client_attempts: number;
+  max_client_attempts: number;        // derivado = client_retry_delays_min.length
   advisor_ring_timeout_sec: number;
+  weekly_recontact: boolean;          // tras agotar reintentos → 1×/semana hasta contactar
+  daily_dial_cap: number;             // máx marcaciones al cliente por día por lead
+  weekly_dial_cap: number;            // máx marcaciones al cliente por semana por lead
 }
 
 export function parseHorario(config: Record<string, unknown>): Horario {
+  const delays = parseMaybe(config.client_retry_delays_min, [5, 15, 30]) as number[];
   return {
     timezone: (config.timezone as string) || "America/New_York",
     schedule: parseMaybe(config.schedule, {} as Horario["schedule"]),
-    client_retry_delays_min: parseMaybe(config.client_retry_delays_min, [5, 15, 30]),
-    max_client_attempts: Number(parseMaybe(config.max_client_attempts, 3)) || 3,
+    client_retry_delays_min: delays,
+    // Máx intentos = cantidad de reintentos configurados (auto). Fallback al guardado.
+    max_client_attempts: delays.length || Number(parseMaybe(config.max_client_attempts, 3)) || 3,
     advisor_ring_timeout_sec: Number(parseMaybe(config.advisor_ring_timeout_sec, 30)) || 30,
+    weekly_recontact: String(parseMaybe(config.weekly_recontact, false)) === "true",
+    daily_dial_cap: Number(parseMaybe(config.daily_dial_cap, 6)) || 6,
+    weekly_dial_cap: Number(parseMaybe(config.weekly_dial_cap, 18)) || 18,
   };
 }
 
@@ -96,6 +104,42 @@ export function horarioStatus(h: Horario, at: Date = new Date()): { open: boolea
     if (dt.getTime() > at.getTime()) return { open: false, nextOpen: dt };
   }
   return { open: false, nextOpen: new Date(at.getTime() + 3_600_000) };
+}
+
+// ── Topes de marcaciones por lead (frena el sobre-marcado) ────────────────────
+// Una "marcación al cliente" = un intento advisor_answered (el asesor aceptó y el
+// softphone marcó). Contamos esos por día/semana para no saturar al lead.
+function startOfDayIso(tz: string, at: Date = new Date()): string {
+  const p = tzParts(tz, at);
+  return zonedToUtc(p.y, p.mo, p.d, 0, 0, tz).toISOString();
+}
+function startOfNextDayIso(tz: string): string {
+  const p = tzParts(tz, new Date(Date.now() + 86_400_000));
+  return zonedToUtc(p.y, p.mo, p.d, 0, 1, tz).toISOString();
+}
+async function countDials(admin: Admin, leadId: string, sinceIso: string): Promise<number> {
+  const { count } = await admin
+    .from("call_attempts")
+    .select("id", { count: "exact", head: true })
+    .eq("lead_id", leadId)
+    .eq("estado", "advisor_answered")
+    .gte("inicio_at", sinceIso);
+  return count ?? 0;
+}
+// Cuándo reintentar un lead respetando los topes diario/semanal. Devuelve el ISO y
+// el motivo: "reintento" (usa baseDelayMin) | "cap_diario" (mañana) | "cap_semanal".
+export async function nextRetryAt(
+  admin: Admin, leadId: string, baseDelayMin: number, horario: Horario,
+): Promise<{ at: string; reason: string }> {
+  if (horario.weekly_dial_cap > 0) {
+    const dWeek = await countDials(admin, leadId, new Date(Date.now() - 7 * 86_400_000).toISOString());
+    if (dWeek >= horario.weekly_dial_cap) return { at: new Date(Date.now() + 7 * 86_400_000).toISOString(), reason: "cap_semanal" };
+  }
+  if (horario.daily_dial_cap > 0) {
+    const dToday = await countDials(admin, leadId, startOfDayIso(horario.timezone));
+    if (dToday >= horario.daily_dial_cap) return { at: startOfNextDayIso(horario.timezone), reason: "cap_diario" };
+  }
+  return { at: plusMin(baseDelayMin), reason: "reintento" };
 }
 
 // ── Kommo: asignación de Responsable + Status Call + etapa ────────────────────
@@ -356,6 +400,15 @@ async function dialItem(admin: Admin, item: QueueItem, ctx: { rc: RCCfg; kommo: 
       });
       broadcastCancel(admin, prev.asesor_id as string, prev.id as string, item.lead_id);
     }
+  }
+
+  // ── 1b) Tope de marcaciones por lead — no saturar al cliente ───────────────
+  // Si ya alcanzó el máximo del día/semana, se empuja a mañana / próxima semana en
+  // vez de ofrecerlo (y de paso liberamos al asesor para otros leads).
+  const cap = await nextRetryAt(admin, item.lead_id, 0, horario);
+  if (cap.reason !== "reintento") {
+    await setQueue(admin, item.id, { estado: "scheduled", scheduled_at: cap.at, next_asesor_idx: 0, ultimo_resultado: cap.reason });
+    return { lead: item.lead_id, action: cap.reason };
   }
 
   // ── 2) Asesores + compuertas (presencia, ocupado, ring activo, pin) ────────

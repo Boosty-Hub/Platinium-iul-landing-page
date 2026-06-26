@@ -71,8 +71,15 @@ export interface Horario {
   timezone: string;
   schedule: Record<string, HorarioDia>;
   client_retry_delays_min: number[];
+  /** Derivado: = client_retry_delays_min.length. Se guarda por compatibilidad. */
   max_client_attempts: number;
   advisor_ring_timeout_sec: number;
+  /** Tras agotar los reintentos, seguir marcando 1×/semana hasta contactar. */
+  weekly_recontact: boolean;
+  /** Máx. marcaciones al cliente por DÍA por lead (frena el sobre-marcado). */
+  daily_dial_cap: number;
+  /** Máx. marcaciones al cliente por SEMANA por lead. */
+  weekly_dial_cap: number;
 }
 
 export async function getIntegraciones(): Promise<Integracion[]> {
@@ -187,6 +194,9 @@ const DEFAULT_HORARIO: Horario = {
   client_retry_delays_min: [5, 15, 30],
   max_client_attempts: 3,
   advisor_ring_timeout_sec: 30,
+  weekly_recontact: false,
+  daily_dial_cap: 6,
+  weekly_dial_cap: 18,
 };
 
 export async function getHorario(): Promise<Horario> {
@@ -207,6 +217,11 @@ export async function getHorario(): Promise<Horario> {
       advisor_ring_timeout_sec: cfg.advisor_ring_timeout_sec
         ? parseInt(cfg.advisor_ring_timeout_sec, 10)
         : DEFAULT_HORARIO.advisor_ring_timeout_sec,
+      weekly_recontact: cfg.weekly_recontact != null
+        ? String(cfg.weekly_recontact) === "true"
+        : DEFAULT_HORARIO.weekly_recontact,
+      daily_dial_cap: cfg.daily_dial_cap ? parseInt(cfg.daily_dial_cap, 10) : DEFAULT_HORARIO.daily_dial_cap,
+      weekly_dial_cap: cfg.weekly_dial_cap ? parseInt(cfg.weekly_dial_cap, 10) : DEFAULT_HORARIO.weekly_dial_cap,
     };
   } catch {
     return DEFAULT_HORARIO;
@@ -221,8 +236,12 @@ export async function saveHorario(cfg: Horario): Promise<void> {
       timezone: cfg.timezone,
       schedule: JSON.stringify(cfg.schedule),
       client_retry_delays_min: JSON.stringify(cfg.client_retry_delays_min),
-      max_client_attempts: String(cfg.max_client_attempts),
+      // Máx intentos = cantidad de reintentos configurados (auto, no editable aparte).
+      max_client_attempts: String(cfg.client_retry_delays_min.length || 1),
       advisor_ring_timeout_sec: String(cfg.advisor_ring_timeout_sec),
+      weekly_recontact: String(cfg.weekly_recontact),
+      daily_dial_cap: String(cfg.daily_dial_cap),
+      weekly_dial_cap: String(cfg.weekly_dial_cap),
     },
     true
   );
